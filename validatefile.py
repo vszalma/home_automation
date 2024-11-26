@@ -54,7 +54,7 @@ def list_files_by_regex(start_folder, file_type_or_group):
                     case "pdf":
                         validate_pdf(f"{root}\\{filename}")
                     case "videos":
-                        validate_video_moviepy(f"{root}\\{filename}")
+                        x = validate_video_ffprobe(f"{root}\\{filename}")
                     case "excel":
                         validate_xlsx_openpyxl(f"{root}\\{filename}")
                     case _:
@@ -121,6 +121,34 @@ def validate_video_opencv(file_path):
     except Exception as e:
         print(f"Error validating video file: {file_path} - {e}")
 
+
+
+def validate_video_ffprobe(file_path):
+    import subprocess
+
+    print("PATH:", os.environ.get("PATH"))
+    
+    try:
+        subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT)
+        print("FFprobe is installed and accessible.")
+    except FileNotFoundError:
+        print("FFprobe is not installed or not in PATH.")
+
+    try:
+        # Run FFprobe command
+        command = [
+            "ffprobe",
+            "-v", "error",  # Only show errors
+            "-show_entries", "format=duration",  # Check for duration (validity indicator)
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            file_path
+        ]
+        print(f"Command is: {command}")
+        subprocess.check_output(command, stderr=subprocess.STDOUT)
+        return {"valid": True, "error": None}
+    except subprocess.CalledProcessError as e:
+        # If FFprobe returns an error, the file is likely corrupted
+        return {"valid": False, "error": e.output.decode().strip()}
 
 def get_arguments(argv):
     arg_help = "{0} <directory> <filetype>".format(argv[0])
