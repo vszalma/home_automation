@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["C:\\Users\\vszal", "videos"]
+            "args": ["F:\\_bu-2024-11-16\\Media\\2023", "videos"]
         }
     ]
 }

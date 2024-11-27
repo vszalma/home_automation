@@ -6,7 +6,7 @@ import sys
 # Define logical groupings for file types
 FILE_TYPE_GROUPS = {
     "images": [r".*\.(jpg|jpeg|png|gif|bmp|tiff)$"],
-    "documents": [r".*\.(pdf|doc|docx|txt|xls|xlsx)$"],
+    "documents": [r".*\.(doc|docx|txt|xls|xlsx)$"],
     "videos": [r".*\.(mp4|avi|mkv|mov|flv|wmv|webm)$"],
     "audio": [r".*\.(mp3|wav|aac|flac|ogg)$"],
     "excel": [r".*\.(xlsx)$"],
@@ -43,6 +43,11 @@ def list_files_by_regex(start_folder, file_type_or_group):
     error_count = 0
     print(f"Looking for {file_type_or_group} files in directory {start_folder}.")
 
+    total_files = get_total_file_count(start_folder)
+    matching_files = count_files_with_pattern(start_folder, combined_pattern)
+
+    print(f"Found a total of {matching_files} found. Validating files now.")
+
     # Walk through the directory and subdirectories
     for root, dirs, files in os.walk(start_folder):
         for filename in files:
@@ -61,7 +66,6 @@ def list_files_by_regex(start_folder, file_type_or_group):
                         validate_xlsx_openpyxl(f"{root}\\{filename}")
                     case _:
                         print("An undefined filetype is found")
-                if 
 
     print(f"Total files read: {file_count}")
 
@@ -173,6 +177,26 @@ def validate_image_with_pillow(file_path):
     except Exception as e:
         print(f"Invalid image file: {e}")
 
+def get_total_file_count(directory):
+    file_count = 0
+
+    for root, dirs, files in os.walk(directory):
+        file_count += len(files)
+
+    return file_count
+
+def count_files_with_pattern(directory, compiled_pattern):
+    # Compile the regex pattern
+    #compiled_pattern = re.compile(pattern)
+    file_count = 0
+
+    # Walk through the directory and subdirectories
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if compiled_pattern.match(file):  # Check if file matches the pattern
+                file_count += 1
+
+    return file_count
 
 if __name__ == "__main__":
     arguments = get_arguments(sys.argv)
