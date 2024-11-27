@@ -2,12 +2,13 @@ from PIL import Image
 import os
 import re
 import sys
+import csv
 
 # Define logical groupings for file types
 FILE_TYPE_GROUPS = {
-    "images": [r".*\.(jpg|jpeg|png|gif|bmp|tiff)$"],
-    "documents": [r".*\.(doc|docx|txt|xls|xlsx)$"],
-    "videos": [r".*\.(mp4|avi|mkv|mov|flv|wmv|webm)$"],
+    "image": [r".*\.(jpg|jpeg|png|gif|bmp|tiff)$"],
+    "document": [r".*\.(docx)$"],
+    "video": [r".*\.(mp4|avi|mkv|mov|flv|wmv|webm)$"],
     "audio": [r".*\.(mp3|wav|aac|flac|ogg)$"],
     "excel": [r".*\.(xlsx)$"],
     "pdf": [r".*\.(pdf)$"],
@@ -47,30 +48,63 @@ def list_files_by_regex(start_folder, file_type_or_group):
     matching_files = count_files_with_pattern(start_folder, combined_pattern)
 
     print(f"Found a total of {matching_files} found. Validating files now.")
+    
+    headers = ["file_name", "error_message"]
 
-    # Walk through the directory and subdirectories
-    for root, dirs, files in os.walk(start_folder):
-        for filename in files:
-            if combined_pattern.match(filename):
-                file_count += 1
-                invalid_file = False
-                # matching_files.append(os.path.join(root, filename))
-                match file_type_or_group:
-                    case "images":
-                        validate_image_with_pillow(f"{root}\\{filename}")
-                    case "pdf":
-                        validate_pdf(f"{root}\\{filename}")
-                    case "videos":
-                        x = validate_video_ffprobe(f"{root}\\{filename}")
-                    case "excel":
-                        validate_xlsx_openpyxl(f"{root}\\{filename}")
-                    case _:
-                        print("An undefined filetype is found")
+    with open("test_output_error.csv", mode="w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["file_name", "error_message"])  # Write the headers
+ 
+        # Walk through the directory and subdirectories
+        for root, dirs, files in os.walk(start_folder):
+            for filename in files:
+                if combined_pattern.match(filename):
+                    file_count += 1
+                    invalid_file = False
+                    file_name = f"{root}\\{filename}"
+                    # matching_files.append(os.path.join(root, filename))
+                    match file_type_or_group:
+                        case "image":
+                            is_valid, error_message = validate_image(f"{file_name}")
+                        case "pdf":
+                            is_valid, error_message = validate_pdf(f"{file_name}")
+                        case "video":
+                            is_valid, error_message = validate_video(f"{file_name}")
+                        case "excel":
+                            is_valid, error_message = validate_excel(f"{file_name}")
+                        case "document":
+                            is_valid, error_message = validate_document(f"{file_name}")
+                        case _:
+                            print("An undefined filetype is found")
+                    if not is_valid:
+                        error_count += 1
+                        # pass filename {root}\\{filename} and error_message to method to write file
+                        writer.writerow([file_name, error_message])
+    if error_count == 0:
+        os.remove("test_output_error.csv")
 
     print(f"Total files read: {file_count}")
+    print(f"Total errors found: {error_count}")
 
+def validate_document(file_path):
+    from docx import Document
 
-def validate_xlsx_openpyxl(file_path):
+    try:
+        # Try to open the document
+        doc = Document(file_path)
+
+        # Check if the document contains paragraphs
+        if len(doc.paragraphs) > 0:
+            return True, "Valid document file."
+        else:
+            print(f"Document {file_path} is empty.")
+            return False, f"Document {file_path} is empty."
+        
+    except Exception as e:
+        print(f"Document {file_path} is not valid.")
+        return False, f"Document {file_path} is not valid."
+
+def validate_excel(file_path):
     from openpyxl import load_workbook
 
     try:
@@ -79,10 +113,12 @@ def validate_xlsx_openpyxl(file_path):
         # Check if the workbook contains any sheets
         if not workbook.sheetnames:
             print(f"Invalid .xlsx file: {file_path} (No sheets found).")
-
-        return
+            return False, f"Invalid .xlsx file: {file_path} (No sheets found)."
+        else:
+            return True, "Valid .xlsx file."
     except Exception as e:
         print(f"Invalid .xlsx file: {file_path} (Error: {e}).")
+        return False, f"Invalid .xlsx file: {file_path} (Error: {e})."
 
 
 def validate_pdf(file_path):
@@ -92,45 +128,18 @@ def validate_pdf(file_path):
 
         # Open and validate the PDF
         reader = PdfReader(file_path)
-        if not reader.pages:
+        if reader.pages:
+            return True, "Valid pdf file."
+        else:
             print(f"Invalid PDF: {file_path} (No pages found)")
+            return False, f"Invalid PDF: {file_path} (No pages found)"
 
     except Exception as e:
         print(f"Invalid PDF: {file_path} (Error: {e})")
+        return False, f"Invalid PDF: {file_path} (Error: {e})"
 
 
-def validate_video_moviepy(file_path):
-    from moviepy import VideoFileClip
-
-    try:
-        clip = VideoFileClip(file_path)
-        duration = clip.duration  # Check if the video has a valid duration
-        clip.close()
-        print(f"Valid video file. Duration: {duration:.2f} seconds.")
-
-    except Exception as e:
-        print(f"Invalid video file. Error: {e}")
-
-
-def validate_video_opencv(file_path):
-    import cv2
-
-    try:
-        cap = cv2.VideoCapture(file_path)
-        if not cap.isOpened():
-            print(f"Invalid video file (cannot be opened): {file_path}.")
-
-        # Check if the video has at least one frame
-        ret, _ = cap.read()
-        cap.release()
-        if not ret:
-            print(f"Invalid video file (no frames found): {file_path}.")
-    except Exception as e:
-        print(f"Error validating video file: {file_path} - {e}")
-
-
-
-def validate_video_ffprobe(file_path):
+def validate_video(file_path):
     import subprocess
 
     try:
@@ -143,11 +152,11 @@ def validate_video_ffprobe(file_path):
             file_path
         ]
         subprocess.check_output(command, stderr=subprocess.STDOUT)
-        return {"valid": True, "error": None}
+        return True, "Valid video file." 
     except subprocess.CalledProcessError as e:
         # If FFprobe returns an error, the file is likely corrupted
         print (f"Video file {file_path} is not a valid video file.")
-        return {"valid": False, "error": e.output.decode().strip()}
+        return False, f"Video file {file_path} is not a valid video file."
 
 def get_arguments(argv):
     arg_help = "{0} <directory> <filetype>".format(argv[0])
@@ -169,13 +178,14 @@ def get_arguments(argv):
     return [arg_directory, arg_filetypes]
 
 
-def validate_image_with_pillow(file_path):
+def validate_image(file_path):
     try:
         with Image.open(file_path) as img:
             img.verify()  # Verify that it is a valid image
-        # return "Valid image file."
+        return True, "Valid image file." # the file is not invalid
     except Exception as e:
         print(f"Invalid image file: {e}")
+        return False, f"Invalid image file: {e}"
 
 def get_total_file_count(directory):
     file_count = 0
