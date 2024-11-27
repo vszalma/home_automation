@@ -128,12 +128,23 @@ def validate_excel(file_path):
 
 
 def validate_pdf(file_path):
+    from contextlib import redirect_stderr
+    import io
+
     try:
         # Importing PyPDF2 inside the function
         from PyPDF2 import PdfReader
 
+        with io.StringIO() as err_buffer, redirect_stderr(err_buffer):
+            reader = PdfReader(file_path)
+
         # Open and validate the PDF
         reader = PdfReader(file_path)
+
+                # Check if the PDF is encrypted
+        if reader.is_encrypted:
+            return False, "File is encrypted"
+
         if reader.pages:
             return True, "Valid pdf file."
         else:
