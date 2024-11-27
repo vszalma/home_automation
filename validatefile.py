@@ -27,6 +27,9 @@ def list_files_by_regex(start_folder, file_type_or_group):
     Returns:
         list: A list of matching file paths.
     """
+    from datetime import datetime
+    from tqdm import tqdm
+    
     # Resolve regex patterns based on group or specific type
     if isinstance(file_type_or_group, str):
         patterns = FILE_TYPE_GROUPS.get(
@@ -50,38 +53,41 @@ def list_files_by_regex(start_folder, file_type_or_group):
     print(f"Found a total of {matching_files} found. Validating files now.")
     
     headers = ["file_name", "error_message"]
+    output_file = f"{datetime.today().strftime('%Y-%m-%d')}-error-output-{file_type_or_group}.csv"
 
-    with open("test_output_error.csv", mode="w", newline="", encoding="utf-8") as csvfile:
+    with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["file_name", "error_message"])  # Write the headers
  
-        # Walk through the directory and subdirectories
-        for root, dirs, files in os.walk(start_folder):
-            for filename in files:
-                if combined_pattern.match(filename):
-                    file_count += 1
-                    invalid_file = False
-                    file_name = f"{root}\\{filename}"
-                    # matching_files.append(os.path.join(root, filename))
-                    match file_type_or_group:
-                        case "image":
-                            is_valid, error_message = validate_image(f"{file_name}")
-                        case "pdf":
-                            is_valid, error_message = validate_pdf(f"{file_name}")
-                        case "video":
-                            is_valid, error_message = validate_video(f"{file_name}")
-                        case "excel":
-                            is_valid, error_message = validate_excel(f"{file_name}")
-                        case "document":
-                            is_valid, error_message = validate_document(f"{file_name}")
-                        case _:
-                            print("An undefined filetype is found")
-                    if not is_valid:
-                        error_count += 1
-                        # pass filename {root}\\{filename} and error_message to method to write file
-                        writer.writerow([file_name, error_message])
+        with tqdm(total=matching_files, desc="Processing matching files", unit="file") as pbar:       # Walk through the directory and subdirectories
+            for root, dirs, files in os.walk(start_folder):
+                for filename in files:
+                    if combined_pattern.match(filename):
+                        file_count += 1
+                        invalid_file = False
+                        file_name = f"{root}\\{filename}"
+                        # matching_files.append(os.path.join(root, filename))
+                        match file_type_or_group:
+                            case "image":
+                                is_valid, error_message = validate_image(f"{file_name}")
+                            case "pdf":
+                                is_valid, error_message = validate_pdf(f"{file_name}")
+                            case "video":
+                                is_valid, error_message = validate_video(f"{file_name}")
+                            case "excel":
+                                is_valid, error_message = validate_excel(f"{file_name}")
+                            case "document":
+                                is_valid, error_message = validate_document(f"{file_name}")
+                            case _:
+                                print("An undefined filetype is found")
+                        pbar.update(1)
+                        if not is_valid:
+                            error_count += 1
+                            # pass filename {root}\\{filename} and error_message to method to write file
+                            writer.writerow([file_name, error_message])
+                        
     if error_count == 0:
-        os.remove("test_output_error.csv")
+        os.remove(output_file)
 
     print(f"Total files read: {file_count}")
     print(f"Total errors found: {error_count}")
