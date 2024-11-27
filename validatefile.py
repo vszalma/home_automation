@@ -40,6 +40,7 @@ def list_files_by_regex(start_folder, file_type_or_group):
     combined_pattern = re.compile("|".join(patterns), re.IGNORECASE)
 
     file_count = 0
+    error_count = 0
     print(f"Looking for {file_type_or_group} files in directory {start_folder}.")
 
     # Walk through the directory and subdirectories
@@ -47,6 +48,7 @@ def list_files_by_regex(start_folder, file_type_or_group):
         for filename in files:
             if combined_pattern.match(filename):
                 file_count += 1
+                invalid_file = False
                 # matching_files.append(os.path.join(root, filename))
                 match file_type_or_group:
                     case "images":
@@ -59,6 +61,7 @@ def list_files_by_regex(start_folder, file_type_or_group):
                         validate_xlsx_openpyxl(f"{root}\\{filename}")
                     case _:
                         print("An undefined filetype is found")
+                if 
 
     print(f"Total files read: {file_count}")
 
@@ -126,14 +129,6 @@ def validate_video_opencv(file_path):
 def validate_video_ffprobe(file_path):
     import subprocess
 
-    print("PATH:", os.environ.get("PATH"))
-    
-    try:
-        subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT)
-        print("FFprobe is installed and accessible.")
-    except FileNotFoundError:
-        print("FFprobe is not installed or not in PATH.")
-
     try:
         # Run FFprobe command
         command = [
@@ -143,11 +138,11 @@ def validate_video_ffprobe(file_path):
             "-of", "default=noprint_wrappers=1:nokey=1",
             file_path
         ]
-        print(f"Command is: {command}")
         subprocess.check_output(command, stderr=subprocess.STDOUT)
         return {"valid": True, "error": None}
     except subprocess.CalledProcessError as e:
         # If FFprobe returns an error, the file is likely corrupted
+        print (f"Video file {file_path} is not a valid video file.")
         return {"valid": False, "error": e.output.decode().strip()}
 
 def get_arguments(argv):
