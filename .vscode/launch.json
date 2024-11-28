@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["F:\\_bu-2024-11-16", "pdf"]
+            //"args": ["F:\\_bu-2024-11-16", "pdf"],
+            "args": ["C:\\Users\\vszal\\Documents\\code\\scripts\\2024-11-27-collector-output-CUsersvszalDownloads.csv", "C:\\Users\\vszal\\Documents\\code\\scripts\\2024-11-27-collector-output-CUsersvszalDownloads.csv"]
         }
     ]
 }

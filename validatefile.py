@@ -103,11 +103,9 @@ def validate_document(file_path):
         if len(doc.paragraphs) > 0:
             return True, "Valid document file."
         else:
-            print(f"Document {file_path} is empty.")
             return False, f"Document {file_path} is empty."
         
     except Exception as e:
-        print(f"Document {file_path} is not valid.")
         return False, f"Document {file_path} is not valid."
 
 def validate_excel(file_path):
@@ -118,12 +116,10 @@ def validate_excel(file_path):
         workbook = load_workbook(file_path)
         # Check if the workbook contains any sheets
         if not workbook.sheetnames:
-            print(f"Invalid .xlsx file: {file_path} (No sheets found).")
             return False, f"Invalid .xlsx file: {file_path} (No sheets found)."
         else:
             return True, "Valid .xlsx file."
     except Exception as e:
-        print(f"Invalid .xlsx file: {file_path} (Error: {e}).")
         return False, f"Invalid .xlsx file: {file_path} (Error: {e})."
 
 
@@ -148,11 +144,9 @@ def validate_pdf(file_path):
         if reader.pages:
             return True, "Valid pdf file."
         else:
-            print(f"Invalid PDF: {file_path} (No pages found)")
             return False, f"Invalid PDF: {file_path} (No pages found)"
 
     except Exception as e:
-        print(f"Invalid PDF: {file_path} (Error: {e})")
         return False, f"Invalid PDF: {file_path} (Error: {e})"
 
 
@@ -171,8 +165,6 @@ def validate_video(file_path):
         subprocess.check_output(command, stderr=subprocess.STDOUT)
         return True, "Valid video file." 
     except subprocess.CalledProcessError as e:
-        # If FFprobe returns an error, the file is likely corrupted
-        print (f"Video file {file_path} is not a valid video file.")
         return False, f"Video file {file_path} is not a valid video file."
 
 def get_arguments(argv):
@@ -184,13 +176,10 @@ def get_arguments(argv):
             if len(sys.argv) > 1
             else '"C:\\Users\\vszal\\OneDrive\\Pictures"'
         )
-        arg_filetypes = sys.argv[2] if len(sys.argv) > 2 else "images"
+        arg_filetypes = sys.argv[2] if len(sys.argv) > 2 else "image"
     except:
         print(arg_help)
         sys.exit(2)
-
-    print("directory:", arg_directory)
-    print("filetypes:", arg_filetypes)
 
     return [arg_directory, arg_filetypes]
 
@@ -227,8 +216,8 @@ def count_files_with_pattern(directory, compiled_pattern):
 
 if __name__ == "__main__":
     arguments = get_arguments(sys.argv)
-    print("directory: ", arguments[0])
-    print("filetypes: ", arguments[1])
+    print("Directory to be searched: ", arguments[0])
+    print("Type of file to be validated: ", arguments[1])
 
     # List files
     list_files_by_regex(arguments[0], arguments[1])
