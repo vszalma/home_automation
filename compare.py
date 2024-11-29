@@ -68,8 +68,9 @@ def get_arguments(argv):
 
     return [file1, file2]
 
+from mailersend import emails
 
-def send_outlook_email(subject, body, to_email, from_email, password):
+def send_outlook_email(subject, body, to_email, from_email):
     """
     Send an email using an Outlook.com account.
 
@@ -82,30 +83,40 @@ def send_outlook_email(subject, body, to_email, from_email, password):
     """
     try:
 
-        mailer = emails.NewEmail()
+        mailer = emails.NewEmail("mlsn.011b4017977722058e2195d23680a996ed8e5204da1922fefe9e8e23a30bbc2f")
 
-        mail_body = {"Testing email from Python"}
+        mail_body = {}
 
         mail_from = {
             "name": "me",
             "email": "MS_eLLyva@trial-x2p034766dkgzdrn.mlsender.net",
-            "password": "uq4qVb7vhIiX6P6y"
         }
 
         recipients = [
             {
-                "name": "Victor",
-                "email": "vszalma@hotmail.com"
+                "name": "Victor Szalma",
+                "email": "vszalma@hotmail.com",
             }
         ]
 
+        reply_to = {
+            "name": "Victor Szalma",
+            "email": "vszalma@hotmail.com",
+        }
+
+        
+
         mailer.set_mail_from(mail_from, mail_body)
         mailer.set_mail_to(recipients, mail_body)
-        mailer.set_subject("Hello!", mail_body)
-        mailer.set_html_content("Greetings from the team, you got this message through MailerSend.", mail_body)
-        mailer.set_plaintext_content("Greetings from the team, you got this message through MailerSend.", mail_body)
+        mailer.set_subject(subject, mail_body)
+        mailer.set_html_content(body, mail_body)
+        mailer.set_plaintext_content(body, mail_body)
+        mailer.set_reply_to(reply_to, mail_body)
 
+        # using print() will also return status code and data
         mailer.send(mail_body)
+            
+
         print(f"Email sent to {to_email}")
         
     except Exception as e:
@@ -127,8 +138,7 @@ if __name__ == "__main__":
 
     send_outlook_email(
         subject="Test Email from Python",
-        body="This is a test email sent using Outlook.com SMTP.",
+        body="This is a test email.",
         to_email="vszalma@hotmail.com",
-        from_email="vszalma@hotmail.com",
-        password="Ch1ck.C0r3a"
+        from_email="vszalma@hotmail.com"
     )
