@@ -6,17 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from mailersend import emails
 
 
-def calculate_file_hash(file_path, hash_algorithm="sha256"):
-    """
-    Calculate the hash of a file using a specified hash algorithm.
-
-    Parameters:
-        file_path (str): Path to the file.
-        hash_algorithm (str): The hash algorithm to use (e.g., "md5", "sha256").
-
-    Returns:
-        str: The computed hash as a hexadecimal string.
-    """
+def _calculate_file_hash(file_path, hash_algorithm="sha256"):
     try:
         # Create a hash object
         hash_func = hashlib.new(hash_algorithm)
@@ -32,20 +22,9 @@ def calculate_file_hash(file_path, hash_algorithm="sha256"):
 
 
 def compare_files(file1, file2, hash_algorithm="sha256"):
-    """
-    Compare two files based on their hash values.
-
-    Parameters:
-        file1 (str): Path to the first file.
-        file2 (str): Path to the second file.
-        hash_algorithm (str): The hash algorithm to use (e.g., "md5", "sha256").
-
-    Returns:
-        bool: True if the files are identical, False otherwise.
-    """
     try:
-        hash1 = calculate_file_hash(file1, hash_algorithm)
-        hash2 = calculate_file_hash(file2, hash_algorithm)
+        hash1 = _calculate_file_hash(file1, hash_algorithm)
+        hash2 = _calculate_file_hash(file2, hash_algorithm)
         return hash1 == hash2
     except Exception as e:
         print(f"Error comparing files: {e}")
@@ -70,17 +49,7 @@ def get_arguments(argv):
 
 from mailersend import emails
 
-def send_outlook_email(subject, body, to_email, from_email):
-    """
-    Send an email using an Outlook.com account.
-
-    Parameters:
-        subject (str): Email subject.
-        body (str): Email body.
-        to_email (str): Recipient's email address.
-        from_email (str): Sender's email address.
-        password (str): Sender's email password.
-    """
+def send_email(subject, body):
     try:
 
         mailer = emails.NewEmail("mlsn.011b4017977722058e2195d23680a996ed8e5204da1922fefe9e8e23a30bbc2f")
@@ -104,8 +73,6 @@ def send_outlook_email(subject, body, to_email, from_email):
             "email": "vszalma@hotmail.com",
         }
 
-        
-
         mailer.set_mail_from(mail_from, mail_body)
         mailer.set_mail_to(recipients, mail_body)
         mailer.set_subject(subject, mail_body)
@@ -117,7 +84,7 @@ def send_outlook_email(subject, body, to_email, from_email):
         mailer.send(mail_body)
             
 
-        print(f"Email sent to {to_email}")
+        print(f"Email sent to {recipients}")
         
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -136,7 +103,7 @@ if __name__ == "__main__":
     else:
         print("The files are different.")
 
-    send_outlook_email(
+    send_email(
         subject="Test Email from Python",
         body="This is a test email.",
         to_email="vszalma@hotmail.com",

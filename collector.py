@@ -4,6 +4,15 @@ import csv
 from datetime import datetime
 import re
 
+def main(directory):
+    # directory = input("Enter the directory to scan: ")
+    if os.path.isdir(directory):
+        file_info = collect_file_info(directory)
+        output_file = display_file_info(directory, file_info)
+        return True, output_file
+    else:
+        return False, "Invalid directory. Please try again."
+
 def collect_file_info(directory):
     # Dictionary to store file type information
     file_info = defaultdict(lambda: {'count': 0, 'size': 0})
@@ -48,10 +57,7 @@ def display_file_info(directory, file_info):
             writer.writerow([file_type, stats['count'], stats['size']])
             #print(f"{file_type:<15} {stats['count']:<10} {stats['size']:<20}")
 
-if __name__ == "__main__":
-    directory = input("Enter the directory to scan: ")
-    if os.path.isdir(directory):
-        file_info = collect_file_info(directory)
-        display_file_info(directory, file_info)
-    else:
-        print("Invalid directory. Please try again.")
+    return output_file
+
+""" if __name__ == "__main__":
+        main() """
