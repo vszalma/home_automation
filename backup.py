@@ -46,7 +46,7 @@ def _run_robocopy(source, destination, options=None, log_file="robocopy_log.txt"
         print(f"Error executing robocopy: {e}")
 
 
-def executebackup(source, destination):
+def execute_backup(source, destination):
     print("Backup is being run.")
     options = ["/E", "/MT:8", "/xo", "/nfl", "/ndl"]
 
@@ -56,4 +56,4 @@ def executebackup(source, destination):
 if __name__ == "__main__":
 
     arguments = _get_arguments(sys.argv)
-    executebackup(arguments[0], arguments[1])
+    execute_backup(arguments[0], arguments[1])

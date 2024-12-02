@@ -3,6 +3,8 @@ import compare
 import backup
 import os
 import sys
+from datetime import date
+import time
 
 
 def _backup_needed(source, destination):
@@ -15,15 +17,24 @@ def _backup_needed(source, destination):
     else:
         most_recent_backup = backup_dir_list[0]
 
+    start_time = time.time()
     ret_destination, output_destination = collector.collect_file_info(
         most_recent_backup
     )
+    end_time = time.time()
+    destination_duration = end_time - start_time
+    print(f"Time taken go collect file info for destination prior to backup: {destination_duration}")
+
     if ret_destination:
         print(f"output file: {output_destination}")
 
+    start_time = time.time()
     ret_source, output_source = collector.collect_file_info(source)
     if ret_source:
         print(f"output file: {output_source}")
+    end_time = time.time()
+    source_duration = end_time - start_time
+    print(f"Time taken go collect file info for source prior to backup: {source_duration}")
 
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
@@ -59,9 +70,15 @@ def main(source, destination):
 
     # execute backup if needed.
     if _backup_needed(source, destination):
-        backup.executebackup()
+        destination = f"{destination}/BU-{date.today()}"
+        start_time = time.time()
+        backup.execute_backup(source, destination)
+        end_time = time.time()
+        backup_duration = end_time - start_time
+        print(f"Backup duration: {backup_duration}")
 
-    # After backup, validate backup was succesful (i.e. matches source file counts and sizes.)
+
+    # After backup, validate backup was successful (i.e. matches source file counts and sizes.)
     ret_source, output_source = collector.collect_file_info(source)
     if ret_source:
         print(f"output file: {output_source}")
@@ -73,7 +90,9 @@ def main(source, destination):
     # if different, run a backup
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
-            compare.send_email("Succesful backup", "The files match")
+            subject = "Successful backup"
+            body = "The files match"
+            compare.send_email(subject, body)
 
 
 def _list_and_sort_directories(path):
@@ -85,7 +104,7 @@ def _list_and_sort_directories(path):
         # Filter directories matching the format 'BU-YYYYMMDD'
         filtered_dirs = []
         for d in directories:
-            if d.startswith("BU-") and len(d) == 11:  # Check basic format
+            if d.startswith("BU-") and len(d) == 13:  # Check basic format
                 try:
                     # Extract YYYYMMDD and check if it is valid
                     date_part = d[3:]
