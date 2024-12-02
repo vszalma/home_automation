@@ -2,55 +2,81 @@ import collector
 import compare
 import backup
 import os
+import sys
+
 
 def _backup_needed(source, destination):
-        
+
     # Get most recent backup file location.
-    backup_dir_list = list_and_sort_directories(destination)
-    
+    backup_dir_list = _list_and_sort_directories(destination)
+
     if not backup_dir_list:
         return True
     else:
         most_recent_backup = backup_dir_list[0]
-    
-    ret_destination, output_destination = collector.main(most_recent_backup)
+
+    ret_destination, output_destination = collector.collect_file_info(
+        most_recent_backup
+    )
     if ret_destination:
         print(f"output file: {output_destination}")
 
-    ret_source, output_source = collector.main(source)
+    ret_source, output_source = collector.collect_file_info(source)
     if ret_source:
         print(f"output file: {output_source}")
 
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
-            compare.send_email("Backup not run.", "There was no need to backup files as the content hasn't changed.")
+            compare.send_email(
+                "Backup not run.",
+                "There was no need to backup files as the content hasn't changed.",
+            )
             return False
         else:
             return True
 
-def main():
-    source = "C:\\Users\\vszal\\Downloads"
-    destination = "C:\\Users\\vszal\\Downloads"
-    
+
+def _get_arguments(argv):
+    arg_help = "{0} <source directory> <destination directory>".format(argv[0])
+
+    try:
+        arg_source = (
+            sys.argv[1]
+            if len(sys.argv) > 1
+            else '"C:\\Users\\vszal\\OneDrive\\Pictures"'
+        )
+        arg_destination = (
+            sys.argv[2] if len(sys.argv) > 2 else "C:\\Users\\vszal\\OneDrive\\Pictures"
+        )
+    except:
+        print(arg_help)
+        sys.exit(2)
+
+    return [arg_source, arg_destination]
+
+
+def main(source, destination):
+
     # execute backup if needed.
     if _backup_needed(source, destination):
         backup.executebackup()
 
-    # After backup checks to ensure backup was succesful(i.e. matches source file counts and sizes.)
-    ret_source, output_source = collector.main(source)
+    # After backup, validate backup was succesful (i.e. matches source file counts and sizes.)
+    ret_source, output_source = collector.collect_file_info(source)
     if ret_source:
         print(f"output file: {output_source}")
-    
-    ret_destination, output_destination = collector.main(destination)
+
+    ret_destination, output_destination = collector.collect_file_info(destination)
     if ret_destination:
         print(f"output file: {output_destination}")
-    
+
     # if different, run a backup
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
             compare.send_email("Succesful backup", "The files match")
 
-def list_and_sort_directories(path):
+
+def _list_and_sort_directories(path):
     try:
         # List all directories one level deep
         all_items = os.listdir(path)
@@ -78,5 +104,7 @@ def list_and_sort_directories(path):
         print(f"An error occurred: {e}")
         return []
 
+
 if __name__ == "__main__":
-    main()
+    arguments = _get_arguments(sys.argv)
+    main(arguments[0], arguments[1])

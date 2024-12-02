@@ -95,8 +95,8 @@ def send_email(subject, body):
 
 if __name__ == "__main__":
     arguments = get_arguments(sys.argv)
-    print("File to be compared: ", arguments[0])
-    print("File to be compared: ", arguments[1])
+    print("File to be compared (1): ", arguments[0])
+    print("File to be compared (2): ", arguments[1])
 
     if compare_files(arguments[0], arguments[1]):
         print("The files are identical.")
