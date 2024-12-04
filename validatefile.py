@@ -3,6 +3,10 @@ import os
 import re
 import sys
 import csv
+import warnings
+
+warnings.simplefilter("ignore", UserWarning)
+
 
 # Define logical groupings for file types
 FILE_TYPE_GROUPS = {
@@ -76,17 +80,14 @@ def _validate_pdf(file_path):
         with io.StringIO() as err_buffer, redirect_stderr(err_buffer):
             reader = PdfReader(file_path)
 
-        # Open and validate the PDF
-        reader = PdfReader(file_path)
+            # Check if the PDF is encrypted
+            if reader.is_encrypted:
+                return False, "File is encrypted"
 
-        # Check if the PDF is encrypted
-        if reader.is_encrypted:
-            return False, "File is encrypted"
-
-        if reader.pages:
-            return True, "Valid pdf file."
-        else:
-            return False, f"Invalid PDF: {file_path} (No pages found)"
+            if reader.pages:
+                return True, "Valid pdf file."
+            else:
+                return False, f"Invalid PDF: {file_path} (No pages found)"
 
     except Exception as e:
         return False, f"Invalid PDF: {file_path} (Error: {e})"
@@ -119,7 +120,6 @@ def _validate_image(file_path):
             img.verify()  # Verify that it is a valid image
         return True, "Valid image file."  # the file is not invalid
     except Exception as e:
-        print(f"Invalid image file: {e}")
         return False, f"Invalid image file: {e}"
 
 
@@ -189,6 +189,7 @@ def validate_files_by_type(start_folder, file_type_or_group):
                         invalid_file = False
                         file_name = f"{root}\\{filename}"
                         # matching_files.append(os.path.join(root, filename))
+                        pbar.set_description(f"Processing: {filename}")
                         match file_type_or_group:
                             case "image":
                                 is_valid, error_message = _validate_image(f"{file_name}")
