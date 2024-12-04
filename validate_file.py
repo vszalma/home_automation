@@ -13,7 +13,7 @@ FILE_TYPE_GROUPS = {
     "image": [r".*\.(jpg|jpeg|png|gif|bmp|tiff)$"],
     "document": [r".*\.(docx)$"],
     "video": [r".*\.(mp4|avi|mkv|mov|flv|wmv|webm)$"],
-    "audio": [r".*\.(mp3|wav|aac|flac|ogg)$"],
+    "audio": [r".*\.(mp3|wav|aac|flac|m4a|ogg)$"],
     "excel": [r".*\.(xlsx)$"],
     "pdf": [r".*\.(pdf)$"],
 }
