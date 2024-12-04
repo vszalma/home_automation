@@ -54,6 +54,16 @@ def _validate_document(file_path):
         return False, f"Document {file_path} is not valid."
 
 
+def _validate_audio(file_path):
+    from pydub import AudioSegment
+    try:
+        # Attempt to load the audio file
+        audio = AudioSegment.from_file(file_path)
+        return True, f"Valid audio file: {file_path}"
+    except Exception as e:
+        return False, f"Invalid audio file: {file_path} (Error: {e})"
+
+
 def _validate_excel(file_path):
     from openpyxl import load_workbook
 
@@ -199,6 +209,8 @@ def validate_files_by_type(start_folder, file_type_or_group):
                                 is_valid, error_message = _validate_video(f"{file_name}")
                             case "excel":
                                 is_valid, error_message = _validate_excel(f"{file_name}")
+                            case "audio":
+                                is_valid, error_message = _validate_audio(f"{file_name}")
                             case "document":
                                 is_valid, error_message = _validate_document(
                                     f"{file_name}"
