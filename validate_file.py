@@ -133,22 +133,34 @@ def _validate_image(file_path):
         return False, f"Invalid image file: {e}"
 
 
-def _get_total_file_count(directory):
+def _get_total_file_count(directory, exclusions):
     file_count = 0
 
     for root, dirs, files in os.walk(directory):
-        file_count += len(files)
+        # Exclude directories
+        dirs[:] = [d for d in dirs if os.path.join(root, d) not in exclusions]
+
+        # Count files, excluding those in the exclusions
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path not in exclusions:
+                file_count += 1
 
     return file_count
 
 
-def _get_file_count_for_type(directory, compiled_pattern):
+def _get_file_count_for_type(directory, compiled_pattern, exclusions):
     file_count = 0
 
     # Walk through the directory and subdirectories
     for root, dirs, files in os.walk(directory):
+        # Exclude directories
+        dirs[:] = [d for d in dirs if os.path.join(root, d) not in exclusions]
+
+        # Count matching files, excluding those in the exclusions
         for file in files:
-            if compiled_pattern.match(file):  # Check if file matches the pattern
+            file_path = os.path.join(root, file)
+            if file_path not in exclusions and compiled_pattern.match(file):
                 file_count += 1
 
     return file_count
@@ -186,8 +198,8 @@ def validate_files_by_type(start_folder, file_type_or_group):
     error_count = 0
     print(f"Looking for {file_type_or_group} files in directory {start_folder}.")
 
-    total_files = _get_total_file_count(start_folder)
-    matching_files = _get_file_count_for_type(start_folder, combined_pattern)
+    total_files = _get_total_file_count(start_folder, exclusions)
+    matching_files = _get_file_count_for_type(start_folder, combined_pattern, exclusions)
 
     print(f"Found a total of {matching_files} found. Validating files now.")
 
@@ -244,7 +256,8 @@ def validate_files_by_type(start_folder, file_type_or_group):
     if error_count == 0:
         os.remove(output_file)
 
-    print(f"Total files read: {file_count}")
+    print(f"Total files read: {total_files}")
+    print(f"Matching files read: {file_count}")
     print(f"Total errors found: {error_count}")
 
 
