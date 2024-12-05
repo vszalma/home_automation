@@ -171,6 +171,17 @@ def validate_files_by_type(start_folder, file_type_or_group):
     # Compile all patterns into a single regex for efficiency
     combined_pattern = re.compile("|".join(patterns), re.IGNORECASE)
 
+    exclusion_file = f"{file_type_or_group}_exclusions.txt"
+
+    # Load exclusions
+    exclusions = set()
+    if exclusion_file:
+        try:
+            with open(exclusion_file, "r", encoding="utf-8") as f:
+                exclusions = set(line.strip() for line in f if line.strip())
+        except FileNotFoundError:
+            print(f"Exclusion file {exclusion_file} not found. Continuing without exclusions.")
+
     file_count = 0
     error_count = 0
     print(f"Looking for {file_type_or_group} files in directory {start_folder}.")
@@ -187,47 +198,55 @@ def validate_files_by_type(start_folder, file_type_or_group):
 
     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["file_name", "error_message"])  # Write the headers
+        writer.writerow(headers)  # Write the headers
 
         with tqdm(
             total=matching_files, desc="Processing matching files", unit="file"
         ) as pbar:  # Walk through the directory and subdirectories
             for root, dirs, files in os.walk(start_folder):
+                # Skip excluded directories
+                dirs[:] = [d for d in dirs if os.path.join(root, d) not in exclusions]
+
                 for filename in files:
+                    file_path = os.path.join(root, filename)
+
+                    # Skip excluded files
+                    if file_path in exclusions:
+                        continue
+
                     if combined_pattern.match(filename):
                         file_count += 1
-                        invalid_file = False
-                        file_name = f"{root}\\{filename}"
-                        # matching_files.append(os.path.join(root, filename))
                         pbar.set_description(f"Processing: {filename}")
+
+                        # Validate file based on type
                         match file_type_or_group:
                             case "image":
-                                is_valid, error_message = _validate_image(f"{file_name}")
+                                is_valid, error_message = _validate_image(file_path)
                             case "pdf":
-                                is_valid, error_message = _validate_pdf(f"{file_name}")
+                                is_valid, error_message = _validate_pdf(file_path)
                             case "video":
-                                is_valid, error_message = _validate_video(f"{file_name}")
+                                is_valid, error_message = _validate_video(file_path)
                             case "excel":
-                                is_valid, error_message = _validate_excel(f"{file_name}")
+                                is_valid, error_message = _validate_excel(file_path)
                             case "audio":
-                                is_valid, error_message = _validate_audio(f"{file_name}")
+                                is_valid, error_message = _validate_audio(file_path)
                             case "document":
-                                is_valid, error_message = _validate_document(
-                                    f"{file_name}"
-                                )
+                                is_valid, error_message = _validate_document(file_path)
                             case _:
                                 print("An undefined filetype is found")
+                                is_valid, error_message = False, "Undefined filetype"
+
                         pbar.update(1)
                         if not is_valid:
                             error_count += 1
-                            # pass filename {root}\\{filename} and error_message to method to write file
-                            writer.writerow([file_name, error_message])
+                            writer.writerow([file_path, error_message])
 
     if error_count == 0:
         os.remove(output_file)
 
     print(f"Total files read: {file_count}")
     print(f"Total errors found: {error_count}")
+
 
 
 if __name__ == "__main__":
