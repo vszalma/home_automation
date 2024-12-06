@@ -90,12 +90,11 @@ def _validate_pdf(file_path):
         with io.StringIO() as err_buffer, redirect_stderr(err_buffer):
             reader = PdfReader(file_path)
 
-            # Check if the PDF is encrypted
-            if reader.is_encrypted:
-                return False, "File is encrypted"
-
             if reader.pages:
-                return True, "Valid pdf file."
+                if reader.is_encrypted:
+                    return False, "File is encrypted"
+                else:
+                    return True, "Valid pdf file."
             else:
                 return False, f"Invalid PDF: {file_path} (No pages found)"
 
@@ -148,6 +147,9 @@ def _get_total_file_count(directory, exclusions):
 
     return file_count
 
+def _normalize_path(path):
+    return os.path.normpath(path)
+
 
 def _get_file_count_for_type(directory, compiled_pattern, exclusions):
     file_count = 0
@@ -164,6 +166,19 @@ def _get_file_count_for_type(directory, compiled_pattern, exclusions):
                 file_count += 1
 
     return file_count
+
+def _append_to_csv(file_path, data, headers=None):
+    file_exists = os.path.exists(file_path)  # Check if the file already exists
+
+    with open(file_path, mode="a", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+
+        # Write headers if the file is newly created
+        if not file_exists and headers:
+            writer.writerow(headers)
+
+        # Append the data
+        writer.writerow(data)
 
 
 def validate_files_by_type(start_folder, file_type_or_group):
@@ -190,7 +205,8 @@ def validate_files_by_type(start_folder, file_type_or_group):
     if exclusion_file:
         try:
             with open(exclusion_file, "r", encoding="utf-8") as f:
-                exclusions = set(line.strip() for line in f if line.strip())
+                # exclusions = set(line.strip() for line in f if line.strip())
+                exclusions = set(_normalize_path(line.strip()) for line in f if line.strip())
         except FileNotFoundError:
             print(f"Exclusion file {exclusion_file} not found. Continuing without exclusions.")
 
@@ -255,6 +271,15 @@ def validate_files_by_type(start_folder, file_type_or_group):
 
     if error_count == 0:
         os.remove(output_file)
+
+    summary_headers = ["date", "file_type", "total_file_count", "matching_file_count", "error_count"]
+    summary_output_file = ("validation_summary_output.csv")
+    today = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
+
+    summary_output_data = [today, file_type_or_group, total_files, file_count, error_count]
+    #headers = ["Date", "Description", "Details"]
+
+    _append_to_csv(summary_output_file, summary_output_data, summary_headers)
 
     print(f"Total files read: {total_files}")
     print(f"Matching files read: {file_count}")
