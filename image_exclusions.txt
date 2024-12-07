@@ -1,285 +1,303 @@
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\images\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\index_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\News_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_borders\_vti_cnf\image004.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\_derived\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods3\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\images\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_borders\_vti_cnf\image004.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_derived\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_a.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_p.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_overlay\_vti_cnf\index.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\activities.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\boardofdirectors.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\community.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\covenants.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\news.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull1.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull2.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull3.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablrule.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbnr.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull1.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull2.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull3.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blglb.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbh.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbp.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbs.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhome.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomeh.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomes.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnext.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexth.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexts.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphb.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphbp.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprev.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevh.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevs.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvb.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvbp.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blrule.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blup.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\bluph.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blups.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbh.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbp.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbs.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture2.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture3.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button58.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button59.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5A.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button6.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button7.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image010.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image012.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image018.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image020.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image022.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image024.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image026.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image028.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\McNeely.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\NSub.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\SSub.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\images\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\index_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\News_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_borders\_vti_cnf\image004.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_themes\copy-of-buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite4\images\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite6\images\buttons\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite6\images\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite6\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\index_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\720\720_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\How to request an instant EPM Cloud demo environment\How_to_request_an_instant_EPM_Cloud_demo_environment_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Laptop demo title setup\Laptop_demo_title_setup_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Schedule Instant Demo no AP no Laptop\Schedule_Instant_Demo_no_AP_no_Laptop_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\test\test_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\UAT Laptop Demo Regs 1280\UAT_Laptop_Demo_Regs_1280_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\iQT Iterations\IQT_05_09_17\images\projects\projectsummary\laborhours-min.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\iQT Iterations\IQT_05_15_17\images\projects\projectsummary\projectdetails2.PNG
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\iQT Iterations\IQT_05_15_17\images\projects\projectsummary\projectfte2-max.PNG
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\Quick Tour 31_AUG\images\projects\analysis\variance-max.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Keep\iCloud Photos\Downloads\IMG_1267.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Certification_30-Sep\Cathy Schauer E360 US Level 1 B2B\Cathy_Schauer_E360_US_Level_1_B2B_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\D03_Chapter_1_PreDemoSteps\D03_Chapter_1_PreDemoSteps_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\Demo Store version\Supremo Fitness - Chapter 1 (Strategy to Plan)\Supremo_Fitness_-_Chapter_1_(Strategy_to_Plan)_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\E360_Chapter 1\E360_Chapter_1_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_Customer_Facing\D03_Chapter_9_Customer_Facing_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\Demo Store Version\Supremo Fitness - Chapter 9 (Close to Analysis)\Supremo_Fitness_-_Chapter_9_(Close_to_Analysis)_Thumbnails.png
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0128\IMG_0548.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0570.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0571.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0572.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0573.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0574.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0575.JPG
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2018-2020 Camera Roll and prior misc\20110210_000712000_iOS.jpg
-F:\_bu-2024-11-16\Cathy Stuff\Photos\2018-2020 Camera Roll and prior misc\20110211_165922000_iOS.jpg
-F:\_bu-2024-11-16\found.000\13000000-IMG_0001.JPG
-F:\_bu-2024-11-16\found.000\C2000000-IMG_0007.JPG
-F:\_bu-2024-11-16\found.000\63000000-Cat Stevens\Very Best of Cat Stevens [Universal]\AlbumArtSmall.jpg
-F:\_bu-2024-11-16\found.000\dir0028.chk\GETTING STARTED.png
-F:\_bu-2024-11-16\Media\2022\PA150273.JPG
-F:\_bu-2024-11-16\Music\
-F:\_bu-2024-11-16\Music to categorize\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\images\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\index_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\News_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_borders\_vti_cnf\image004.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\_derived\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods3\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\images\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_borders\_vti_cnf\image004.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_derived\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_a.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_p.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_overlay\_vti_cnf\index.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\activities.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\boardofdirectors.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\community.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\covenants.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\news.htm_nav_buckinghamwoods010_hbtn.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull1.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull2.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull3.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablrule.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbnr.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull1.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull2.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull3.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blglb.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbh.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbp.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbs.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhome.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomeh.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomes.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnext.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexth.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexts.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphb.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphbp.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprev.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevh.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevs.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvb.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvbp.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blrule.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blup.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\bluph.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blups.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbh.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbp.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbs.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture2.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture3.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button58.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button59.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5A.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button6.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button7.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image010.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image012.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image018.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image020.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image022.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image024.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image026.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image028.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\McNeely.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\NSub.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\SSub.jpg
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\images\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\index_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\News_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_borders\_vti_cnf\image004.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_themes\copy-of-buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite4\images\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\buttons\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\images\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_borders\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_fpclass\_overlay\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\images\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\News_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_borders\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods3\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\images\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_borders\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\Activities_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\images\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\News_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_borders\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_fpclass\_overlay\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_themes\copy-of-buckinghamwoods\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite4\images\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\buttons\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\index_files\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_fpclass\_overlay\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_overlay\_vti_cnf\
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\My Music\
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\720\720_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\How to request an instant EPM Cloud demo environment\How_to_request_an_instant_EPM_Cloud_demo_environment_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Laptop demo title setup\Laptop_demo_title_setup_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Schedule Instant Demo no AP no Laptop\Schedule_Instant_Demo_no_AP_no_Laptop_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\test\test_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\UAT Laptop Demo Regs 1280\UAT_Laptop_Demo_Regs_1280_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Keep\iCloud Photos\Downloads\IMG_1267.jpg
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Certification_30-Sep\Cathy Schauer E360 US Level 1 B2B\Cathy_Schauer_E360_US_Level_1_B2B_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\D03_Chapter_1_PreDemoSteps\D03_Chapter_1_PreDemoSteps_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\Demo Store version\Supremo Fitness - Chapter 1 (Strategy to Plan)\Supremo_Fitness_-_Chapter_1_(Strategy_to_Plan)_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\E360_Chapter 1\E360_Chapter_1_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_Customer_Facing\D03_Chapter_9_Customer_Facing_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
-F:\_bu-2024-11-16\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\Demo Store Version\Supremo Fitness - Chapter 9 (Close to Analysis)\Supremo_Fitness_-_Chapter_9_(Close_to_Analysis)_Thumbnails.png
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\Activities_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\images\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\index_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\News_files\_vti_cnf\image001.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_borders\_vti_cnf\image004.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\_derived\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\_themes\buckinghamwoods\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods3\_themes\buckinghamwoods\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\Activities_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\images\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\index_files\_vti_cnf\image001.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_borders\_vti_cnf\image004.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_derived\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_a.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_p.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_overlay\_vti_cnf\index.htm_nav_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\activities.htm_nav_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\boardofdirectors.htm_nav_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\community.htm_nav_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\covenants.htm_nav_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\news.htm_nav_buckinghamwoods010_hbtn.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull1.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull2.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull3.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablrule.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbnr.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull1.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull2.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull3.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blglb.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbh.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbp.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbs.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhome.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomeh.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomes.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnext.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexth.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexts.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphb.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphbp.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprev.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevh.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevs.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvb.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvbp.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blrule.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blup.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\bluph.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blups.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbh.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbp.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbs.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture2.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture3.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button58.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button59.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5A.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button6.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button7.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image010.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image012.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image018.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image020.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image022.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image024.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image026.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image028.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\McNeely.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\NSub.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\SSub.jpg
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\Activities_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\images\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\index_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\News_files\_vti_cnf\image001.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_borders\_vti_cnf\image004.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_overlay\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_themes\copy-of-buckinghamwoods\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite4\images\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite6\images\buttons\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite6\images\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\fpwebsite6\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\index_files\_vti_cnf\
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\720\720_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\How to request an instant EPM Cloud demo environment\How_to_request_an_instant_EPM_Cloud_demo_environment_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Laptop demo title setup\Laptop_demo_title_setup_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Schedule Instant Demo no AP no Laptop\Schedule_Instant_Demo_no_AP_no_Laptop_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\test\test_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\UAT Laptop Demo Regs 1280\UAT_Laptop_Demo_Regs_1280_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\iQT Iterations\IQT_05_09_17\images\projects\projectsummary\laborhours-min.jpg
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\iQT Iterations\IQT_05_15_17\images\projects\projectsummary\projectdetails2.PNG
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\iQT Iterations\IQT_05_15_17\images\projects\projectsummary\projectfte2-max.PNG
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\IQT\Quick Tour 31_AUG\images\projects\analysis\variance-max.jpg
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Keep\iCloud Photos\Downloads\IMG_1267.jpg
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Certification_30-Sep\Cathy Schauer E360 US Level 1 B2B\Cathy_Schauer_E360_US_Level_1_B2B_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\D03_Chapter_1_PreDemoSteps\D03_Chapter_1_PreDemoSteps_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\Demo Store version\Supremo Fitness - Chapter 1 (Strategy to Plan)\Supremo_Fitness_-_Chapter_1_(Strategy_to_Plan)_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\E360_Chapter 1\E360_Chapter_1_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_Customer_Facing\D03_Chapter_9_Customer_Facing_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
+\Cathy Stuff\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\Demo Store Version\Supremo Fitness - Chapter 9 (Close to Analysis)\Supremo_Fitness_-_Chapter_9_(Close_to_Analysis)_Thumbnails.png
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0128\IMG_0548.JPG
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0570.JPG
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0571.JPG
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0572.JPG
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0573.JPG
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0574.JPG
+\Cathy Stuff\Photos\2000-2021 Pictures\2004\2004\1Jan 04\0129\IMG_0575.JPG
+\Cathy Stuff\Photos\2018-2020 Camera Roll and prior misc\20110210_000712000_iOS.jpg
+\Cathy Stuff\Photos\2018-2020 Camera Roll and prior misc\20110211_165922000_iOS.jpg
+\found.000\13000000-IMG_0001.JPG
+\found.000\C2000000-IMG_0007.JPG
+\found.000\63000000-Cat Stevens\Very Best of Cat Stevens [Universal]\AlbumArtSmall.jpg
+\found.000\dir0028.chk\GETTING STARTED.png
+\Media\2022\PA150273.JPG
+\Music\
+\Music to categorize\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\Activities_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\images\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\index_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\News_files\_vti_cnf\image001.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_borders\_vti_cnf\image004.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\_derived\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_themes\buckinghamwoods\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods3\_themes\buckinghamwoods\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\Activities_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\images\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\index_files\_vti_cnf\image001.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_borders\_vti_cnf\image004.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_derived\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_a.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\index.htm_cmp_buckinghamwoods010_hbtn_p.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_overlay\_vti_cnf\index.htm_nav_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\activities.htm_nav_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\boardofdirectors.htm_nav_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\community.htm_nav_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\covenants.htm_nav_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\news.htm_nav_buckinghamwoods010_hbtn.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull1.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull2.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablbull3.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\ablrule.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbnr.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull1.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull2.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blbull3.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blglb.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbh.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbp.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhbs.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhome.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomeh.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blhomes.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnext.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexth.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blnexts.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphb.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blphbp.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprev.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevh.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blprevs.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvb.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blpvbp.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blrule.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blup.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\bluph.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blups.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbh.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbp.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\blvbs.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\button1.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture2.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\picture3.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button58.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button59.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button5A.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button6.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\button7.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image010.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image012.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image018.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image020.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image022.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image024.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image026.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\image028.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\McNeely.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\NSub.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\SSub.jpg
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\Activities_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\images\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\index_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\News_files\_vti_cnf\image001.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_borders\_vti_cnf\image004.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_fpclass\_overlay\index_files\_vti_cnf\image001.gif
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_overlay\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_themes\copy-of-buckinghamwoods\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite4\images\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\buttons\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\Activities_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\images\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_borders\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_fpclass\_overlay\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_overlay\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_themes\buckinghamwoods\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\Activities_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\images\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\News_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_borders\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_fpclass\_overlay\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\_themes\buckinghamwoods\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods3\_themes\buckinghamwoods\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\Activities_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\images\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_borders\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_overlay\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_themes\buckinghamwoods\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\Activities_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\images\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\News_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_borders\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_derived\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_fpclass\_overlay\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_overlay\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_themes\copy-of-buckinghamwoods\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite4\images\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\buttons\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\images\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\fpwebsite6\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\index_files\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_fpclass\_overlay\_overlay\_vti_cnf\
+\oldpc\Old home pc\Cathy's Documents\My Web Sites\BWoods4\_fpclass\_overlay\_overlay\_vti_cnf\
+\Work\Msft\T61P backup\Victor\OldDDrive\My Music\
+\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\720\720_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\How to request an instant EPM Cloud demo environment\How_to_request_an_instant_EPM_Cloud_demo_environment_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Laptop demo title setup\Laptop_demo_title_setup_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\Schedule Instant Demo no AP no Laptop\Schedule_Instant_Demo_no_AP_no_Laptop_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\test\test_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Camtasia Studio\UAT Laptop Demo Regs 1280\UAT_Laptop_Demo_Regs_1280_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Keep\iCloud Photos\Downloads\IMG_1267.jpg
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Certification_30-Sep\Cathy Schauer E360 US Level 1 B2B\Cathy_Schauer_E360_US_Level_1_B2B_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\D03_Chapter_1_PreDemoSteps\D03_Chapter_1_PreDemoSteps_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\Demo Store version\Supremo Fitness - Chapter 1 (Strategy to Plan)\Supremo_Fitness_-_Chapter_1_(Strategy_to_Plan)_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 1\E360_Chapter 1\E360_Chapter_1_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_Customer_Facing\D03_Chapter_9_Customer_Facing_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps\D03_Chapter_9_PreDemoSteps_Thumbnails.png
+\Work\Oracle\Thinkpad\Documents\Documents\Retire Windows Machine\E360\Ch 9\Demo Store Version\Supremo Fitness - Chapter 9 (Close to Analysis)\Supremo_Fitness_-_Chapter_9_(Close_to_Analysis)_Thumbnails.png
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\Activities_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\images\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\index_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_borders\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_derived\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_fpclass\_overlay\_derived\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_overlay\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_themes\buckinghamwoods\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\Activities_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\images\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\index_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_borders\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_derived\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_fpclass\_overlay\_derived\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_overlay\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_themes\buckinghamwoods\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\

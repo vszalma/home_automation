@@ -69,7 +69,7 @@ def _validate_excel(file_path):
 
     try:
         # Try to open the workbook
-        workbook = load_workbook(file_path)
+        workbook = load_workbook(file_path, read_only=True)
         # Check if the workbook contains any sheets
         if not workbook.sheetnames:
             return False, f"Invalid .xlsx file: {file_path} (No sheets found)."
@@ -92,7 +92,7 @@ def _validate_pdf(file_path):
 
             if reader.pages:
                 if reader.is_encrypted:
-                    return False, "File is encrypted"
+                    return True, "File is encrypted"
                 else:
                     return True, "Valid pdf file."
             else:
@@ -147,7 +147,9 @@ def _get_total_file_count(directory, exclusions):
 
     return file_count
 
-def _normalize_path(path):
+def _normalize_path(path, directory=None):
+    if directory:
+        path = f"{directory}{path}"
     return os.path.normpath(path)
 
 
@@ -206,7 +208,7 @@ def validate_files_by_type(start_folder, file_type_or_group):
         try:
             with open(exclusion_file, "r", encoding="utf-8") as f:
                 # exclusions = set(line.strip() for line in f if line.strip())
-                exclusions = set(_normalize_path(line.strip()) for line in f if line.strip())
+                exclusions = set(_normalize_path(line.strip(), start_folder) for line in f if line.strip())
         except FileNotFoundError:
             print(f"Exclusion file {exclusion_file} not found. Continuing without exclusions.")
 

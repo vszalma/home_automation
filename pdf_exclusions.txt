@@ -1,32 +1,34 @@
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\Documents\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\FinStmts\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\Documents\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\_vti_cnf\
-F:\_bu-2024-11-16\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
-F:\_bu-2024-11-16\Documents\Music charts\Fake Books\Real Rock book.pdf
-F:\_bu-2024-11-16\found.000\
-F:\_bu-2024-11-16\Old hd circa 2003\My Documents\Personal\boschdishwasher.pdf
-F:\_bu-2024-11-16\Old home pc\Victor's Documents\boschdishwasher.pdf
-F:\_bu-2024-11-16\OldPC\Old hd circa 2003\My Documents\Personal\boschdishwasher.pdf
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\Documents\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\FinStmts\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\Documents\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
-F:\_bu-2024-11-16\OldPC\Old home pc\Victor's Documentse\boschdishwasher.pdf
-F:\_bu-2024-11-16\Work\Msft\Backup\Mac1\Downloads\$RECYCLE.BIN\
-F:\_bu-2024-11-16\Work\Msft\Backup\Mac1\Downloads\_junk\SampleMilestonePlan.pdf
-F:\_bu-2024-11-16\Work\Msft\Backup\Mac2\Downloads\Market Format LDM.pdf
-F:\_bu-2024-11-16\Work\Msft\Final\2022 PerksPlus\Docking station receipt.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Downloads\CiscoVPN\vpnclient_setup.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\GCTS\Windows\Win7\RJS Briefing on Vista v.2.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\GPSC\GM Microsoft 1-25-08 SCM Final.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\Embedded comparison.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\GM - Windows CE and Windows Mobile.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\GM CE and Windows Mobile NDA Roadmaps_final.pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\Rally04_WSD (Pictor).pdf
-F:\_bu-2024-11-16\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\WinCE Pictor.pdf
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\Documents\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\FinStmts\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\Documents\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\_vti_cnf\
+\Cathy Stuff\Old home pc Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
+\Documents\Music charts\Fake Books\Real Rock book.pdf
+\found.000\
+\Old hd circa 2003\My Documents\Personal\boschdishwasher.pdf
+\Old home pc\Victor's Documents\boschdishwasher.pdf
+\OldPC\Old hd circa 2003\My Documents\Personal\boschdishwasher.pdf
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\Documents\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\FinStmts\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\New_BW_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\Buckingham Woods\godaddy0402\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\Documents\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods0622\New_BW_files\_vti_cnf\
+\OldPC\Old home pc\Cathy's Documents\My Web Sites\BWoods5\_vti_cnf\
+\OldPC\Old home pc\Victor's Documents\boschdishwasher.pdf
+\Work\Msft\Backup\Mac1\Downloads\$RECYCLE.BIN\
+\Work\Msft\Backup\Mac1\Downloads\_junk\SampleMilestonePlan.pdf
+\Work\Msft\Backup\Mac2\Downloads\Market Format LDM.pdf
+\Work\Msft\Final\2022 PerksPlus\Docking station receipt.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Downloads\CiscoVPN\vpnclient_setup.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\GCTS\Windows\Win7\RJS Briefing on Vista v.2.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\GPSC\GM Microsoft 1-25-08 SCM Final.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\Embedded comparison.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\GM - Windows CE and Windows Mobile.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\GM CE and Windows Mobile NDA Roadmaps_final.pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\Rally04_WSD (Pictor).pdf
+\Work\Msft\T61P backup\Victor\OldDDrive\Mesh\General Motors\FY09\M&Q\WinCE Pictor.pdf
+\Work\Msft\Final\Downloads\BDIC.pdf
+\Documents\Music charts\Jazz\Peterson, Oscar - The very best of Oscar Peterson.pdf
