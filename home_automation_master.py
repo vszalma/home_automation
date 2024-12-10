@@ -5,6 +5,7 @@ import os
 import sys
 from datetime import date
 import time
+import home_automation_common
 import structlog
 import logging
 
@@ -74,7 +75,12 @@ def main(source, destination):
     if _backup_needed(source, destination):
         destination = f"{destination}/BU-{date.today()}"
         start_time = time.time()
-        backup.execute_backup(source, destination)
+        backup_result = backup.execute_backup(source, destination)
+        if not backup_result:
+            subject = "BACKUP FAILED!"
+            body = "The backup failed. Please review the logs and rerun."
+            home_automation_common.send_email(subject, body)
+            return
         end_time = time.time()
         backup_duration = end_time - start_time
         print(f"Backup duration: {backup_duration}")
@@ -94,7 +100,7 @@ def main(source, destination):
         if compare.compare_files(output_source, output_destination):
             subject = "Successful backup"
             body = "The files match"
-            compare.send_email(subject, body)
+            home_automation_common.send_email(subject, body)
 
 
 def _list_and_sort_directories(path):

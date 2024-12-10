@@ -1,9 +1,8 @@
 import hashlib
 import sys
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from mailersend import emails
+import home_automation_common
+import datetime
+import structlog
 
 
 def _calculate_file_hash(file_path, hash_algorithm="sha256"):
@@ -47,65 +46,30 @@ def get_arguments(argv):
 
     return [file1, file2]
 
-from mailersend import emails
-
-def send_email(subject, body):
-    try:
-
-        mailer = emails.NewEmail("mlsn.011b4017977722058e2195d23680a996ed8e5204da1922fefe9e8e23a30bbc2f")
-
-        mail_body = {}
-
-        mail_from = {
-            "name": "me",
-            "email": "MS_eLLyva@trial-x2p034766dkgzdrn.mlsender.net",
-        }
-
-        recipients = [
-            {
-                "name": "Victor Szalma",
-                "email": "vszalma@hotmail.com",
-            }
-        ]
-
-        reply_to = {
-            "name": "Victor Szalma",
-            "email": "vszalma@hotmail.com",
-        }
-
-        mailer.set_mail_from(mail_from, mail_body)
-        mailer.set_mail_to(recipients, mail_body)
-        mailer.set_subject(subject, mail_body)
-        mailer.set_html_content(body, mail_body)
-        mailer.set_plaintext_content(body, mail_body)
-        mailer.set_reply_to(reply_to, mail_body)
-
-        # using print() will also return status code and data
-        mailer.send(mail_body)
-            
-
-        print(f"Email sent to {recipients}")
-        
-    except Exception as e:
-        print(f"Error sending email: {e}")
-
-
-
-
 
 if __name__ == "__main__":
+
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    log_file = f"{today}_validation_log.txt"
+
+    log_file = home_automation_common.get_full_filename("log", log_file)
+
+    home_automation_common.configure_logging(log_file)
+
+    logger = structlog.get_logger()
+
     arguments = get_arguments(sys.argv)
-    print("File to be compared (1): ", arguments[0])
-    print("File to be compared (2): ", arguments[1])
+    logger.info("Files to be compared.", file1=arguments[0], file2=arguments[1])
 
     if compare_files(arguments[0], arguments[1]):
-        print("The files are identical.")
+        logger.info("The files are identical.")
     else:
-        print("The files are different.")
+        logger.info("The files are different.")
 
-    send_email(
-        subject="Test Email from Python",
-        body="This is a test email.",
-        to_email="vszalma@hotmail.com",
-        from_email="vszalma@hotmail.com"
-    )
+    # home_automation_common.send_email(
+    #     subject="Test Email from Python",
+    #     body="This is a test email.",
+    #     to_email="vszalma@hotmail.com",
+    #     from_email="vszalma@hotmail.com",
+    # )
