@@ -21,12 +21,15 @@ def _calculate_file_hash(file_path, hash_algorithm="sha256"):
 
 
 def compare_files(file1, file2, hash_algorithm="sha256"):
+
+    logger = structlog.get_logger()
+
     try:
         hash1 = _calculate_file_hash(file1, hash_algorithm)
         hash2 = _calculate_file_hash(file2, hash_algorithm)
         return hash1 == hash2
     except Exception as e:
-        print(f"Error comparing files: {e}")
+        logger.error(f"An error occurred while comparing files", exception=e)
         return False
 
 
