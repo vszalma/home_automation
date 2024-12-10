@@ -5,6 +5,8 @@ import os
 import sys
 from datetime import date
 import time
+import structlog
+import logging
 
 
 def _backup_needed(source, destination):

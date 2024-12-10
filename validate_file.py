@@ -4,11 +4,16 @@ import re
 import sys
 import csv
 import warnings
+import structlog
+import logging
+from datetime import datetime
+from time import time
+import home_automation_common
 
 warnings.simplefilter("ignore", UserWarning)
 
 
-# Define logical groupings for file types
+# Define logical groupings for file types - also used in collector.py
 FILE_TYPE_GROUPS = {
     "image": [r".*\.(jpg|jpeg|png|gif|bmp|tiff)$"],
     "document": [r".*\.(docx)$"],
@@ -169,10 +174,24 @@ def _get_file_count_for_type(directory, compiled_pattern, exclusions):
 
     return file_count
 
-def _append_to_csv(file_path, data, headers=None):
-    file_exists = os.path.exists(file_path)  # Check if the file already exists
+def _write_summary_file(file_type_or_group, total_files, file_count, error_count, start_time, end_time):
+    summary_headers = ["date", "file_type", "total_file_count", "matching_file_count", "error_count", "start_time", "end_time", "duration"]
+    summary_output_file = ("validation_summary_output.csv")
+    today = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
 
-    with open(file_path, mode="a", newline="", encoding="utf-8") as csvfile:
+    summary_output_data = [today, file_type_or_group, total_files, file_count, error_count, start_time, end_time, end_time - start_time]
+    #headers = ["Date", "Description", "Details"]
+
+    _append_to_csv(summary_output_file, summary_output_data, summary_headers)
+
+
+def _append_to_csv(file_path, data, headers=None):
+
+    output_file = home_automation_common.get_full_filename("output", file_path)
+
+    file_exists = os.path.exists(output_file)  # Check if the file already exists
+
+    with open(output_file, mode="a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
 
         # Write headers if the file is newly created
@@ -184,8 +203,15 @@ def _append_to_csv(file_path, data, headers=None):
 
 
 def validate_files_by_type(start_folder, file_type_or_group):
-    from datetime import datetime
     from tqdm import tqdm
+
+    start_time = datetime.now()
+
+    logger = structlog.get_logger()
+
+    logger.info("Directory to be searched: ", folder=start_folder)
+    logger.info("Type of file to be validated: ", type=file_type_or_group)
+
 
     # Resolve regex patterns based on group or specific type
     if isinstance(file_type_or_group, str):
@@ -195,7 +221,12 @@ def validate_files_by_type(start_folder, file_type_or_group):
     elif isinstance(file_type_or_group, list):
         patterns = file_type_or_group
     else:
+        logger.error("file_type_or_group must be a string or a list")
         raise ValueError("file_type_or_group must be a string or a list")
+    
+    if not os.path.exists(start_folder):
+        logger.error(f"Folder {start_folder} does not exist. Retry.")
+        raise ValueError("Invalid folder was specified. It does not exist.")
 
     # Compile all patterns into a single regex for efficiency
     combined_pattern = re.compile("|".join(patterns), re.IGNORECASE)
@@ -210,21 +241,23 @@ def validate_files_by_type(start_folder, file_type_or_group):
                 # exclusions = set(line.strip() for line in f if line.strip())
                 exclusions = set(_normalize_path(line.strip(), start_folder) for line in f if line.strip())
         except FileNotFoundError:
-            print(f"Exclusion file {exclusion_file} not found. Continuing without exclusions.")
+            logger.info(f"Exclusion file {exclusion_file} not found. Continuing without exclusions.")
 
     file_count = 0
     error_count = 0
-    print(f"Looking for {file_type_or_group} files in directory {start_folder}.")
+    logger.info(f"Looking for {file_type_or_group} files in directory {start_folder}.")
 
     total_files = _get_total_file_count(start_folder, exclusions)
     matching_files = _get_file_count_for_type(start_folder, combined_pattern, exclusions)
 
-    print(f"Found a total of {matching_files} found. Validating files now.")
+    logger.info(f"Found a total of {matching_files} found. Validating files now.")
 
     headers = ["file_name", "error_message"]
     output_file = (
         f"{datetime.today().strftime('%Y-%m-%d')}-error-output-{file_type_or_group}.csv"
     )
+
+    output_file = home_automation_common.get_full_filename("output", output_file)
 
     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -263,38 +296,50 @@ def validate_files_by_type(start_folder, file_type_or_group):
                             case "document":
                                 is_valid, error_message = _validate_document(file_path)
                             case _:
-                                print("An undefined filetype is found")
+                                logger.error("An undefined filetype is found")
                                 is_valid, error_message = False, "Undefined filetype"
 
                         pbar.update(1)
                         if not is_valid:
                             error_count += 1
                             writer.writerow([file_path, error_message])
+                            logger.info(error_message, file=file_path)
 
     if error_count == 0:
         os.remove(output_file)
 
-    summary_headers = ["date", "file_type", "total_file_count", "matching_file_count", "error_count"]
-    summary_output_file = ("validation_summary_output.csv")
-    today = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
+    end_time = datetime.now()
 
-    summary_output_data = [today, file_type_or_group, total_files, file_count, error_count]
-    #headers = ["Date", "Description", "Details"]
+    _write_summary_file(file_type_or_group, total_files, file_count, error_count, start_time, end_time)
 
-    _append_to_csv(summary_output_file, summary_output_data, summary_headers)
-
-    print(f"Total files read: {total_files}")
-    print(f"Matching files read: {file_count}")
-    print(f"Total errors found: {error_count}")
-
+    # logger.info(f"Total files read: {total_files}")
+    # logger.info(f"Matching files read: {file_count}")
+    # logger.info(f"Total errors found: {error_count}")
+    logger.info("Analysis complete.", total_files=total_files, matching_files=matching_files,error_count=error_count)
 
 
 if __name__ == "__main__":
+
+    # today = datetime.today().strftime("%Y-%m-%d")
+
+    # logfile = f"{today}_validation_log.txt"
+    # os.makedirs(os.path.dirname(logfile), exist_ok=True)
+
+
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    log_file = f"{today}_validation_log.txt"
+
+    log_file = home_automation_common.get_full_filename("log", log_file)
+
+    home_automation_common.configure_logging(log_file)
+
+    logger = structlog.get_logger()
+
     arguments = _get_arguments(sys.argv)
-    print("Directory to be searched: ", arguments[0])
-    print("Type of file to be validated: ", arguments[1])
 
-    # Validate files
-    validate_files_by_type(arguments[0], arguments[1])
-
-    print("Analysis complete.")
+    if len(arguments) != 2:
+        logger.error("Invalid arguments.")
+    else:
+        # Validate files
+        validate_files_by_type(arguments[0], arguments[1])

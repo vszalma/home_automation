@@ -4,18 +4,24 @@ import csv
 from datetime import datetime
 import re
 import sys
+import structlog
+import home_automation_common
 
 
 def collect_file_info(directory):
+    logger = structlog.get_logger()
+    logger.info(f"Directory to be searched is {directory}.")
     if os.path.isdir(directory):
-        file_info = _calculate_file_info(directory)
+        file_info = _calculate_file_info(directory, logger)
         output_file = _output_file_info(directory, file_info)
+        logger.info("Collection completed.")
         return True, output_file
     else:
+        logger.error("Invalid directory. Please try again.")
         return False, "Invalid directory. Please try again."
 
 
-def _calculate_file_info(directory):
+def _calculate_file_info(directory, logger):
     # Dictionary to store file type information
     file_info = defaultdict(lambda: {"count": 0, "size": 0})
 
@@ -30,6 +36,7 @@ def _calculate_file_info(directory):
             try:
                 file_size = os.path.getsize(file_path)
             except OSError:
+                logger.warning("Skipped file {file_path} due to error.")
                 continue  # Skip files that can't be accessed
 
             # Update dictionary
@@ -54,6 +61,8 @@ def _output_file_info(directory, file_info):
     output_file = (
         f"{datetime.today().strftime('%Y-%m-%d')}-collector-output-{sanitized_name}.csv"
     )
+
+    output_file = home_automation_common.get_full_filename("output", output_file)
 
     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -82,8 +91,17 @@ def _get_arguments(argv):
 
 
 if __name__ == "__main__":
+
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    log_file = f"{today}_validation_log.txt"
+
+    log_file = home_automation_common.get_full_filename("log", log_file)
+
+    home_automation_common.configure_logging(log_file)
+
+    logger = structlog.get_logger()
+
     arguments = _get_arguments(sys.argv)
-    print("Directory to be searched: ", arguments[0])
+
     ret, error_message = collect_file_info(arguments[0])
-    if not ret:
-        print(error_message)
