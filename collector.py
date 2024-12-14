@@ -3,6 +3,7 @@ from collections import defaultdict
 import csv
 from datetime import datetime
 import re
+import stat
 import sys
 import structlog
 import home_automation_common
@@ -10,33 +11,56 @@ import home_automation_common
 
 def collect_file_info(directory):
     logger = structlog.get_logger()
-    logger.info(f"Directory to be searched is {directory}.")
+    logger.info("Directory search.", module="collector", message=f"Directory to be searched is {directory}.")
+    exclusions = home_automation_common.get_exclusion_list("collector", directory)
     if os.path.isdir(directory):
-        file_info = _calculate_file_info(directory, logger)
+        file_info = _calculate_file_info(directory, logger, exclusions)
         output_file = _output_file_info(directory, file_info)
-        logger.info("Collection completed.")
+        logger.info("Collection completed.", module="collector", message="Collection completed.")
         return True, output_file
     else:
-        logger.error("Invalid directory. Please try again.")
+        logger.error("Invalid directory.", module="collector", message="Invalid directory. Please correct and try again.")
         return False, "Invalid directory. Please try again."
 
 
-def _calculate_file_info(directory, logger):
+def _is_hidden_or_system(file_path):
+    """
+    Determine if a file is hidden or a system file (Windows only).
+    Returns True if the file is hidden or system, False otherwise.
+    """
+    try:
+        file_attributes = os.stat(file_path).st_file_attributes
+        return bool(file_attributes & (stat.FILE_ATTRIBUTE_HIDDEN | stat.FILE_ATTRIBUTE_SYSTEM))
+    except AttributeError:
+        # For non-Windows systems, return False (no hidden/system attributes)
+        return False
+
+
+def _calculate_file_info(directory, logger, exclusions):
     # Dictionary to store file type information
     file_info = defaultdict(lambda: {"count": 0, "size": 0})
 
     # Walk through the directory tree
-    for root, _, files in os.walk(directory):
+    for root, dirs, files in os.walk(directory):
+                # Modify the dirs list to exclude specified directories
+        dirs[:] = [d for d in dirs if d not in exclusions]
+
         for file in files:
             # Get file extension and size
             file_path = os.path.join(root, file)
+
+            # Skip hidden or system files
+            # if _is_hidden_or_system(file_path):
+            #     logger.info("Skipping file(s).", module="collector", message=f"Skipping hidden or system file: {file_path}")
+            #     continue
+
             file_extension = os.path.splitext(file)[
                 1
             ].lower()  # Get the extension (case-insensitive)
             try:
                 file_size = os.path.getsize(file_path)
             except OSError:
-                logger.warning("Skipped file {file_path} due to error.")
+                logger.warning("File skipped.", module="collector", message=f"Skipped file {file_path} due to error.")
                 continue  # Skip files that can't be accessed
 
             # Update dictionary
@@ -59,7 +83,7 @@ def _output_file_info(directory, file_info):
     sanitized_name = _sanitize_filename(directory)
 
     output_file = (
-        f"{datetime.today().strftime('%Y-%m-%d')}-collector-output-{sanitized_name}.csv"
+        f"{datetime.now().date()}-collector-output-{sanitized_name}.csv"
     )
 
     output_file = home_automation_common.get_full_filename("output", output_file)
@@ -92,9 +116,9 @@ def _get_arguments(argv):
 
 if __name__ == "__main__":
 
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.now().date()
 
-    log_file = f"{today}_validation_log.txt"
+    log_file = f"{today}_collector_log.txt"
 
     log_file = home_automation_common.get_full_filename("log", log_file)
 

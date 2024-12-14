@@ -6,7 +6,7 @@ import csv
 import warnings
 import structlog
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import time
 import home_automation_common
 
@@ -41,7 +41,6 @@ def _get_arguments(argv):
     return [arg_directory, arg_filetypes]
 
 
-
 def _validate_document(file_path):
     from docx import Document
 
@@ -61,6 +60,7 @@ def _validate_document(file_path):
 
 def _validate_audio(file_path):
     from pydub import AudioSegment
+
     try:
         # Attempt to load the audio file
         audio = AudioSegment.from_file(file_path)
@@ -152,6 +152,7 @@ def _get_total_file_count(directory, exclusions):
 
     return file_count
 
+
 def _normalize_path(path, directory=None):
     if directory:
         path = f"{directory}{path}"
@@ -174,13 +175,35 @@ def _get_file_count_for_type(directory, compiled_pattern, exclusions):
 
     return file_count
 
-def _write_summary_file(file_type_or_group, total_files, file_count, error_count, start_time, end_time):
-    summary_headers = ["date", "file_type", "total_file_count", "matching_file_count", "error_count", "start_time", "end_time", "duration"]
-    summary_output_file = ("validation_summary_output.csv")
-    today = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
 
-    summary_output_data = [today, file_type_or_group, total_files, file_count, error_count, start_time, end_time, end_time - start_time]
-    #headers = ["Date", "Description", "Details"]
+def _write_summary_file(
+    file_type_or_group, total_files, file_count, error_count, start_time, end_time
+):
+    summary_headers = [
+        "date",
+        "file_type",
+        "total_file_count",
+        "matching_file_count",
+        "error_count",
+        "start_time",
+        "end_time",
+        "duration",
+    ]
+    summary_output_file = "validation_summary_output.csv"
+
+    duration = home_automation_common.duration_from_times(end_time, start_dime)
+
+    summary_output_data = [
+        today,
+        file_type_or_group,
+        total_files,
+        file_count,
+        error_count,
+        start_time,
+        end_time,
+        duration,
+    ]
+    # headers = ["Date", "Description", "Details"]
 
     _append_to_csv(summary_output_file, summary_output_data, summary_headers)
 
@@ -205,13 +228,11 @@ def _append_to_csv(file_path, data, headers=None):
 def validate_files_by_type(start_folder, file_type_or_group):
     from tqdm import tqdm
 
-    start_time = datetime.now()
+    start_time = datetime.now().time()
 
     logger = structlog.get_logger()
 
-    logger.info("Directory to be searched: ", folder=start_folder)
-    logger.info("Type of file to be validated: ", type=file_type_or_group)
-
+    logger.info("Searching for file types.", module="validation_file", message="Directory to be searched for file types.", folder=start_folder, type=file_type_or_group)
 
     # Resolve regex patterns based on group or specific type
     if isinstance(file_type_or_group, str):
@@ -221,11 +242,11 @@ def validate_files_by_type(start_folder, file_type_or_group):
     elif isinstance(file_type_or_group, list):
         patterns = file_type_or_group
     else:
-        logger.error("file_type_or_group must be a string or a list")
+        logger.error("Invalid file type argument.", module="backup", message="file_type_or_group must be a string or a list")
         raise ValueError("file_type_or_group must be a string or a list")
-    
+
     if not os.path.exists(start_folder):
-        logger.error(f"Folder {start_folder} does not exist. Retry.")
+        logger.error("Folder does not exist", module="validate_file", message=f"Folder {start_folder} does not exist. Retry.")
         raise ValueError("Invalid folder was specified. It does not exist.")
 
     # Compile all patterns into a single regex for efficiency
@@ -239,22 +260,30 @@ def validate_files_by_type(start_folder, file_type_or_group):
         try:
             with open(exclusion_file, "r", encoding="utf-8") as f:
                 # exclusions = set(line.strip() for line in f if line.strip())
-                exclusions = set(_normalize_path(line.strip(), start_folder) for line in f if line.strip())
+                exclusions = set(
+                    _normalize_path(line.strip(), start_folder)
+                    for line in f
+                    if line.strip()
+                )
         except FileNotFoundError:
-            logger.info(f"Exclusion file {exclusion_file} not found. Continuing without exclusions.")
+            logger.info(
+                "No exclusions found.", module="validate_file", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
+            )
 
     file_count = 0
     error_count = 0
-    logger.info(f"Looking for {file_type_or_group} files in directory {start_folder}.")
+    logger.info("File type search beginning.", module="validate_file", message=f"Looking for {file_type_or_group} files in directory {start_folder}.")
 
     total_files = _get_total_file_count(start_folder, exclusions)
-    matching_files = _get_file_count_for_type(start_folder, combined_pattern, exclusions)
+    matching_files = _get_file_count_for_type(
+        start_folder, combined_pattern, exclusions
+    )
 
-    logger.info(f"Found a total of {matching_files} found. Validating files now.")
+    logger.info("Matching files found.", module="validate_file", message=f"Found a total of {matching_files} found. Validating files now.")
 
     headers = ["file_name", "error_message"]
     output_file = (
-        f"{datetime.today().strftime('%Y-%m-%d')}-error-output-{file_type_or_group}.csv"
+        f"{datetime.now().date()}-error-output-{file_type_or_group}.csv"
     )
 
     output_file = home_automation_common.get_full_filename("output", output_file)
@@ -296,39 +325,37 @@ def validate_files_by_type(start_folder, file_type_or_group):
                             case "document":
                                 is_valid, error_message = _validate_document(file_path)
                             case _:
-                                logger.error("An undefined filetype is found")
+                                logger.error("Incorrect file type found.", module="validate_file", message="An undefined filetype is found")
                                 is_valid, error_message = False, "Undefined filetype"
 
                         pbar.update(1)
                         if not is_valid:
                             error_count += 1
                             writer.writerow([file_path, error_message])
-                            logger.info(error_message, file=file_path)
+                            logger.info("File validation exception found.", module="validate_file", message=error_message, file=file_path)
 
     if error_count == 0:
         os.remove(output_file)
 
-    end_time = datetime.now()
+    end_time = datetime.now().time()
 
-    _write_summary_file(file_type_or_group, total_files, file_count, error_count, start_time, end_time)
+    _write_summary_file(
+        file_type_or_group, total_files, file_count, error_count, start_time, end_time
+    )
 
-    # logger.info(f"Total files read: {total_files}")
-    # logger.info(f"Matching files read: {file_count}")
-    # logger.info(f"Total errors found: {error_count}")
-    logger.info("Analysis complete.", total_files=total_files, matching_files=matching_files,error_count=error_count)
+    logger.info(
+        "Validation completed.", module="backup", message="Analysis complete.",
+        total_files=total_files,
+        matching_files=matching_files,
+        error_count=error_count,
+    )
 
 
 if __name__ == "__main__":
 
-    # today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.now().date()
 
-    # logfile = f"{today}_validation_log.txt"
-    # os.makedirs(os.path.dirname(logfile), exist_ok=True)
-
-
-    today = datetime.today().strftime("%Y-%m-%d")
-
-    log_file = f"{today}_validation_log.txt"
+    log_file = f"{today}_validate_file_log.txt"
 
     log_file = home_automation_common.get_full_filename("log", log_file)
 
@@ -339,7 +366,7 @@ if __name__ == "__main__":
     arguments = _get_arguments(sys.argv)
 
     if len(arguments) != 2:
-        logger.error("Invalid arguments.")
+        logger.error("Invalid arguments.", module="validate_file", message="Invalid arguments.")
     else:
         # Validate files
         validate_files_by_type(arguments[0], arguments[1])

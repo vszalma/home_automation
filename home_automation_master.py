@@ -1,9 +1,11 @@
+import datetime
 import collector
 import compare
 import backup
 import os
 import sys
-from datetime import date
+#from datetime import date
+from datetime import datetime
 import time
 import home_automation_common
 import structlog
@@ -26,22 +28,22 @@ def _backup_needed(source, destination):
     )
     end_time = time.time()
     destination_duration = end_time - start_time
-    print(f"Time taken go collect file info for destination prior to backup: {destination_duration}")
+    logging.info(f"Time taken go collect file info for destination prior to backup: {destination_duration}")
 
     if ret_destination:
-        print(f"output file: {output_destination}")
+        logging.info(f"output file: {output_destination}")
 
     start_time = time.time()
     ret_source, output_source = collector.collect_file_info(source)
     if ret_source:
-        print(f"output file: {output_source}")
+        logging.info(f"output file: {output_source}")
     end_time = time.time()
     source_duration = end_time - start_time
-    print(f"Time taken go collect file info for source prior to backup: {source_duration}")
+    logger.info("File metadata collection duration.", module="home_automation_master", message=f"Time taken go collect file info for source prior to backup: {source_duration}")
 
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
-            compare.send_email(
+            home_automation_common.send_email(
                 "Backup not run.",
                 "There was no need to backup files as the content hasn't changed.",
             )
@@ -73,7 +75,7 @@ def main(source, destination):
 
     # execute backup if needed.
     if _backup_needed(source, destination):
-        destination = f"{destination}/BU-{date.today()}"
+        destination = f"{destination}\BU-{datetime.now().date()}"
         start_time = time.time()
         backup_result = backup.execute_backup(source, destination)
         if not backup_result:
@@ -83,17 +85,17 @@ def main(source, destination):
             return
         end_time = time.time()
         backup_duration = end_time - start_time
-        print(f"Backup duration: {backup_duration}")
+        logger.info("Backup completed.", module="home_automation_master", message="Backup completed.", start_time=start_time, end_time=end_time, duration=backup_duration)
 
 
     # After backup, validate backup was successful (i.e. matches source file counts and sizes.)
     ret_source, output_source = collector.collect_file_info(source)
     if ret_source:
-        print(f"output file: {output_source}")
+        logger.info("Collector output.", module="home_automation_master", message=f"output file: {output_source}")
 
     ret_destination, output_destination = collector.collect_file_info(destination)
     if ret_destination:
-        print(f"output file: {output_destination}")
+        logger.info("Collector output", module="home_automation_master", message=f"output file: {output_destination}")
 
     # if different, run a backup
     if ret_source and ret_destination:
@@ -128,10 +130,21 @@ def _list_and_sort_directories(path):
         return [d[0] for d in sorted_dirs]
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.exception("File collection exception found.", module="home_automation_master", message=f"An error occurred: {e}")
         return []
 
 
 if __name__ == "__main__":
+
+    today = datetime.now().date()    #.strftime("%Y-%m-%d")
+
+    log_file = f"{today}_home_automation_log.txt"
+
+    log_file = home_automation_common.get_full_filename("log", log_file)
+
+    home_automation_common.configure_logging(log_file)
+
+    logger = structlog.get_logger()
+
     arguments = _get_arguments(sys.argv)
     main(arguments[0], arguments[1])

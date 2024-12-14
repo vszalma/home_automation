@@ -2,6 +2,8 @@ import logging
 import structlog
 import os
 from mailersend import emails
+from datetime import datetime
+from datetime import timedelta
 
 
 def configure_logging(log_file_name):
@@ -34,6 +36,21 @@ def get_full_filename(directory_name, file_name):
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     return output_file
+
+
+def duration_from_times(start_time, end_time):
+    date_today = datetime.today().date()
+    start_datetime = datetime.combine(date_today, start_time)
+
+    if end_time < start_time:
+        end_datetime = datetime.combine(date_today + timedelta(days=1), end_time)
+    else:
+        end_datetime = datetime.combine(date_today, end_time)
+
+    duration = (end_datetime - start_datetime)
+
+    return duration
+
 
 
 def send_email(subject, body):
@@ -73,7 +90,36 @@ def send_email(subject, body):
 
         logger = structlog.get_logger()
 
-        logger.info(f"Email sent to {recipients}")
+        logger.info("Email sent.", module="home_automation_common", message=f"Email sent to {recipients}")
 
     except Exception as e:
-        logger.error("Error sending email.", exception=e)
+        logger.error("Email failure.", module="home_automation_common", message="Error sending email.", exception=e)
+
+def _normalize_path(path, directory=None):
+    if directory:
+        path = f"{directory}{path}"
+    return os.path.normpath(path)
+
+def get_exclusion_list(exclusion_type, start_folder):
+
+    logger = structlog.get_logger()
+
+    exclusion_file = f"{exclusion_type}_exclusions.txt"
+
+    # Load exclusions
+    exclusions = set()
+    if exclusion_file:
+        try:
+            with open(exclusion_file, "r", encoding="utf-8") as f:
+                # exclusions = set(line.strip() for line in f if line.strip())
+                exclusions = set(
+                    _normalize_path(line.strip(), start_folder)
+                    for line in f
+                    if line.strip()
+                )
+        except FileNotFoundError:
+            logger.info(
+                "No exclusions found.", module="home_automation_common", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
+            )
+    
+    return exclusions

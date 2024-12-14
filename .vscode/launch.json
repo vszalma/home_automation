@@ -10,8 +10,9 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            //"args": ["F:\\_bu-2024-11-16", "pdf"],
-            "args": ["F:\\source", "F:\\backup"]
+            //"args": ["F:\\_bu-2024-11-16\\Music\\Ahmad Jamal\\Ahmad's Blues", "audio"],
+            // "args": ["G:\\Backups\\BU-2024-12-12", "F:\\_bu-2024-11-16", "dex"]
+            "args": ["E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-F_bu-2024-11-16.csv", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-GBackupsBU-2024-12-12.csv"]
         }
     ]
 }

@@ -1,7 +1,7 @@
 import hashlib
 import sys
 import home_automation_common
-import datetime
+from datetime import datetime
 import structlog
 
 
@@ -29,7 +29,7 @@ def compare_files(file1, file2, hash_algorithm="sha256"):
         hash2 = _calculate_file_hash(file2, hash_algorithm)
         return hash1 == hash2
     except Exception as e:
-        logger.error(f"An error occurred while comparing files", exception=e)
+        logger.error("File comparison error.", module="compare", message="An error occurred while comparing files", exception=e)
         return False
 
 
@@ -52,9 +52,9 @@ def get_arguments(argv):
 
 if __name__ == "__main__":
 
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.now().date()
 
-    log_file = f"{today}_validation_log.txt"
+    log_file = f"{today}_compare_log.txt"
 
     log_file = home_automation_common.get_full_filename("log", log_file)
 
@@ -63,12 +63,12 @@ if __name__ == "__main__":
     logger = structlog.get_logger()
 
     arguments = get_arguments(sys.argv)
-    logger.info("Files to be compared.", file1=arguments[0], file2=arguments[1])
+    logger.info("File comparison starting.", module="compare", message="Files to be compared.", file1=arguments[0], file2=arguments[1])
 
     if compare_files(arguments[0], arguments[1]):
-        logger.info("The files are identical.")
+        logger.info("File comparison successful", module="compare", message="The files are identical.")
     else:
-        logger.info("The files are different.")
+        logger.warning("File comparison failed.", module="compare", message="The files are different.")
 
     # home_automation_common.send_email(
     #     subject="Test Email from Python",
