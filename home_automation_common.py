@@ -1,4 +1,5 @@
 import logging
+import re
 import structlog
 import os
 from mailersend import emails
@@ -98,9 +99,19 @@ def send_email(subject, body):
 def _normalize_path(path, directory=None):
     if directory:
         path = f"{directory}{path}"
-    return os.path.normpath(path)
+        return os.path.normpath(path)
+    else:
+        return path
 
-def get_exclusion_list(exclusion_type, start_folder):
+
+def sanitize_filename(directory):
+    invalid_chars = r'[<>:"/\\|?*]'  # Windows-invalid characters
+    sanitized = re.sub(invalid_chars, "", directory)
+    sanitized = sanitized.strip()  # Remove leading and trailing spaces
+    return sanitized
+
+
+def get_exclusion_list(exclusion_type, start_folder=None):
 
     logger = structlog.get_logger()
 
@@ -112,11 +123,18 @@ def get_exclusion_list(exclusion_type, start_folder):
         try:
             with open(exclusion_file, "r", encoding="utf-8") as f:
                 # exclusions = set(line.strip() for line in f if line.strip())
-                exclusions = set(
-                    _normalize_path(line.strip(), start_folder)
-                    for line in f
-                    if line.strip()
-                )
+                if start_folder:
+                    exclusions = set(
+                        _normalize_path(line.strip(), start_folder)
+                        for line in f
+                        if line.strip()
+                    )
+                else:
+                    exclusions = set(
+                        _normalize_path(line.strip())
+                        for line in f
+                        if line.strip()
+                    )
         except FileNotFoundError:
             logger.info(
                 "No exclusions found.", module="home_automation_common", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."

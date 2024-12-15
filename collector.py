@@ -12,7 +12,7 @@ import home_automation_common
 def collect_file_info(directory):
     logger = structlog.get_logger()
     logger.info("Directory search.", module="collector", message=f"Directory to be searched is {directory}.")
-    exclusions = home_automation_common.get_exclusion_list("collector", directory)
+    exclusions = home_automation_common.get_exclusion_list("collector")
     if os.path.isdir(directory):
         file_info = _calculate_file_info(directory, logger, exclusions)
         output_file = _output_file_info(directory, file_info)
@@ -40,9 +40,15 @@ def _calculate_file_info(directory, logger, exclusions):
     # Dictionary to store file type information
     file_info = defaultdict(lambda: {"count": 0, "size": 0})
 
+    # Add the \\?\ prefix to the root directory
+    if os.name == "nt":  # Only apply on Windows
+        directory = r"\\?\\" + os.path.abspath(directory)
+    else:
+        directory = os.path.abspath(directory)
+
     # Walk through the directory tree
     for root, dirs, files in os.walk(directory):
-                # Modify the dirs list to exclude specified directories
+        # Modify the dirs list to exclude specified directories
         dirs[:] = [d for d in dirs if d not in exclusions]
 
         for file in files:
@@ -54,10 +60,11 @@ def _calculate_file_info(directory, logger, exclusions):
             #     logger.info("Skipping file(s).", module="collector", message=f"Skipping hidden or system file: {file_path}")
             #     continue
 
-            file_extension = os.path.splitext(file)[
-                1
-            ].lower()  # Get the extension (case-insensitive)
+            file_extension = os.path.splitext(file)[1].lower()  # Get the extension (case-insensitive)
             try:
+                # Ensure the file path uses the extended-length prefix
+                # if os.name == "nt":
+                #     file_path = r"\\?\\" + os.path.abspath(file_path)
                 file_size = os.path.getsize(file_path)
             except OSError:
                 logger.warning("File skipped.", module="collector", message=f"Skipped file {file_path} due to error.")
@@ -70,17 +77,10 @@ def _calculate_file_info(directory, logger, exclusions):
     return file_info
 
 
-def _sanitize_filename(directory):
-    invalid_chars = r'[<>:"/\\|?*]'  # Windows-invalid characters
-    sanitized = re.sub(invalid_chars, "", directory)
-    sanitized = sanitized.strip()  # Remove leading and trailing spaces
-    return sanitized
-
-
 def _output_file_info(directory, file_info):
     # Print a summary of the results
 
-    sanitized_name = _sanitize_filename(directory)
+    sanitized_name = home_automation_common.sanitize_filename(directory)
 
     output_file = (
         f"{datetime.now().date()}-collector-output-{sanitized_name}.csv"

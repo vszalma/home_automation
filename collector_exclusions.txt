@@ -1,2 +1,2 @@
-\found.000\
-\$RECYCLE.BIN\
+found.000
+$RECYCLE.BIN
