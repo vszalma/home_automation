@@ -7,20 +7,36 @@ import stat
 import sys
 import structlog
 import home_automation_common
+from validate_file import FILE_TYPE_GROUPS
 
 
 def collect_file_info(directory):
     logger = structlog.get_logger()
     logger.info("Directory search.", module="collector", message=f"Directory to be searched is {directory}.")
     exclusions = home_automation_common.get_exclusion_list("collector")
+    filetype_lookup  = _build_reverse_filetype_lookup(FILE_TYPE_GROUPS)
     if os.path.isdir(directory):
-        file_info = _calculate_file_info(directory, logger, exclusions)
+        file_info = _calculate_file_info(directory, logger, exclusions, filetype_lookup)
         output_file = _output_file_info(directory, file_info)
         logger.info("Collection completed.", module="collector", message="Collection completed.")
         return True, output_file
     else:
         logger.error("Invalid directory.", module="collector", message="Invalid directory. Please correct and try again.")
         return False, "Invalid directory. Please try again."
+
+
+def _build_reverse_filetype_lookup(file_type_groups):
+    """Create a reverse lookup dictionary from FILE_TYPE_GROUPS."""
+    reverse_lookup = {}
+    for group, patterns in file_type_groups.items():
+        for pattern in patterns:
+            # Extract extensions from the pattern
+            matches = re.findall(r"\((.*?)\)", pattern)  # Capture inside parentheses
+            if matches:  # Ensure there's a match
+                extensions = matches[0].split("|")  # Split the matched string by '|'
+                for ext in extensions:
+                    reverse_lookup[f".{ext.lower()}"] = group
+    return reverse_lookup
 
 
 def _is_hidden_or_system(file_path):
@@ -36,9 +52,9 @@ def _is_hidden_or_system(file_path):
         return False
 
 
-def _calculate_file_info(directory, logger, exclusions):
+def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
     # Dictionary to store file type information
-    file_info = defaultdict(lambda: {"count": 0, "size": 0})
+    file_info = defaultdict(lambda: {"count": 0, "size": 0, "group": ""})
 
     # Add the \\?\ prefix to the root directory
     if os.name == "nt":  # Only apply on Windows
@@ -66,6 +82,7 @@ def _calculate_file_info(directory, logger, exclusions):
                 # if os.name == "nt":
                 #     file_path = r"\\?\\" + os.path.abspath(file_path)
                 file_size = os.path.getsize(file_path)
+                group_name = filetype_lookup.get(file_extension, "unknown")
             except OSError:
                 logger.warning("File skipped.", module="collector", message=f"Skipped file {file_path} due to error.")
                 continue  # Skip files that can't be accessed
@@ -73,6 +90,7 @@ def _calculate_file_info(directory, logger, exclusions):
             # Update dictionary
             file_info[file_extension]["count"] += 1
             file_info[file_extension]["size"] += file_size
+            file_info[file_extension]["group"] += group_name
 
     return file_info
 
