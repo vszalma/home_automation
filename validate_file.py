@@ -191,7 +191,7 @@ def _write_summary_file(
     ]
     summary_output_file = "validation_summary_output.csv"
 
-    duration = home_automation_common.duration_from_times(end_time, start_dime)
+    duration = home_automation_common.duration_from_times(end_time, start_time)
 
     summary_output_data = [
         today,
@@ -309,7 +309,7 @@ def validate_files_by_type(start_folder, file_type_or_group):
                     if combined_pattern.match(filename):
                         file_count += 1
                         pbar.set_description(f"Processing: {filename}")
-
+                        file_path = r"\\?\\" + os.path.abspath(file_path)
                         # Validate file based on type
                         match file_type_or_group:
                             case "image":
@@ -344,7 +344,7 @@ def validate_files_by_type(start_folder, file_type_or_group):
     )
 
     logger.info(
-        "Validation completed.", module="backup", message="Analysis complete.",
+        "Validation completed.", module="validate_file", message="Analysis complete.",
         total_files=total_files,
         matching_files=matching_files,
         error_count=error_count,
