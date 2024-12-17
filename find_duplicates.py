@@ -47,10 +47,24 @@ def _calculate_file_hash(file_path, chunk_size=8192):
 
 def _group_files_by_size(directory, file_extension):
     """Group files by size after filtering by extension."""
+    from tqdm import tqdm
     exclusions = home_automation_common.get_exclusion_list("collector", None)
     size_map = defaultdict(list)
-    total_files = sum(len(files) for _, _, files in os.walk(directory))
-    with tqdm(total=total_files, desc="Scanning files", unit="file") as pbar:
+
+    # Accurately count only files to be processed
+    total_files = 0
+    for root, dirs, files in os.walk(directory):
+        dirs[:] = [d for d in dirs if d not in exclusions]
+        total_files += sum(1 for file in files if file.lower().endswith(file_extension.lower()))
+
+    print(f"Total files to process: {total_files}")
+
+    if total_files == 0:
+        print("No matching files found.")
+        return size_map  # Exit early if no files to process
+
+    # Initialize tqdm progress bar
+    with tqdm(total=total_files, desc="Scanning files", unit="file", leave=True, mininterval=0.1) as pbar:
         for root, dirs, files in os.walk(directory):
             dirs[:] = [d for d in dirs if d not in exclusions]
             for file in files:
@@ -58,16 +72,17 @@ def _group_files_by_size(directory, file_extension):
                     file_path = Path(root) / file
                     try:
                         file_size = os.path.getsize(file_path)
-                        size_map[file_size].append(file_path)
+                        if file_size > 0:
+                            size_map[file_size].append(file_path)
                     except Exception as e:
-                        print(f"Error accessing file {file_path}: {e}")
                         logger.exception(
                             "File error",
                             module="find_duplicates._group_files_by_size",
                             message=e,
                             file_path=file_path,
                         )
-                pbar.update(1)  # Update progress bar
+                    pbar.update(1)  # Update progress bar only for matching files
+
     return size_map
 
 
@@ -82,19 +97,24 @@ def _process_duplicates(duplicates, output_file):
     headers = [
         "duplicate_count",
         "hash",
+        "duplicate_file_count",
         "file_path",
     ]
 
     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)  # Write the headers
-        dup_number = 0
+        hash_count = 0
+        file_count_per_hash = 0
         for hash_val, files in duplicates.items():
-            dup_number += 1
+            hash_count += 1
+            file_count_per_hash = 0
             for file in files:
+                file_count_per_hash += 1
                 duplicate_data = [
-                    dup_number,
+                    hash_count,
                     hash_val,
+                    file_count_per_hash,
                     file,
                 ]
                 writer.writerow(duplicate_data)
