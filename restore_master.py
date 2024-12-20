@@ -13,78 +13,70 @@ import structlog
 import logging
 
 
-def _backup_needed(source, destination):
+def _backup_available(source, destination):
     
     logger = structlog.get_logger()
 
-    # Get most recent backup file location.
-    backup_dir_list = _list_and_sort_directories(destination)
-
-    if not backup_dir_list:
-        return True
+    if "BU-" in source:
+        # validate if source dir exists if argument is a full path to a backup file.
+        if not os.path.exists(source):
+            logger.error("Restore not found.", module="restore._backup_available", message="The source directory provided does not exist.")
+            return False, "None"
     else:
-        most_recent_backup = os.path.join(destination, backup_dir_list[0])
-
-    start_time = time.time()
-    ret_destination, output_destination = collector.collect_file_info(
-        most_recent_backup
-    )
-    end_time = time.time()
-    destination_duration = end_time - start_time
-    logger.info(
-        f"Time taken go collect file info for destination prior to backup: {destination_duration}"
-    )
-
-    if ret_destination:
-        logger.info(f"output file: {output_destination}")
-
-    start_time = time.time()
-    ret_source, output_source = collector.collect_file_info(source)
-    if ret_source:
-        logger.info(f"output file: {output_source}")
-    end_time = time.time()
-    source_duration = end_time - start_time
-    logger.info(
-        "File metadata collection duration.",
-        module="home_automation_master",
-        message=f"Time taken go collect file info for source prior to backup: {source_duration}",
-    )
-
-    if ret_source and ret_destination:
-        if compare.compare_files(output_source, output_destination):
-            home_automation_common.send_email(
-                "Backup not run.",
-                "There was no need to backup files as the content hasn't changed.",
-            )
-            return False
+        # Get most recent backup file location.
+        backup_dir_list = _list_and_sort_directories(destination)
+        if not backup_dir_list:
+            logger.error("Restore not found.", module="restore._backup_available", message="The source directory does not contain any valid backups.")
+            return False, "None"
         else:
-            return True
+            most_recent_backup = os.path.join(destination, backup_dir_list[0])
+            return True, most_recent_backup
 
 
-def _handle_backup_and_validate(source, destination):
+
+def _restore_and_validate(source, destination):
     
     logger = structlog.get_logger()
-    destination = f"{destination}\BU-{datetime.now().date()}"
+
     start_time = time.time()
-    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup")
-    # backup_result = True
-    if not backup_result:
-        subject = "BACKUP FAILED!"
-        body = "The backup failed. Please review the logs and rerun."
-        home_automation_common.send_email(subject, body)
-        return
+
+    # restore_result = backup.execute_backup(source, destination)
+    restore_result = True
+
     end_time = time.time()
     backup_duration = end_time - start_time
-    logger.info(
-        "Backup completed.",
-        module="home_automation_master",
-        message="Backup completed.",
-        start_time=start_time,
-        end_time=end_time,
-        duration=backup_duration,
-    )
 
-    _validate_backup_results(source, destination)
+    if not restore_result:
+        subject = "RESTORE FAILED!"
+        body = "The restore failed. Please review the logs and rerun."
+        home_automation_common.send_email(subject, body)
+
+        logger.error(
+            "Restore failed.",
+            module="restore._handle_restore_and_validate",
+            message="The restore failed. Please review the logs and rerun",
+            start_time=start_time,
+            end_time=end_time,
+            duration=backup_duration,
+            source=source,
+            destination=destination
+        )
+
+        return False
+    else:
+    
+        logger.info(
+            "Restore completed.",
+            module="restore._handle_restore_and_validate",
+            message="Backup completed.",
+            start_time=start_time,
+            end_time=end_time,
+            duration=backup_duration,
+            source=source,
+            destination=destination
+        )
+
+        return _validate_results(source, destination)
 
 
 def _get_arguments(argv):
@@ -106,7 +98,7 @@ def _get_arguments(argv):
     return [arg_source, arg_destination]
 
 
-def _validate_backup_results(source, destination):
+def _validate_results(source, destination):
     
     logger = structlog.get_logger()
 
@@ -127,23 +119,44 @@ def _validate_backup_results(source, destination):
             message=f"output file: {output_destination}",
         )
 
-    # if different, run a backup
+    # validate source and destination have same content
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
             subject = "Successful backup"
             body = "The files match"
             home_automation_common.send_email(subject, body)
+            logger.info(
+                    "Restore validated.",
+                    module="restore._validate_results",
+                    message="Source and destination are identical. Restore has been validated.",
+                )
+
+            return True
+        else:
+            logger.error(
+                    "Restore not valid.",
+                    module="restore._validate_results",
+                    message="Source and destination are different. Restore unsuccessful, review and retry.",
+                )
+            return False
+    else:
+        logger.error(
+                "Restore validation failed.",
+                module="restore._validate_results",
+                message="An error occurred while validating source and destination. Restore failed, review and retry.",
+            )
+        return False
 
 
-def coordinate_backup_process(source, destination, logger_exists=True):
+def coordinate_restore_process(source, destination, create_logger=True):
 
-    if not logger_exists:
-        home_automation_common.create_logger()
+    if create_logger:
+        home_automation_common.create_logger("restore")
 
+    backup_is_available, backup_file_source = _backup_available(source, destination)
     # execute backup if needed.
-    if _backup_needed(source, destination):
-        _handle_backup_and_validate(source, destination)
-        return True
+    if backup_is_available:
+        return _restore_and_validate(backup_file_source, destination)
     else:
         return False
 
@@ -202,7 +215,6 @@ def _list_and_sort_directories(path):
 
 
 if __name__ == "__main__":
-    home_automation_common.create_logger()
 
     arguments = _get_arguments(sys.argv)
-    coordinate_backup_process(arguments[0], arguments[1], True)
+    coordinate_restore_process(arguments[0], arguments[1], True)

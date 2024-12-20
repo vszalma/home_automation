@@ -20,7 +20,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             // "args": ["G:\\Backups\\BU-2024-12-12", ".txt"],
-            "args": ["F:\\_bu-2024-11-16", "G:\\Backups"]   // args for home_automation_master
+            "args": ["F:\\_bu-2024-11-16", "G:\\Backups"]   // args for backup_master
             // "args": ["F:\\_bu-2024-11-16", "G:\\Backups\\BU-2024-12-12",  ".txt"]
             // "args": ["E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-F_bu-2024-11-16.csv", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-GBackupsBU-2024-12-12.csv"]
         }
