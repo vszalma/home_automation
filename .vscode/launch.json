@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Debug Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/${file}",  // Adjust to your tests folder
+            "args": ["-m", "pytest", "-s"],
+            "console": "integratedTerminal"
+          }
+          
+        {
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",

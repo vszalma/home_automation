@@ -26,6 +26,17 @@ def configure_logging(log_file_name):
         cache_logger_on_first_use=True,
     )
 
+def create_logger(module_name="home_automation"):
+    today = datetime.now().date()  # .strftime("%Y-%m-%d")
+
+    log_file = f"{today}_{module_name}_log.txt"
+
+    log_file = get_full_filename("log", log_file)
+
+    configure_logging(log_file)
+
+    return log_file
+
 
 def get_full_filename(directory_name, file_name):
     # Get the directory where the script is located

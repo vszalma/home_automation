@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-import home-automation.home_automation_master
+from home_automation_master import _backup_needed
 
 @patch("home_automation_master._list_and_sort_directories")
 @patch("home_automation_master.collector.collect_file_info")
@@ -11,7 +11,7 @@ def test_backup_needed(
 ):
     # Test Case 1: No backup directories exist, backup is needed
     mock_list_dirs.return_value = []  # No directories found
-    result = home_automation_master._backup_needed("source_path", "destination_path")
+    result = _backup_needed("source_path", "destination_path")
     assert result is True  # Backup should be needed
 
     # Test Case 2: Directories exist but no changes in files
@@ -21,7 +21,7 @@ def test_backup_needed(
         (True, "destination_output_file"),
     ]  # Mock source and destination outputs
     mock_compare_files.return_value = True  # Files are the same
-    result = home_automation_master._backup_needed("source_path", "destination_path")
+    result = _backup_needed("source_path", "destination_path")
     assert result is False  # Backup not needed
     mock_send_email.assert_called_once_with(
         "Backup not run.",
@@ -30,7 +30,7 @@ def test_backup_needed(
 
     # Test Case 3: Directories exist, files differ
     mock_compare_files.return_value = False  # Files differ
-    result = home_automation_master._backup_needed("source_path", "destination_path")
+    result = _backup_needed("source_path", "destination_path")
     assert result is True  # Backup is needed
 
     # Test Case 4: Error collecting file info
@@ -38,5 +38,6 @@ def test_backup_needed(
         (False, None),  # Error for source
         (True, "destination_output_file"),
     ]
-    result = home_automation_master._backup_needed("source_path", "destination_path")
+    result = _backup_needed("source_path", "destination_path")
     assert result is True  # Assume backup is needed if source collection fails
+
