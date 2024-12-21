@@ -1,7 +1,6 @@
 import datetime
 import collector
 import compare
-import robocopy_helper
 import os
 import sys
 
@@ -10,26 +9,25 @@ from datetime import datetime
 import time
 import home_automation_common
 import structlog
-import logging
 
 
-def _backup_available(source, destination):
+def _backup_available(source):
     
     logger = structlog.get_logger()
 
     if "BU-" in source:
         # validate if source dir exists if argument is a full path to a backup file.
         if not os.path.exists(source):
-            logger.error("Restore not found.", module="restore._backup_available", message="The source directory provided does not exist.")
+            logger.error("Restore not found.", module="restore_master._backup_available", message="The source directory provided does not exist.")
             return False, "None"
     else:
         # Get most recent backup file location.
-        backup_dir_list = _list_and_sort_directories(destination)
+        backup_dir_list = _list_and_sort_directories(source)
         if not backup_dir_list:
-            logger.error("Restore not found.", module="restore._backup_available", message="The source directory does not contain any valid backups.")
+            logger.error("Restore not found.", module="restore_master._backup_available", message="The source directory does not contain any valid backups.")
             return False, "None"
         else:
-            most_recent_backup = os.path.join(destination, backup_dir_list[0])
+            most_recent_backup = os.path.join(source, backup_dir_list[0])
             return True, most_recent_backup
 
 
@@ -53,7 +51,7 @@ def _restore_and_validate(source, destination):
 
         logger.error(
             "Restore failed.",
-            module="restore._handle_restore_and_validate",
+            module="restore_master._handle_restore_and_validate",
             message="The restore failed. Please review the logs and rerun",
             start_time=start_time,
             end_time=end_time,
@@ -67,7 +65,7 @@ def _restore_and_validate(source, destination):
     
         logger.info(
             "Restore completed.",
-            module="restore._handle_restore_and_validate",
+            module="restore_master._handle_restore_and_validate",
             message="Backup completed.",
             start_time=start_time,
             end_time=end_time,
@@ -107,7 +105,7 @@ def _validate_results(source, destination):
     if ret_source:
         logger.info(
             "Collector output.",
-            module="home_automation_master",
+            module="backup_master._validate_results",
             message=f"output file: {output_source}",
         )
 
@@ -115,19 +113,19 @@ def _validate_results(source, destination):
     if ret_destination:
         logger.info(
             "Collector output",
-            module="home_automation_master",
+            module="backup_master._validate_results",
             message=f"output file: {output_destination}",
         )
 
     # validate source and destination have same content
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
-            subject = "Successful backup"
-            body = "The files match"
+            subject = "Successful restore"
+            body = "The restore was successful. Source and destination are identical. Restore has been validated."
             home_automation_common.send_email(subject, body)
             logger.info(
                     "Restore validated.",
-                    module="restore._validate_results",
+                    module="restore_master._validate_results",
                     message="Source and destination are identical. Restore has been validated.",
                 )
 
@@ -135,14 +133,14 @@ def _validate_results(source, destination):
         else:
             logger.error(
                     "Restore not valid.",
-                    module="restore._validate_results",
+                    module="restore_master._validate_results",
                     message="Source and destination are different. Restore unsuccessful, review and retry.",
                 )
             return False
     else:
         logger.error(
                 "Restore validation failed.",
-                module="restore._validate_results",
+                module="restore_master._validate_results",
                 message="An error occurred while validating source and destination. Restore failed, review and retry.",
             )
         return False
@@ -153,7 +151,7 @@ def coordinate_restore_process(source, destination, create_logger=True):
     if create_logger:
         home_automation_common.create_logger("restore")
 
-    backup_is_available, backup_file_source = _backup_available(source, destination)
+    backup_is_available, backup_file_source = _backup_available(source)
     # execute backup if needed.
     if backup_is_available:
         return _restore_and_validate(backup_file_source, destination)
@@ -208,7 +206,7 @@ def _list_and_sort_directories(path):
     except Exception as e:
         logger.exception(
             "File collection exception found.",
-            module="home_automation_master",
+            module="restore_master._list_and_sort_directories",
             message=f"An error occurred: {e}",
         )
         return []

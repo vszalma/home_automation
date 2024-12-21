@@ -26,7 +26,7 @@ def configure_logging(log_file_name):
         cache_logger_on_first_use=True,
     )
 
-def create_logger(module_name="home_automation"):
+def create_logger(module_name="backup_master"):
     today = datetime.now().date()  # .strftime("%Y-%m-%d")
 
     log_file = f"{today}_{module_name}_log.txt"

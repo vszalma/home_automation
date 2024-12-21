@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from home_automation_master import _backup_needed
+from backup_master import _backup_needed
 
 @patch("home_automation_master._list_and_sort_directories")
 @patch("home_automation_master.collector.collect_file_info")

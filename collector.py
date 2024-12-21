@@ -6,19 +6,24 @@ import re
 import stat
 import sys
 import structlog
+import time
 import home_automation_common
 from validate_file import FILE_TYPE_GROUPS
 
 
 def collect_file_info(directory):
     logger = structlog.get_logger()
-    logger.info("Directory search.", module="collector", message=f"Directory to be searched is {directory}.")
+    start_time = time.time()
+
+    logger.info("Directory search.", module="collector.collect_file_info", message=f"Directory to be searched is {directory}.")
     exclusions = home_automation_common.get_exclusion_list("collector")
     filetype_lookup  = _build_reverse_filetype_lookup(FILE_TYPE_GROUPS)
     if os.path.isdir(directory):
         file_info = _calculate_file_info(directory, logger, exclusions, filetype_lookup)
         output_file = _output_file_info(directory, file_info)
-        logger.info("Collection completed.", module="collector", message="Collection completed.")
+        end_time = time.time()
+        duration = end_time - start_time
+        logger.info("Collection completed.", module="collector", message="Collection completed.", duration=duration, file=output_file)
         return True, output_file
     else:
         logger.error("Invalid directory.", module="collector", message="Invalid directory. Please correct and try again.")
