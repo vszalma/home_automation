@@ -232,7 +232,7 @@ def validate_files_by_type(start_folder, file_type_or_group):
 
     logger = structlog.get_logger()
 
-    logger.info("Searching for file types.", module="validation_file", message="Directory to be searched for file types.", folder=start_folder, type=file_type_or_group)
+    logger.info("Searching for file types.", module="validate_file.validate_files_by_type", message="Directory to be searched for file types.", folder=start_folder, type=file_type_or_group)
 
     # Resolve regex patterns based on group or specific type
     if isinstance(file_type_or_group, str):
@@ -242,11 +242,11 @@ def validate_files_by_type(start_folder, file_type_or_group):
     elif isinstance(file_type_or_group, list):
         patterns = file_type_or_group
     else:
-        logger.error("Invalid file type argument.", module="backup", message="file_type_or_group must be a string or a list")
+        logger.error("Invalid file type argument.", module="validate_file.validate_files_by_type", message="file_type_or_group must be a string or a list")
         raise ValueError("file_type_or_group must be a string or a list")
 
     if not os.path.exists(start_folder):
-        logger.error("Folder does not exist", module="validate_file", message=f"Folder {start_folder} does not exist. Retry.")
+        logger.error("Folder does not exist", module="validate_file.validate_files_by_type", message=f"Folder {start_folder} does not exist. Retry.")
         raise ValueError("Invalid folder was specified. It does not exist.")
 
     # Compile all patterns into a single regex for efficiency
@@ -267,19 +267,19 @@ def validate_files_by_type(start_folder, file_type_or_group):
                 )
         except FileNotFoundError:
             logger.info(
-                "No exclusions found.", module="validate_file", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
+                "No exclusions found.", module="validate_file.validate_files_by_type", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
             )
 
     file_count = 0
     error_count = 0
-    logger.info("File type search beginning.", module="validate_file", message=f"Looking for {file_type_or_group} files in directory {start_folder}.")
+    logger.info("File type search beginning.", module="validate_file.validate_files_by_type", message=f"Looking for {file_type_or_group} files in directory {start_folder}.")
 
     total_files = _get_total_file_count(start_folder, exclusions)
     matching_files = _get_file_count_for_type(
         start_folder, combined_pattern, exclusions
     )
 
-    logger.info("Matching files found.", module="validate_file", message=f"Found a total of {matching_files} found. Validating files now.")
+    logger.info("Matching files found.", module="validate_file.validate_files_by_type", message=f"Found a total of {matching_files} found. Validating files now.")
 
     headers = ["file_name", "error_message"]
     output_file = (
@@ -325,14 +325,14 @@ def validate_files_by_type(start_folder, file_type_or_group):
                             case "document":
                                 is_valid, error_message = _validate_document(file_path)
                             case _:
-                                logger.error("Incorrect file type found.", module="validate_file", message="An undefined filetype is found")
+                                logger.error("Incorrect file type found.", module="validate_file.validate_files_by_type", message="An undefined filetype is found")
                                 is_valid, error_message = False, "Undefined filetype"
 
                         pbar.update(1)
                         if not is_valid:
                             error_count += 1
                             writer.writerow([file_path, error_message])
-                            logger.info("File validation exception found.", module="validate_file", message=error_message, file=file_path)
+                            logger.info("File validation exception found.", module="validate_file.validate_files_by_type", message=error_message, file=file_path)
 
     if error_count == 0:
         os.remove(output_file)
@@ -344,7 +344,7 @@ def validate_files_by_type(start_folder, file_type_or_group):
     )
 
     logger.info(
-        "Validation completed.", module="validate_file", message="Analysis complete.",
+        "Validation completed.", module="validate_file.validate_files_by_type", message="Analysis complete.",
         total_files=total_files,
         matching_files=matching_files,
         error_count=error_count,
@@ -366,7 +366,7 @@ if __name__ == "__main__":
     arguments = _get_arguments(sys.argv)
 
     if len(arguments) != 2:
-        logger.error("Invalid arguments.", module="validate_file", message="Invalid arguments.")
+        logger.error("Invalid arguments.", module="validate_file.__main__", message="Invalid arguments.")
     else:
         # Validate files
         validate_files_by_type(arguments[0], arguments[1])

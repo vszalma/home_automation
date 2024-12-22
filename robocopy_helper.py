@@ -41,18 +41,18 @@ def _run_robocopy(source, destination, options=None, log_file="robocopy_log.txt"
 
         # Check the exit code
         if result.returncode == 0:
-            logger.info("Robocopy completed successfully.", module="robocopy_helper")
+            logger.info("Robocopy completed successfully.", module="robocopy_helper._run_robocopy")
         elif result.returncode >= 1 and result.returncode <= 7:
             logger.warning(
-                "Robocopy completed with warnings or skipped files.", module="robocopy_helper", message="Check the log for details."
+                "Robocopy completed with warnings or skipped files.", module="robocopy_helper._run_robocopy", message="Check the log for details."
             )
         else:
-            logger.error("Robocopy encountered an error.", module="robocopy_helper", message="Check the log for details.")
+            logger.error("Robocopy encountered an error.", module="robocopy_helper._run_robocopy", message="Check the log for details.")
         
         return True
 
     except Exception as e:
-        logger.error("Error executing robocopy", module="robocopy_helper", message=e)
+        logger.error("Error executing robocopy", module="robocopy_helper._run_robocopy", message=e)
         return False
 
 
@@ -67,16 +67,16 @@ def execute_robocopy(source, destination, action="Backup"):
     output_file = home_automation_common.get_full_filename("log", output_file)
 
     if not os.path.exists(source):
-        logger.error("File does not exist", module="robocopy_helper", message="Source file location does not exist", location=source)
+        logger.error("File does not exist", module="robocopy_helper.execute_robocopy", message="Source file location does not exist", location=source)
         return False
 
     if not os.path.exists(destination):
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         os.makedirs(destination, exist_ok=True)
-        # logger.error("File does not exist", module="robocopy_helper", message="Destination file location does not exist", location=destination)
+        # logger.error("File does not exist", module="robocopy_helper.execute_robocopy", message="Destination file location does not exist", location=destination)
         # return False
 
-    logger.info(f"{action} running.", module="robocopy_helper", message="Backup is being run.")
+    logger.info(f"{action} running.", module="robocopy_helper.execute_robocopy", message="Backup is being run.")
     #options = ["/E", "/MT:8", "/XA:S", "/xo", "/nfl", "/ndl"]
     options = ["/E", "/MT:8", "/xo"]
 
@@ -85,7 +85,7 @@ def execute_robocopy(source, destination, action="Backup"):
     if isCompleted:
         end_time = datetime.now().time()
         duration = home_automation_common.duration_from_times(end_time, start_time)
-        logger.info("Backup completed.", module="robocopy_helper", message="Backup completed.", start_time=start_time, end_time=end_time, duration=duration, source=source, destination=destination)
+        logger.info("Backup completed.", module="robocopy_helper.execute_robocopy", message="Backup completed.", start_time=start_time, end_time=end_time, duration=duration, source=source, destination=destination)
         return True
 
 

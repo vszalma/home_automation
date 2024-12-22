@@ -40,7 +40,7 @@ def _calculate_file_hash(file_path, chunk_size=8192):
         return sha256.hexdigest()
     except Exception as e:
         logger.exception(
-            "File error", module="find_duplicates", message=e, file_path=file_path
+            "File error", module="find_duplicates._calculate_file_hash", message=e, file_path=file_path
         )
         return None
 
@@ -175,14 +175,14 @@ def get_duplicates_by_type(directory, file_extension):
     if not os.path.isdir(directory):
         logger.error(
             "Invalid directory",
-            module="find_duplicates",
+            module="find_duplicates.get_duplicates_by_type",
             message=f"{directory} was not found. Please provide a valid path.",
         )
         return
 
     logger.info(
         "Searching for duplicates.",
-        module="find_duplicates",
+        module="find_duplicates.get_duplicates_by_type",
         message=f"Searching for duplicate '{file_extension}' files in: {directory}",
     )
     duplicates = _find_duplicate_files(directory, file_extension)
@@ -191,12 +191,12 @@ def get_duplicates_by_type(directory, file_extension):
         output_file = _get_output_filename(file_extension)
         logger.warning(
             "Duplicate files found",
-            module="find_duplicates",
+            module="find_duplicates.get_duplicates_by_type",
             message=f"Duplicates written to file {output_file}.",
         )
         _process_duplicates(duplicates, output_file)
     else:
-        logger.info("No duplicate found.", module="find_duplicates")
+        logger.info("No duplicate found.", module="find_duplicates.get_duplicates_by_type")
 
 
 if __name__ == "__main__":
@@ -215,7 +215,7 @@ if __name__ == "__main__":
 
     if len(arguments) != 2:
         logger.error(
-            "Invalid arguments.", module="validate_file", message="Invalid arguments."
+            "Invalid arguments.", module="find_duplicates..__main__", message="Invalid arguments."
         )
     else:
         get_duplicates_by_type(arguments[0], arguments[1])

@@ -102,10 +102,10 @@ def send_email(subject, body):
 
         logger = structlog.get_logger()
 
-        logger.info("Email sent.", module="home_automation_common", message=f"Email sent to {recipients}")
+        logger.info("Email sent.", module="home_automation_common.send_email", message=f"Email sent to {recipients}")
 
     except Exception as e:
-        logger.error("Email failure.", module="home_automation_common", message="Error sending email.", exception=e)
+        logger.error("Email failure.", module="home_automation_common.send_email", message="Error sending email.", exception=e)
 
 def _normalize_path(path, directory=None):
     if directory:
@@ -148,7 +148,7 @@ def get_exclusion_list(exclusion_type, start_folder=None):
                     )
         except FileNotFoundError:
             logger.info(
-                "No exclusions found.", module="home_automation_common", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
+                "No exclusions found.", module="home_automation_common.get_exclusion_list", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
             )
     
     return exclusions

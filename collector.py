@@ -23,10 +23,10 @@ def collect_file_info(directory):
         output_file = _output_file_info(directory, file_info)
         end_time = time.time()
         duration = end_time - start_time
-        logger.info("Collection completed.", module="collector", message="Collection completed.", duration=duration, file=output_file)
+        logger.info("Collection completed.", module="collector.collect_file_info", message="Collection completed.", duration=duration, file=output_file)
         return True, output_file
     else:
-        logger.error("Invalid directory.", module="collector", message="Invalid directory. Please correct and try again.")
+        logger.error("Invalid directory.", module="collector.collect_file_info", message="Invalid directory. Please correct and try again.")
         return False, "Invalid directory. Please try again."
 
 
@@ -78,7 +78,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
 
             # Skip hidden or system files
             # if _is_hidden_or_system(file_path):
-            #     logger.info("Skipping file(s).", module="collector", message=f"Skipping hidden or system file: {file_path}")
+            #     logger.info("Skipping file(s).", module="collector.collect_file_info", message=f"Skipping hidden or system file: {file_path}")
             #     continue
 
             file_extension = os.path.splitext(file)[1].lower()  # Get the extension (case-insensitive)
@@ -89,7 +89,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
                 file_size = os.path.getsize(file_path)
                 group_name = filetype_lookup.get(file_extension, "unknown")
             except OSError:
-                logger.warning("File skipped.", module="collector", message=f"Skipped file {file_path} due to error.")
+                logger.warning("File skipped.", module="collector.collect_file_info", message=f"Skipped file {file_path} due to error.")
                 continue  # Skip files that can't be accessed
 
             # Update dictionary

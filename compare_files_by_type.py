@@ -197,9 +197,9 @@ def compare_file_structures(root1, root2, file_extension, output_file):
                 writer.writerow(row)
                 differences_found = True
     if differences_found:
-        logger.info("Differences found.", module="compare_file_by_type",message=f"Comparison results saved to {output_file}")
+        logger.info("Differences found.", module="compare_file_by_type.compare_file_structures",message=f"Comparison results saved to {output_file}")
     else:
-        logger.info("No Differences were found.", module="compare_file_by_type")
+        logger.info("No Differences were found.", module="compare_file_by_type.compare_file_structures")
         os.remove(output_file)
 
 
@@ -229,9 +229,9 @@ if __name__ == "__main__":
     arguments = _get_arguments(sys.argv)
 
     if len(arguments) != 3:
-        logger.error("Invalid arguments.", module="compare_file_by_type", message="Invalid arguments. Expected <directory> <directory> <file-extension>")
+        logger.error("Invalid arguments.", module="compare_file_by_type.__main__", message="Invalid arguments. Expected <directory> <directory> <file-extension>")
     else:
-        logger.info("Comparison starting.", module="compare_file_by_type")
+        logger.info("Comparison starting.", module="compare_file_by_type.__main__")
         # Validate files
         output_file_name = _output_file_name(arguments[2])
         compare_file_structures(
@@ -243,8 +243,8 @@ if __name__ == "__main__":
         # results = compare_file_structures(arguments[0], arguments[1], arguments[2])
         # if results["missing_in_root1"] | results["missing_in_root2"] | results["mismatched_files"]:
         #     _process_results(results)
-        #     logger.info("Differences found.", module="compare_file_by_type", message="Differences written to output file.")
+        #     logger.info("Differences found.", module="compare_file_by_type.__main__", message="Differences written to output file.")
         # else:
-        #     logger.info("No differences found.", module="compare_file_by_type")
-    logger.info("Comparison completed.", module="compare_file_by_type")
+        #     logger.info("No differences found.", module="compare_file_by_type.__main__")
+    logger.info("Comparison completed.", module="compare_file_by_type.__main__")
 
