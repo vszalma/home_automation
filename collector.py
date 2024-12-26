@@ -19,15 +19,15 @@ def collect_file_info(directory):
     exclusions = home_automation_common.get_exclusion_list("collector")
     filetype_lookup  = _build_reverse_filetype_lookup(FILE_TYPE_GROUPS)
     if os.path.isdir(directory):
-        file_info = _calculate_file_info(directory, logger, exclusions, filetype_lookup)
+        file_info, file_size_total = _calculate_file_info(directory, logger, exclusions, filetype_lookup)
         output_file = _output_file_info(directory, file_info)
         end_time = time.time()
         duration = end_time - start_time
-        logger.info("Collection completed.", module="collector.collect_file_info", message="Collection completed.", duration=duration, file=output_file)
-        return True, output_file
+        logger.info("Collection completed.", module="collector.collect_file_info", message="Collection completed.", duration=duration, file=output_file, total_size=file_size_total)
+        return True, output_file, file_size_total
     else:
         logger.error("Invalid directory.", module="collector.collect_file_info", message="Invalid directory. Please correct and try again.")
-        return False, "Invalid directory. Please try again."
+        return False, "Invalid directory. Please try again.", 0
 
 
 def _build_reverse_filetype_lookup(file_type_groups):
@@ -67,6 +67,8 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
     else:
         directory = os.path.abspath(directory)
 
+    file_size_total = 0
+
     # Walk through the directory tree
     for root, dirs, files in os.walk(directory):
         # Modify the dirs list to exclude specified directories
@@ -88,6 +90,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
                 #     file_path = r"\\?\\" + os.path.abspath(file_path)
                 file_size = os.path.getsize(file_path)
                 group_name = filetype_lookup.get(file_extension, "unknown")
+                file_size_total += file_size
             except OSError:
                 logger.warning("File skipped.", module="collector.collect_file_info", message=f"Skipped file {file_path} due to error.")
                 continue  # Skip files that can't be accessed
@@ -97,7 +100,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
             file_info[file_extension]["size"] += file_size
             file_info[file_extension]["group"] += group_name
 
-    return file_info
+    return file_info, file_size_total
 
 
 def _output_file_info(directory, file_info):
@@ -151,4 +154,5 @@ if __name__ == "__main__":
 
     arguments = _get_arguments(sys.argv)
 
-    ret, error_message = collect_file_info(arguments[0])
+    ret, output_file, file_size_total = collect_file_info(arguments[0])
+    print ("done.")
