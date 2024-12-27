@@ -10,6 +10,8 @@ import time
 import home_automation_common
 import structlog
 
+import robocopy_helper
+
 
 def _backup_available(source):
     
@@ -38,8 +40,8 @@ def _restore_and_validate(source, destination):
 
     start_time = time.time()
 
-    # restore_result = backup.execute_backup(source, destination)
-    restore_result = True
+    restore_result = robocopy_helper.execute_robocopy(source, destination)
+    # restore_result = True
 
     end_time = time.time()
     backup_duration = end_time - start_time
