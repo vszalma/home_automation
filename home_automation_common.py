@@ -6,22 +6,29 @@ from mailersend import emails
 from datetime import datetime
 from datetime import timedelta
 
-
-def configure_logging(log_file_name):
-    # Create a FileHandler for the log file
+def configure_logging(log_file_name, log_level=logging.INFO):
+    # Create handlers
     file_handler = logging.FileHandler(log_file_name, mode="a")
     file_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    file_handler.setLevel(log_level)
 
-    # Set up the root logger with the file handler
-    logging.basicConfig(level=logging.INFO, handlers=[file_handler])
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    console_handler.setLevel(log_level)
 
-    # Configure structlog to use the logging system
+    # Configure root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
+
+    # Configure structlog
     structlog.configure(
         processors=[
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.JSONRenderer(),
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+        wrapper_class=structlog.make_filtering_bound_logger(log_level),
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
