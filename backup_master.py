@@ -76,7 +76,7 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
 def _backup_and_validate(source, destination):
 
     logger = structlog.get_logger()
-    destination = f"{destination}\BU-{datetime.now().date()}"
+    destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
     backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup")
     # backup_result = True

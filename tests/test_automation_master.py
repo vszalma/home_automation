@@ -11,3 +11,6 @@ def test_coordinate_backup_process(mock_calculate_enough_space_available, mock_r
     mock_calculate_enough_space_available.return_value = False
     result = coordinate_backup_process("F:\\_bu-2024-11-16", "G:\\Backups", True)
     assert result == False
+
+
+# pytest --capture=no --log-cli-level=INFO tests\test_automation_master.py
