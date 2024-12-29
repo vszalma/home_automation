@@ -11,27 +11,61 @@ from time import time
 import home_automation_common
 import sys
 import csv
+import argparse
 
 
-def _get_arguments(argv):
-    arg_help = "{0} <directory> <filetype>".format(argv[0])
+def _get_arguments():
+    """
+    Parses command-line arguments for directory and file type.
+    Returns:
+        tuple: A tuple containing:
+            - directory (str): Path to the directory to process. Defaults to 'F:\\'.
+            - filetype (str): Type of files to process (e.g., '.jpg'). Defaults to '.jpg'.
+    """
+    parser = argparse.ArgumentParser(
+        description="Process a directory and file type for file operations."
+    )
 
-    try:
-        arg_directory = (
-            sys.argv[1]
-            if len(sys.argv) > 1
-            else '"C:\\Users\\vszal\\OneDrive\\Pictures"'
-        )
-        arg_filetypes = sys.argv[2] if len(sys.argv) > 2 else "image"
-    except:
-        print(arg_help)
-        sys.exit(2)
+    # Add named arguments
+    parser.add_argument(
+        "--directory",
+        "-d",
+        type=str,
+        required=True,
+        default="F:\\",
+        help="Path to the directory to process. Defaults to 'F:\\'.",
+    )
+    parser.add_argument(
+        "--filetype",
+        "-f",
+        type=str,
+        required=True,
+        default=".jpg",
+        help="Type of files to process (e.g., '.jpg'). Defaults to '.jpg'.",
+    )
 
-    return [arg_directory, arg_filetypes]
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Return arguments as a dictionary (or list if preferred)
+    # return {"directory": args.directory, "filetype": args.filetype}
+    return args.directory, args.filetype
 
 
 def _calculate_file_hash(file_path, chunk_size=8192):
-    """Calculate the SHA256 hash of a file."""
+    """
+    Calculate the SHA256 hash of a file.
+
+    Args:
+        file_path (str): The path to the file to hash.
+        chunk_size (int, optional): The size of each chunk to read from the file. Defaults to 8192.
+
+    Returns:
+        str: The SHA256 hash of the file in hexadecimal format, or None if an error occurs.
+
+    Raises:
+        Exception: If there is an error reading the file, it will be logged and None will be returned.
+    """
     sha256 = hashlib.sha256()
     try:
         with open(file_path, "rb") as f:
@@ -40,14 +74,35 @@ def _calculate_file_hash(file_path, chunk_size=8192):
         return sha256.hexdigest()
     except Exception as e:
         logger.exception(
-            "File error", module="find_duplicates._calculate_file_hash", message=e, file_path=file_path
+            "File error",
+            module="find_duplicates._calculate_file_hash",
+            message=e,
+            file_path=file_path,
         )
         return None
 
 
 def _group_files_by_size(directory, file_extension):
-    """Group files by size after filtering by extension."""
+    """
+    Group files by size after filtering by extension.
+    This function scans a given directory and its subdirectories for files with a specified extension,
+    groups them by their size, and returns a dictionary where the keys are file sizes and the values
+    are lists of file paths with that size. It also uses a progress bar to indicate the scanning progress.
+    Args:
+        directory (str): The root directory to start scanning for files.
+        file_extension (str): The file extension to filter files by.
+    Returns:
+        defaultdict: A dictionary where keys are file sizes (in bytes) and values are lists of file paths
+        with that size.
+    Raises:
+        Exception: If there is an error accessing a file's size, it logs the exception with the file path.
+    Notes:
+        - The function uses the `tqdm` library to display a progress bar.
+        - It excludes directories listed in the exclusion list obtained from `home_automation_common.get_exclusion_list`.
+        - If no matching files are found, it prints a message and returns an empty dictionary.
+    """
     from tqdm import tqdm
+
     exclusions = home_automation_common.get_exclusion_list("collector", None)
     size_map = defaultdict(list)
 
@@ -55,7 +110,9 @@ def _group_files_by_size(directory, file_extension):
     total_files = 0
     for root, dirs, files in os.walk(directory):
         dirs[:] = [d for d in dirs if d not in exclusions]
-        total_files += sum(1 for file in files if file.lower().endswith(file_extension.lower()))
+        total_files += sum(
+            1 for file in files if file.lower().endswith(file_extension.lower())
+        )
 
     print(f"Total files to process: {total_files}")
 
@@ -64,7 +121,13 @@ def _group_files_by_size(directory, file_extension):
         return size_map  # Exit early if no files to process
 
     # Initialize tqdm progress bar
-    with tqdm(total=total_files, desc="Scanning files", unit="file", leave=True, mininterval=0.1) as pbar:
+    with tqdm(
+        total=total_files,
+        desc="Scanning files",
+        unit="file",
+        leave=True,
+        mininterval=0.1,
+    ) as pbar:
         for root, dirs, files in os.walk(directory):
             dirs[:] = [d for d in dirs if d not in exclusions]
             for file in files:
@@ -87,18 +150,36 @@ def _group_files_by_size(directory, file_extension):
 
 
 def _get_output_filename(file_extension):
+    """
+    Generate the output filename for duplicate files with the given extension.
+
+    Args:
+        file_extension (str): The file extension for which the output filename is generated.
+
+    Returns:
+        str: The full path of the output filename.
+    """
     return home_automation_common.get_full_filename(
         "output", f"duplicate.{file_extension}s.output.csv"
     )
 
 
 def _process_duplicates(duplicates, output_file):
-    # open output file
+    """
+    Processes and writes duplicate file information to a CSV file.
+    Args:
+        duplicates (dict): A dictionary where the keys are hash values and the values are lists of file paths that have the same hash.
+        output_file (str): The path to the output CSV file where the duplicate information will be written.
+    Returns:
+        None
+    """
     headers = [
         "duplicate_count",
         "hash",
         "duplicate_file_count",
-        "file_path",
+        "full_file_name",
+        "path",
+        "file_name",
     ]
 
     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
@@ -111,11 +192,17 @@ def _process_duplicates(duplicates, output_file):
             file_count_per_hash = 0
             for file in files:
                 file_count_per_hash += 1
+
+                # Split file into path and file name
+                path, file_name = os.path.split(file)
+
                 duplicate_data = [
                     hash_count,
                     hash_val,
                     file_count_per_hash,
                     file,
+                    path,
+                    file_name,
                 ]
                 writer.writerow(duplicate_data)
 
@@ -171,6 +258,19 @@ def _find_duplicate_files(directory, file_extension):
 
 
 def get_duplicates_by_type(directory, file_extension):
+    """
+    Searches for duplicate files of a specific type within a given directory.
+    Args:
+        directory (str): The path to the directory where the search will be conducted.
+        file_extension (str): The file extension of the files to search for duplicates.
+    Returns:
+        None
+    Logs:
+        - Error if the provided directory is invalid.
+        - Info when the search for duplicates starts.
+        - Warning if duplicate files are found, along with the output file where duplicates are listed.
+        - Info if no duplicates are found.
+    """
 
     if not os.path.isdir(directory):
         logger.error(
@@ -196,7 +296,9 @@ def get_duplicates_by_type(directory, file_extension):
         )
         _process_duplicates(duplicates, output_file)
     else:
-        logger.info("No duplicate found.", module="find_duplicates.get_duplicates_by_type")
+        logger.info(
+            "No duplicate found.", module="find_duplicates.get_duplicates_by_type"
+        )
 
 
 if __name__ == "__main__":
@@ -211,13 +313,8 @@ if __name__ == "__main__":
 
     logger = structlog.get_logger()
 
-    arguments = _get_arguments(sys.argv)
+    directory, filetype = _get_arguments()
 
-    if len(arguments) != 2:
-        logger.error(
-            "Invalid arguments.", module="find_duplicates..__main__", message="Invalid arguments."
-        )
-    else:
-        get_duplicates_by_type(arguments[0], arguments[1])
+    get_duplicates_by_type(directory, filetype)
 
     logger.info("Processing completed", module="find_duplicates.__main__")
