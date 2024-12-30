@@ -5,105 +5,72 @@ import sys
 import home_automation_common
 import structlog
 import csv
+import argparse
 
+def _get_arguments():
+    """
+    Parses command-line arguments for comparing two directories for differences in files/structures of a given file type.
+    Returns:
+        argparse.Namespace: Parsed command-line arguments with the following attributes:
+            directory1 (str): Path to the first directory to compare.
+            directory2 (str): Path to the second directory to compare.
+            filetype (str): The file type to search for differences in the two file structures. Defaults to ".jpg".
+    """
+    parser = argparse.ArgumentParser(
+        description="Compare 2 directories for differences in files/structures of a given file type."
+    )
 
-def _get_arguments(argv):
-    arg_help = "{0} <directory> <filetype>".format(argv[0])
+    # Add named arguments
+    parser.add_argument(
+        "--directory1",
+        "-d1",
+        type=str,
+        required=True,
+        help="Path to first directory to compare with file structure of directory2.",
+    )
+    parser.add_argument(
+        "--directory2",
+        "-d2",
+        type=str,
+        required=True,
+        help="Path to second directory to compare with file structure of directory1.",
+    )
+    parser.add_argument(
+        "--filetype",
+        "-f",
+        type=str,
+        default=".jpg",
+        help="The filetype to search for differences in the 2 file structures.",
+    )
 
-    try:
-        arg_dir1 = (
-            sys.argv[1]
-            # if len(sys.argv) > 1
-            # else '"C:\\Users\\vszal\\OneDrive\\Pictures"'
-        )
-        arg_dir2 = (
-            sys.argv[2]
-            # if len(sys.argv) > 1
-            # else '"C:\\Users\\vszal\\OneDrive\\Pictures"'
-        )
-        arg_filetype = sys.argv[3] #if len(sys.argv) > 2 else "image"
-    except:
-        print(arg_help)
-        sys.exit(2)
+    # Parse the arguments
+    args = parser.parse_args()
 
-    return [arg_dir1, arg_dir2, arg_filetype]
+    # Return arguments as a dictionary (or list if preferred)
+    return args
+
 
 def _output_file_name(file_extension):
+    """
+    Generates an output file name based on the given file extension.
+    The function sanitizes the file extension, creates a file name with the current date,
+    and appends the sanitized file extension. The file name is then converted to a full
+    path in the "output" directory.
+    Args:
+        file_extension (str): The file extension to be included in the output file name.
+    Returns:
+        str: The full path of the output file name.
+    """
 
-    sanitized_name = home_automation_common.sanitize_filename(arguments[2])
+    sanitized_extension = file_extension.replace(".", "")
 
     output_file = (
-        f"{datetime.now().date()}-compare-by-type-output-{arguments[2]}.csv"
+        f"{datetime.now().date()}-compare-by-type-output-{sanitized_extension}.csv"
     )
 
     output_file = home_automation_common.get_full_filename("output", output_file)
 
     return output_file
-
-# def _output_file_info(directory, file_info):
-#     # Print a summary of the results
-
-#     sanitized_name = home_automation_common.sanitize_filename(arguments[2])
-
-#     output_file = (
-#         f"{datetime.now().date()}-compare-by-type-output-{arguments[2]}.csv"
-#     )
-
-#     output_file = home_automation_common.get_full_filename("output", output_file)
-
-#     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(["file_type", "count", "total_size"])  # Write the headers
-
-#         for file_type, stats in sorted(file_info.items()):
-#             writer.writerow([file_type, stats["count"], stats["size"]])
-
-#     return output_file
-
-# def _process_results(results):
-#         # Print results
-#         print("Missing in Root 1:")
-#         print("\n".join(results["missing_in_root1"]))
-
-#         print("\nMissing in Root 2:")
-#         print("\n".join(results["missing_in_root2"]))
-
-#         print("\nMismatched Files:")
-#         for mismatch in results["mismatched_files"]:
-#             print(mismatch)
-
-        
-#         sanitized_name = home_automation_common.sanitize_filename(arguments[2])
-
-#         output_file = (
-#             f"{datetime.now().date()}-compare-by-type-output-{sanitized_name}.csv"
-#         )
-
-#         with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
-#             writer = csv.writer(csvfile)
-#             writer.writerow(["root","file_path", "file_size", "date_modified", "root", "file_path", "count", "file_size", "date_modified"])  # Write the headers
-
-#             for file_type, stats in sorted(file_info.items()):
-#                 writer.writerow([file_type, stats["count"], stats["size"]])
-
-
-#         _output_file_info()
-
-#         with open("comparison_results.log", "a", encoding="utf-8") as log_file:
-#             # log_file.write("Missing in Root 1:\n")
-#             for missing1 in results["missing_in_root1"]:
-                
-#             if results["missing_in_root1"]:
-#                 log_file.write("\n".join(results["missing_in_root1"]) + "\n")
-#             else:
-#                 log_file.write("None\n")
-
-#             log_file.write("Missing in Root 2:\n")
-#             if results["missing_in_root2"]:
-#                 log_file.write("\n".join(results["missing_in_root2"]) + "\n")
-#             else:
-#                 log_file.write("None\n")
-
 
 
 
@@ -203,17 +170,6 @@ def compare_file_structures(root1, root2, file_extension, output_file):
         os.remove(output_file)
 
 
-
-
-# Example usage
-# root_dir1 = "/path/to/root1"
-# root_dir2 = "/path/to/root2"
-# file_ext = ".txt"  # Replace with your desired file extension
-
-# results = compare_file_structures(root_dir1, root_dir2, file_ext)
-
-
-
 if __name__ == "__main__":
 
     today = datetime.now().date()
@@ -226,25 +182,16 @@ if __name__ == "__main__":
 
     logger = structlog.get_logger()
 
-    arguments = _get_arguments(sys.argv)
+    args = _get_arguments()
 
-    if len(arguments) != 3:
-        logger.error("Invalid arguments.", module="compare_file_by_type.__main__", message="Invalid arguments. Expected <directory> <directory> <file-extension>")
-    else:
-        logger.info("Comparison starting.", module="compare_file_by_type.__main__")
-        # Validate files
-        output_file_name = _output_file_name(arguments[2])
-        compare_file_structures(
-            root1=arguments[0],
-            root2=arguments[1],
-            file_extension=arguments[2],
-            output_file=output_file_name,
-        )
-        # results = compare_file_structures(arguments[0], arguments[1], arguments[2])
-        # if results["missing_in_root1"] | results["missing_in_root2"] | results["mismatched_files"]:
-        #     _process_results(results)
-        #     logger.info("Differences found.", module="compare_file_by_type.__main__", message="Differences written to output file.")
-        # else:
-        #     logger.info("No differences found.", module="compare_file_by_type.__main__")
+    logger.info("Comparison starting.", module="compare_file_by_type.__main__")
+
+    output_file_name = _output_file_name(args.filetype)
+    compare_file_structures(
+        root1=args.directory1,
+        root2=args.directory2,
+        file_extension=args.filetype,
+        output_file=output_file_name,
+    )
     logger.info("Comparison completed.", module="compare_file_by_type.__main__")
 

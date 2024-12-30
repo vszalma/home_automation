@@ -159,8 +159,10 @@ def _get_output_filename(file_extension):
     Returns:
         str: The full path of the output filename.
     """
+    sanitized_extension = file_extension.replace(".", "")
+
     return home_automation_common.get_full_filename(
-        "output", f"duplicate.{file_extension}s.output.csv"
+        "output", f"duplicate.{sanitized_extension}s.output.csv"
     )
 
 

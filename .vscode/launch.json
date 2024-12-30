@@ -24,8 +24,8 @@
             // "args": ["-s", "G:\\Backups\\BU-2024-12-12", "-d", "G:\\Backups", "-a backup"], // args for robocopy_helper
             // "args": ["F:\\_bu-2024-11-16", "G:\\Backups"]   // args for backup_master
             // "args": ["G:\\Backups", "F:\\_bu-2024-11-16"]   // args for restore_master
-            // "args": ["F:\\_bu-2024-11-16", "G:\\Backups\\BU-2024-12-12",  ".txt"] 
-            "args": ["-f1", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-F_bu-2024-11-16.csv", "-f2", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-GBackupsBU-2024-12-12.csv"] // args for compare.py
+            "args": ["-d1", "F:\\_bu-2024-11-16", "-d2", "G:\\Backups\\BU-2024-12-12",  "-f", ".txt"] // args for compare_files_by_type
+            // "args": ["-f1", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-F_bu-2024-11-16.csv", "-f2", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-GBackupsBU-2024-12-12.csv"] // args for compare.py
         }
     ]
 }

@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import argparse
 
+
 def _get_arguments():
     """
     Parses command-line arguments for file operations.
@@ -56,24 +57,6 @@ def _get_arguments():
     # Return arguments as a dictionary (or list if preferred)
     return args
 
-# def _get_arguments(argv):
-#     arg_help = "{0} <source directory> <destination directory>".format(argv[0])
-
-#     try:
-#         arg_source = (
-#             sys.argv[1]
-#             if len(sys.argv) > 1
-#             else '"C:\\Users\\vszal\\OneDrive\\Pictures"'
-#         )
-#         arg_destination = (
-#             sys.argv[2] if len(sys.argv) > 2 else "C:\\Users\\vszal\\OneDrive\\Pictures"
-#         )
-#     except:
-#         print(arg_help)
-#         sys.exit(2)
-
-#     return [arg_source, arg_destination]
-
 
 def _run_robocopy(source, destination, options=None, log_file="robocopy_log.txt"):
     """
@@ -101,18 +84,31 @@ def _run_robocopy(source, destination, options=None, log_file="robocopy_log.txt"
 
         # Check the exit code
         if result.returncode == 0:
-            logger.info("Robocopy completed successfully.", module="robocopy_helper._run_robocopy")
+            logger.info(
+                "Robocopy completed successfully.",
+                module="robocopy_helper._run_robocopy",
+            )
         elif result.returncode >= 1 and result.returncode <= 7:
             logger.warning(
-                "Robocopy completed with warnings or skipped files.", module="robocopy_helper._run_robocopy", message="Check the log for details."
+                "Robocopy completed with warnings or skipped files.",
+                module="robocopy_helper._run_robocopy",
+                message="Check the log for details.",
             )
         else:
-            logger.error("Robocopy encountered an error.", module="robocopy_helper._run_robocopy", message="Check the log for details.")
-        
+            logger.error(
+                "Robocopy encountered an error.",
+                module="robocopy_helper._run_robocopy",
+                message="Check the log for details.",
+            )
+
         return True
 
     except Exception as e:
-        logger.error("Error executing robocopy", module="robocopy_helper._run_robocopy", message=e)
+        logger.error(
+            "Error executing robocopy",
+            module="robocopy_helper._run_robocopy",
+            message=e,
+        )
         return False
 
 
@@ -133,12 +129,17 @@ def execute_robocopy(source, destination, action="Backup"):
 
     start_time = datetime.now().time()
 
-    output_file = (f"{datetime.now().date()}_robocopy_log.txt")
+    output_file = f"{datetime.now().date()}_robocopy_log.txt"
 
     output_file = home_automation_common.get_full_filename("log", output_file)
 
     if not os.path.exists(source):
-        logger.error("File does not exist", module="robocopy_helper.execute_robocopy", message="Source file location does not exist", location=source)
+        logger.error(
+            "File does not exist",
+            module="robocopy_helper.execute_robocopy",
+            message="Source file location does not exist",
+            location=source,
+        )
         return False
 
     if not os.path.exists(destination):
@@ -147,16 +148,29 @@ def execute_robocopy(source, destination, action="Backup"):
         # logger.error("File does not exist", module="robocopy_helper.execute_robocopy", message="Destination file location does not exist", location=destination)
         # return False
 
-    logger.info(f"{action} running.", module="robocopy_helper.execute_robocopy", message="Backup is being run.")
-    #options = ["/E", "/MT:8", "/XA:S", "/xo", "/nfl", "/ndl"]
+    logger.info(
+        f"{action} running.",
+        module="robocopy_helper.execute_robocopy",
+        message="Backup is being run.",
+    )
+    # options = ["/E", "/MT:8", "/XA:S", "/xo", "/nfl", "/ndl"]
     options = ["/E", "/MT:8", "/xo"]
 
-    isCompleted =_run_robocopy(source, destination, options, output_file)
+    isCompleted = _run_robocopy(source, destination, options, output_file)
 
     if isCompleted:
         end_time = datetime.now().time()
         duration = home_automation_common.duration_from_times(end_time, start_time)
-        logger.info("Backup completed.", module="robocopy_helper.execute_robocopy", message="Backup completed.", start_time=start_time, end_time=end_time, duration=duration, source=source, destination=destination)
+        logger.info(
+            "Backup completed.",
+            module="robocopy_helper.execute_robocopy",
+            message="Backup completed.",
+            start_time=start_time,
+            end_time=end_time,
+            duration=duration,
+            source=source,
+            destination=destination,
+        )
         return True
 
 

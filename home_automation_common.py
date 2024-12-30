@@ -6,7 +6,18 @@ from mailersend import emails
 from datetime import datetime
 from datetime import timedelta
 
+
 def configure_logging(log_file_name, log_level=logging.INFO):
+    """
+    Configures logging for the application.
+    This function sets up logging to both a file and the console. It also configures
+    structlog for structured logging.
+    Args:
+        log_file_name (str): The name of the log file to write logs to.
+        log_level (int, optional): The logging level to use. Defaults to logging.INFO.
+    Returns:
+        None
+    """
     # Create handlers
     file_handler = logging.FileHandler(log_file_name, mode="a")
     file_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
@@ -33,7 +44,15 @@ def configure_logging(log_file_name, log_level=logging.INFO):
         cache_logger_on_first_use=True,
     )
 
+
 def create_logger(module_name="backup_master"):
+    """
+    Creates and configures a logger for the specified module.
+    Args:
+        module_name (str): The name of the module for which the logger is being created. Defaults to "backup_master".
+    Returns:
+        str: The full path to the log file.
+    """
     today = datetime.now().date()  # .strftime("%Y-%m-%d")
 
     log_file = f"{today}_{module_name}_log.txt"
@@ -46,6 +65,16 @@ def create_logger(module_name="backup_master"):
 
 
 def get_full_filename(directory_name, file_name):
+    """
+    Constructs the full file path for a given directory and file name, ensuring that the directory exists.
+    Args:
+        directory_name (str): The name of the directory relative to the script's location.
+        file_name (str): The name of the file.
+    Returns:
+        str: The full file path.
+    Raises:
+        OSError: If the directory cannot be created.
+    """
     # Get the directory where the script is located
     curr_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,6 +87,14 @@ def get_full_filename(directory_name, file_name):
 
 
 def duration_from_times(start_time, end_time):
+    """
+    Calculate the duration between two times.
+    Args:
+        start_time (datetime.time): The start time.
+        end_time (datetime.time): The end time.
+    Returns:
+        timedelta: The duration between the start and end times. If the end time is earlier than the start time, it is assumed to be on the following day.
+    """
     date_today = datetime.today().date()
     start_datetime = datetime.combine(date_today, start_time)
 
@@ -66,13 +103,22 @@ def duration_from_times(start_time, end_time):
     else:
         end_datetime = datetime.combine(date_today, end_time)
 
-    duration = (end_datetime - start_datetime)
+    duration = end_datetime - start_datetime
 
     return duration
 
 
-
 def send_email(subject, body):
+    """
+    Sends an email with the specified subject and body using mailersend SMTP service.
+    Args:
+        subject (str): The subject of the email.
+        body (str): The body content of the email, can be in HTML or plaintext format.
+    Raises:
+        Exception: If there is an error sending the email, it will be logged and raised.
+    Example:
+        send_email("Test Subject", "<p>This is a test email body.</p>")
+    """
     try:
 
         mailer = emails.NewEmail(
@@ -109,12 +155,32 @@ def send_email(subject, body):
 
         logger = structlog.get_logger()
 
-        logger.info("Email sent.", module="home_automation_common.send_email", message=f"Email sent to {recipients}")
+        logger.info(
+            "Email sent.",
+            module="home_automation_common.send_email",
+            message=f"Email sent to {recipients}",
+        )
 
     except Exception as e:
-        logger.error("Email failure.", module="home_automation_common.send_email", message="Error sending email.", exception=e)
+        logger.error(
+            "Email failure.",
+            module="home_automation_common.send_email",
+            message="Error sending email.",
+            exception=e,
+        )
+
 
 def _normalize_path(path, directory=None):
+    """
+    Normalize a given file path by optionally prepending a directory and normalizing the resulting path.
+
+    Args:
+        path (str): The file path to normalize.
+        directory (str, optional): The directory to prepend to the path. Defaults to None.
+
+    Returns:
+        str: The normalized file path.
+    """
     if directory:
         path = f"{directory}{path}"
         return os.path.normpath(path)
@@ -123,6 +189,18 @@ def _normalize_path(path, directory=None):
 
 
 def sanitize_filename(directory):
+    """
+    Sanitize a directory name by removing invalid characters and trimming spaces.
+
+    This function removes characters that are invalid in Windows file names
+    (<>:"/\\|?*) and trims leading and trailing spaces from the input string.
+
+    Args:
+        directory (str): The directory name to sanitize.
+
+    Returns:
+        str: The sanitized directory name.
+    """
     invalid_chars = r'[<>:"/\\|?*]'  # Windows-invalid characters
     sanitized = re.sub(invalid_chars, "", directory)
     sanitized = sanitized.strip()  # Remove leading and trailing spaces
@@ -130,6 +208,16 @@ def sanitize_filename(directory):
 
 
 def get_exclusion_list(exclusion_type, start_folder=None):
+    """
+    Retrieve a set of exclusions from a file based on the given exclusion type.
+    Args:
+        exclusion_type (str): The type of exclusions to retrieve. This will be used to determine the filename.
+        start_folder (str, optional): The starting folder to normalize paths against. Defaults to None.
+    Returns:
+        set: A set of normalized exclusion paths.
+    Raises:
+        FileNotFoundError: If the exclusion file does not exist, an info log is generated and an empty set is returned.
+    """
 
     logger = structlog.get_logger()
 
@@ -149,13 +237,13 @@ def get_exclusion_list(exclusion_type, start_folder=None):
                     )
                 else:
                     exclusions = set(
-                        _normalize_path(line.strip())
-                        for line in f
-                        if line.strip()
+                        _normalize_path(line.strip()) for line in f if line.strip()
                     )
         except FileNotFoundError:
             logger.info(
-                "No exclusions found.", module="home_automation_common.get_exclusion_list", message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions."
+                "No exclusions found.",
+                module="home_automation_common.get_exclusion_list",
+                message=f"Exclusion file {exclusion_file} not found. Continuing without exclusions.",
             )
-    
+
     return exclusions
