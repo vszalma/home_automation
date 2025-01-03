@@ -6,8 +6,6 @@ import compare
 import robocopy_helper
 import os
 import sys
-
-# from datetime import date
 from datetime import datetime
 import time
 import home_automation_common

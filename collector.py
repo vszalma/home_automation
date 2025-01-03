@@ -39,9 +39,6 @@ def _get_arguments():
     # Parse the arguments
     args = parser.parse_args()
 
-    if not args.action not in ["backup", "restore"]:
-        parser.error(f"The action '{args.action}' does not equal backup or restore.")
-
     # Return arguments as a dictionary (or list if preferred)
     return args
 
