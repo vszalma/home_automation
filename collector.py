@@ -11,6 +11,10 @@ import home_automation_common
 from validate_file import FILE_TYPE_GROUPS
 import argparse
 
+""" 
+    Collects and analyzes file information (e.g., counts, sizes) based on their types within a specified directory.
+    Outputs the results to a CSV file for further use or review.
+"""
 
 def _get_arguments():
     """

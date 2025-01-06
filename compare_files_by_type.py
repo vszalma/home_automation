@@ -7,6 +7,11 @@ import structlog
 import csv
 import argparse
 
+""" 
+    This script is designed to compare two directory structures for differences in files of a specified type
+    and generate a report in a CSV file.
+"""
+
 def _get_arguments():
     """
     Parses command-line arguments for comparing two directories for differences in files/structures of a given file type.

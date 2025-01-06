@@ -5,6 +5,9 @@ import home_automation_common
 from datetime import datetime
 import structlog
 
+""" 
+    This script compares two files by calculating their cryptographic hashes and determining if they are identical.
+"""
 
 def _get_arguments():
     """

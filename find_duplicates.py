@@ -13,6 +13,10 @@ import sys
 import csv
 import argparse
 
+""" 
+    This script identifies duplicate files in a directory structure based on a specified file type. 
+    It leverages hashing to determine if files are identical, writes the results to a CSV file, and provides logging for transparency.
+"""
 
 def _get_arguments():
     """

@@ -1,0 +1,1 @@
+for /f %%e in (extensions.txt) do code --install-extension %%e

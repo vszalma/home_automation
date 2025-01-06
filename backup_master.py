@@ -12,7 +12,12 @@ import home_automation_common
 import structlog
 import logging
 
-
+""" 
+    The script backs up a source directory to a destination directory.
+    It checks whether a backup is necessary by comparing the source to the most recent backup.
+    If a backup is needed, it performs the backup using robocopy, validates the results, and logs the outcome.
+    Notifications (e.g., success or failure) are sent via email.
+ """
 def _get_arguments():
     """
     Parses command-line arguments for source and destination directories.

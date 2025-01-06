@@ -13,6 +13,10 @@ import argparse
 import robocopy_helper
 
 
+""" 
+    This script facilitates the restoration of data from a backup directory to a specified destination. 
+    It integrates backup validation, logging, and error handling to ensure the restored data matches the original source.
+"""
 def _get_arguments():
     """
     Parses command-line arguments for source and destination directories.

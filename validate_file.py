@@ -11,6 +11,11 @@ from time import time
 import home_automation_common
 import argparse
 
+""" 
+    This Python script validates files of various types (e.g., images, documents, videos) in a specified directory. 
+    It uses command-line arguments for input and incorporates structured logging.
+"""
+
 warnings.simplefilter("ignore", UserWarning)
 
 
