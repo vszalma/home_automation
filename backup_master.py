@@ -136,7 +136,9 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
     ret_source, output_source, file_size_total = collector.collect_file_info(source)
 
     if ret_source and ret_destination:
-        if compare.compare_files(output_source, output_destination):
+        files_unchanged = compare.compare_files(output_source, output_destination)
+        files_have_not_moved = compare.files_have_moved(source, most_recent_backup)
+        if files_unchanged and files_have_not_moved:
             home_automation_common.send_email(
                 "Backup not run.",
                 "There was no need to backup files as the content hasn't changed.",
