@@ -75,6 +75,8 @@ def _backup_available(source):
                 message="The source directory provided does not exist.",
             )
             return False, "None"
+        else:
+            return True, source
     else:
         # Get most recent backup file location.
         backup_dir_list = _list_and_sort_directories(source)
