@@ -66,7 +66,7 @@ def _backup_available(source):
 
     logger = structlog.get_logger()
 
-    if "BU-" in source:
+    if "BU-" in source.upper():
         # validate if source dir exists if argument is a full path to a backup file.
         if not os.path.exists(source):
             logger.error(
