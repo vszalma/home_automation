@@ -1,0 +1,10 @@
+.codegpt
+.git
+.gitignore
+.pytest_cache
+.vscode
+__pycache__
+bat
+log
+output
+tests
