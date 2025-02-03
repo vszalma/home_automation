@@ -38,7 +38,7 @@ def _get_arguments():
     parser.add_argument(
         "--exclusions",
         "-x",
-        help="A list of file extensions to process.",
+        help="A list of file extensions to exclude.",
         required=False,  # Ensure the argument is provided
     )
 
@@ -59,6 +59,11 @@ def write_folder_structure_with_content(start_path, output_file, exclusion_file=
         exclusion_file (str): Path to a file containing folder names to exclude.
         extensions (list of str): List of file extensions to include content for.
     """
+
+    print(f"Extensions Set: {extensions}")
+    print(f"Extensions Set: {args.extensions}")
+
+
     # Load exclusions from the exclusion file
     exclusion_file = "fs_to_text_exclusions.txt"
     exclusions = set()
@@ -81,15 +86,15 @@ def write_folder_structure_with_content(start_path, output_file, exclusion_file=
             str: Formatted lines representing the folder/file structure.
         """
         try:
+            # Skip entire structures that are under excluded folders
+            if any(path.startswith(os.path.join(start_path, excluded)) for excluded in exclusions):
+                return
+
             items = sorted(os.listdir(path))  # Sort items for consistent order
             for i, item in enumerate(items):
                 item_path = os.path.join(path, item)
                 is_last = i == len(items) - 1
                 connector = "└──" if is_last else "├──"
-
-                # Skip excluded folders
-                if os.path.isdir(item_path) and item in exclusions:
-                    continue
 
                 if os.path.isdir(item_path):
                     yield f"{prefix}{connector} {item}/"

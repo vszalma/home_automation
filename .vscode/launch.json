@@ -24,7 +24,7 @@
             // "args": ["-s", "G:\\Backups\\BU-2024-12-12", "-d", "G:\\Backups", "-a backup"], // args for robocopy_helper
             // "args": ["-s", "F:\\_bu-2024-11-16", "-d", "G:\\Backups"]   // args for backup_master
             // "args": ["-s", "D:\\_bu-2024-11-16","-d", "N:\\"]   // args for restore_master
-            "args": ["-d", ".\\","-o", ".\\output\\test2.txt", "-e", ".py"]   // args for fs_to_text
+            "args": ["--directory", "E:\\vszalma\\Source\\Repos\\MusicJournal", "--output", "MusicJournal.source.txt", "--extensions", ".cs", ".js", ".css", ".json", ".sln", ".html", ".razor"]   // args for fs_to_text
             // "args": ["-d", "F:\\_bu-2024-11-16"] // args for collectory.py
             // "args": ["-d1", "F:\\_bu-2024-11-16", "-d2", "G:\\Backups\\BU-2024-12-12",  "-f", ".txt"] // args for compare_files_by_type
             // "args": ["-f1", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-F_bu-2024-11-16.csv", "-f2", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-GBackupsBU-2024-12-12.csv"] // args for compare.py
