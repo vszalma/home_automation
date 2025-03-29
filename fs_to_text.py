@@ -65,9 +65,11 @@ def write_folder_structure_with_content(start_path, output_file, exclusion_file=
 
 
     # Load exclusions from the exclusion file
-    exclusion_file = "fs_to_text_exclusions.txt"
+
+    exclusion_file = args.exclusions if args.exclusions else None
     exclusions = set()
     if exclusion_file and os.path.exists(exclusion_file):
+        print(f"Exclusion file found {exclusion_file}")
         with open(exclusion_file, "r", encoding="utf-8") as f:
             exclusions = {line.strip() for line in f if line.strip()}
 
