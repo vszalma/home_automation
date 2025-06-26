@@ -5,6 +5,7 @@ import os
 from mailersend import emails
 from datetime import datetime
 from datetime import timedelta
+import shutil
 
 
 def configure_logging(log_file_name, log_level=logging.INFO):
@@ -247,3 +248,31 @@ def get_exclusion_list(exclusion_type, start_folder=None):
             )
 
     return exclusions
+
+def calculate_enough_space_available(most_recent_backup, file_size_total):
+    """
+    Determines if there is enough free space available for a backup.
+
+    Args:
+        most_recent_backup (str): The path to the most recent backup.
+        file_size_total (float): The total size of the files to be backed up.
+
+    Returns:
+        bool: True if there is enough free space available, False otherwise.
+    """
+    free_space = _get_free_space(most_recent_backup)
+    return free_space > file_size_total * .01  # allow for a bit of buffer in file size.
+
+def _get_free_space(file_path):
+    """
+    Get the available free space on the disk where the given file path is located.
+
+    Args:
+        file_path (str): The path to the file or directory to check the disk space for.
+
+    Returns:
+        int: The amount of free space in bytes.
+    """
+    # Get disk usage statistics
+    total, used, free = shutil.disk_usage(file_path)
+    return free

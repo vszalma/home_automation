@@ -80,7 +80,21 @@ def files_have_moved(dir1, dir2):
     Check if there are any moved files between two directories.
     Returns True if any file has been moved, otherwise False.
     """
+    logger = structlog.get_logger()
+
+    logger.info(
+        "Gathering file metadata for comparison.",
+        module="compare.files_have_moved",
+        message=f"Building file metadata for directory {dir1}.",
+    )
+
     metadata1 = build_file_metadata(dir1)
+    
+    logger.info(
+        "Gathering file metadata for comparison.",
+        module="compare.files_have_moved",
+        message=f"Building file metadata for directory {dir2}.",
+    )
     metadata2 = build_file_metadata(dir2)
 
     for file_hash, path1 in metadata1.items():
@@ -90,18 +104,6 @@ def files_have_moved(dir1, dir2):
                 return True  # Found a moved file
 
     return False
-
-
-""" # Example usage:
-dir1 = "path/to/directory1"
-dir2 = "path/to/directory2"
-
-if has_moved_files(dir1, dir2):
-    print("Files have been moved.")
-else:
-    print("No files have been moved.")
- """
-
 
 def _calculate_file_hash(file_path, hash_algorithm="sha256"):
     """
