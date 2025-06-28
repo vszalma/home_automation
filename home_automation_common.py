@@ -3,7 +3,7 @@ import re
 import structlog
 import os
 from mailersend import emails
-from datetime import datetime
+from datetime import datetime, time
 from datetime import timedelta
 import shutil
 
@@ -86,7 +86,6 @@ def get_full_filename(directory_name, file_name):
 
     return output_file
 
-
 def duration_from_times(start_time, end_time):
     """
     Calculate the duration between two times.
@@ -96,6 +95,12 @@ def duration_from_times(start_time, end_time):
     Returns:
         timedelta: The duration between the start and end times. If the end time is earlier than the start time, it is assumed to be on the following day.
     """
+    # Ensure both are datetime.time objects
+    if isinstance(start_time, str):
+        start_time = datetime.strptime(start_time, "%H:%M:%S").time()
+    if isinstance(end_time, str):
+        end_time = datetime.strptime(end_time, "%H:%M:%S").time()
+
     date_today = datetime.today().date()
     start_datetime = datetime.combine(date_today, start_time)
 
@@ -107,7 +112,6 @@ def duration_from_times(start_time, end_time):
     duration = end_datetime - start_datetime
 
     return duration
-
 
 def send_email(subject, body):
     """

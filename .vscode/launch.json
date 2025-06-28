@@ -22,7 +22,9 @@
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", ".jpg"], // args for find_duplicates
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", "image"], // args for validate_file
             // "args": ["-s", "G:\\Backups\\BU-2024-12-12", "-d", "G:\\Backups", "-a backup"], // args for robocopy_helper
-            "args": ["-s", "Y:", "-d", "Z:\\CathyK"]   // args for backup_master and copy_master
+            // "args": ["-s", "Y:", "-d", "Z:\\CathyK"]   // args for backup_master and copy_master
+            // "args": ["-t", "4", "-d", "Z:\\CathyK"]   // args for gather_inventory
+            "args": ["-i", "E:\\vszalma\\Source\\Repos\\home-automation\\home_automation\\log\\2025-06-26_gather_inventory_log.log", "-o", "detect_duplicates.csv", "-f", "False"]   // args for detect_duplicates
             // "args": ["-s", "D:\\_bu-2024-11-16","-d", "N:\\"]   // args for restore_master
             // "args": ["--directory", "E:\\vszalma\\Source\\Repos\\MusicJournal", "--output", "MusicJournal.source.txt", "--extensions", ".cs", ".js", ".css", ".json", ".sln", ".html", ".razor", ".csproj"]   // args for fs_to_text
             // "args": ["-d", "F:\\_bu-2024-11-16"] // args for collectory.py
