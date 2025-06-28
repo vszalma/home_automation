@@ -4,10 +4,13 @@ import sys
 import home_automation_common
 from datetime import datetime
 import structlog
+import os
+from pathlib import Path
 
 """ 
     This script compares two files by calculating their cryptographic hashes and determining if they are identical.
 """
+
 
 def _get_arguments():
     """
@@ -44,6 +47,63 @@ def _get_arguments():
     # Return arguments as a namespace object
     return args
 
+
+def calculate_file_hash(file_path, chunk_size=8192):
+    """Calculate the SHA256 hash of a file."""
+    hasher = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        while chunk := f.read(chunk_size):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
+def build_file_metadata(directory):
+    """
+    Build a dictionary of file metadata keyed by file hash.
+    Each value is the relative path.
+    """
+    file_metadata = {}
+    for root, _, files in os.walk(directory):
+        for file in files:
+            file_path = Path(root) / file
+            try:
+                file_hash = calculate_file_hash(file_path)
+                relative_path = file_path.relative_to(directory)
+                file_metadata[file_hash] = str(relative_path)
+            except Exception as e:
+                print(f"Error processing {file_path}: {e}")
+    return file_metadata
+
+
+def files_have_moved(dir1, dir2):
+    """
+    Check if there are any moved files between two directories.
+    Returns True if any file has been moved, otherwise False.
+    """
+    logger = structlog.get_logger()
+
+    logger.info(
+        "Gathering file metadata for comparison.",
+        module="compare.files_have_moved",
+        message=f"Building file metadata for directory {dir1}.",
+    )
+
+    metadata1 = build_file_metadata(dir1)
+    
+    logger.info(
+        "Gathering file metadata for comparison.",
+        module="compare.files_have_moved",
+        message=f"Building file metadata for directory {dir2}.",
+    )
+    metadata2 = build_file_metadata(dir2)
+
+    for file_hash, path1 in metadata1.items():
+        if file_hash in metadata2:
+            path2 = metadata2[file_hash]
+            if path1 != path2:
+                return True  # Found a moved file
+
+    return False
 
 def _calculate_file_hash(file_path, hash_algorithm="sha256"):
     """

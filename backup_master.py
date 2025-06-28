@@ -73,36 +73,6 @@ def _backup_needed(source, destination):
         return _has_data_changed_since_last_backup(source, most_recent_backup)
     
 
-def _get_free_space(file_path):
-    """
-    Get the available free space on the disk where the given file path is located.
-
-    Args:
-        file_path (str): The path to the file or directory to check the disk space for.
-
-    Returns:
-        int: The amount of free space in bytes.
-    """
-    # Get disk usage statistics
-    total, used, free = shutil.disk_usage(file_path)
-    return free
-
-
-def _calculate_enough_space_available(most_recent_backup, file_size_total):
-    """
-    Determines if there is enough free space available for a backup.
-
-    Args:
-        most_recent_backup (str): The path to the most recent backup.
-        file_size_total (float): The total size of the files to be backed up.
-
-    Returns:
-        bool: True if there is enough free space available, False otherwise.
-    """
-    free_space = _get_free_space(most_recent_backup)
-    return free_space > file_size_total * .01  # allow for a bit of buffer in file size.
-
-
 def _has_data_changed_since_last_backup(source, most_recent_backup):
     """
     Checks if the data in the source directory has changed since the last backup.
@@ -124,7 +94,7 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
     )
 
     # calculate free space available on destination (most_recent_back) volume.
-    if not _calculate_enough_space_available(most_recent_backup, file_size_total):
+    if not home_automation_common.calculate_enough_space_available(most_recent_backup, file_size_total):
         logger = structlog.get_logger()
         logger.error(
             "Not enough storage",
@@ -136,7 +106,9 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
     ret_source, output_source, file_size_total = collector.collect_file_info(source)
 
     if ret_source and ret_destination:
-        if compare.compare_files(output_source, output_destination):
+        files_unchanged = compare.compare_files(output_source, output_destination)
+        files_have_not_moved = compare.files_have_moved(source, most_recent_backup)
+        if files_unchanged and files_have_not_moved:
             home_automation_common.send_email(
                 "Backup not run.",
                 "There was no need to backup files as the content hasn't changed.",

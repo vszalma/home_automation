@@ -151,10 +151,16 @@ def execute_robocopy(source, destination, action="Backup"):
     logger.info(
         f"{action} running.",
         module="robocopy_helper.execute_robocopy",
-        message="Backup is being run.",
+        message="robocopy is being run.",
     )
-    # options = ["/E", "/MT:8", "/XA:S", "/xo", "/nfl", "/ndl"]
-    options = ["/E", "/MT:8", "/xo"]
+    options = ["/E", "/MT:8", "/XA:S", "/xo", "/nfl", "/ndl"]
+    # options = ["/E", "/MT:8", "/xo"]
+
+    # Add excluded folders (relative or absolute)
+    excluded_folders = ["/XD", "System Volume Information", "$RECYCLE.BIN"] 
+
+    # Combine options
+    options += excluded_folders
 
     isCompleted = _run_robocopy(source, destination, options, output_file)
 
@@ -162,9 +168,9 @@ def execute_robocopy(source, destination, action="Backup"):
         end_time = datetime.now().time()
         duration = home_automation_common.duration_from_times(end_time, start_time)
         logger.info(
-            "Backup completed.",
+            f"{action} completed.",
             module="robocopy_helper.execute_robocopy",
-            message="Backup completed.",
+            message="robocopy completed.",
             start_time=start_time,
             end_time=end_time,
             duration=duration,
