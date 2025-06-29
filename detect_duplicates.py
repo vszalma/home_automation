@@ -138,9 +138,10 @@ def main():
         )
         return
     
-    output_csv = args.output
+    log_file = f"{today}_detect_duplicates_log.txt"
+    output_csv = f"{today}_{args.output}"
     OUTPUT_CSV = home_automation_common.get_full_filename("output", output_csv)
-    
+
     if not OUTPUT_CSV.endswith('.csv'):
         logger.error(
         "Invalid output file name.",
@@ -151,7 +152,8 @@ def main():
     
     USE_FULL_HASH = args.fullhash
 
-    start_time = time.time()
+    start_time = datetime.now().time()
+
     logger.info(
         "Loading input CSV file.",
         module="detect_duplicates.main",
