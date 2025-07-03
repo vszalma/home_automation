@@ -89,21 +89,21 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
         - Error if unable to collect data from the source or destination.
     """
 
-    ret_destination, output_destination, file_size_total = collector.collect_file_info(
+    ret_destination, output_destination, dest_file_size_total, dest_total_file_count = collector.collect_file_info(
         most_recent_backup
     )
 
+    ret_source, output_source, source_file_size_total, source_total_file_size = collector.collect_file_info(source)
+
     # calculate free space available on destination (most_recent_back) volume.
-    if not home_automation_common.calculate_enough_space_available(most_recent_backup, file_size_total):
+    if not home_automation_common.calculate_enough_space_available(most_recent_backup, source_file_size_total):
         logger = structlog.get_logger()
         logger.error(
             "Not enough storage",
             module="backup_master._has_data_changed_since_last_backup",
-            message=f"There is not enough storage space to run backup. {file_size_total} is needed."
+            message=f"There is not enough storage space to run backup. {source_file_size_total} is needed."
         )
         return False
-
-    ret_source, output_source, file_size_total = collector.collect_file_info(source)
 
     if ret_source and ret_destination:
         files_unchanged = compare.compare_files(output_source, output_destination)

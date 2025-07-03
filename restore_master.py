@@ -1,22 +1,23 @@
+import argparse
 import datetime
+import shutil
 import collector
 import compare
+import robocopy_helper
 import os
 import sys
-
-# from datetime import date
 from datetime import datetime
 import time
 import home_automation_common
 import structlog
-import argparse
-import robocopy_helper
-
+import logging
 
 """ 
-    This script facilitates the restoration of data from a backup directory to a specified destination. 
-    It integrates backup validation, logging, and error handling to ensure the restored data matches the original source.
-"""
+    The script backs up a source directory to a destination directory.
+    It checks whether a backup is necessary by comparing the source to the most recent backup.
+    If a backup is needed, it performs the backup using robocopy, validates the results, and logs the outcome.
+    Notifications (e.g., success or failure) are sent via email.
+ """
 def _get_arguments():
     """
     Parses command-line arguments for source and destination directories.
@@ -52,208 +53,193 @@ def _get_arguments():
     return args
 
 
-def _backup_available(source):
+def _backup_needed(source, destination):
     """
-    Checks if a backup is available in the given source directory.
-    If the source contains "BU-", it validates if the source directory exists.
-    If the source directory does not exist, it logs an error and returns False and "None".
-    Otherwise, it lists and sorts the directories in the source to find the most recent backup.
+    Determines if a backup is needed by comparing the source directory with the most recent backup in the destination directory.
     Args:
-        source (str): The source directory or path to check for backups.
+        source (str): The path to the source directory that needs to be backed up.
+        destination (str): The path to the destination directory where backups are stored.
     Returns:
-        tuple: A tuple containing a boolean indicating if a backup is available and the path to the most recent backup or "None".
+        bool: True if a backup is needed, False otherwise.
     """
 
-    logger = structlog.get_logger()
+    # Get most recent backup file location.
+    backup_dir_list = _list_and_sort_directories(destination)
 
-    if "BU-" in source.upper():
-        # validate if source dir exists if argument is a full path to a backup file.
-        if not os.path.exists(source):
-            logger.error(
-                "Restore not found.",
-                module="restore_master._backup_available",
-                message="The source directory provided does not exist.",
-            )
-            return False, "None"
-        else:
-            return True, source
+    if not backup_dir_list:
+        return True
     else:
-        # Get most recent backup file location.
-        backup_dir_list = _list_and_sort_directories(source)
-        if not backup_dir_list:
-            logger.error(
-                "Restore not found.",
-                module="restore_master._backup_available",
-                message="The source directory does not contain any valid backups.",
-            )
-            return False, "None"
-        else:
-            most_recent_backup = os.path.join(source, backup_dir_list[0])
-            return True, most_recent_backup
+        most_recent_backup = os.path.join(destination, backup_dir_list[0])
+        return _has_data_changed_since_last_backup(source, most_recent_backup)
+    
 
-
-def _restore_and_validate(source, destination):
+def _has_data_changed_since_last_backup(source, most_recent_backup):
     """
-    Restores data from the source to the destination and validates the results.
-    This function uses the robocopy_helper to perform the restore operation and logs the process.
-    If the restore fails, it sends an email notification and logs the error details.
-    If the restore is successful, it validates the results.
+    Checks if the data in the source directory has changed since the last backup.
+    This function collects file information from the source and the most recent backup,
+    compares the files, and determines if a backup is necessary. It also checks if there
+    is enough storage space available on the destination volume to perform the backup.
     Args:
-        source (str): The source path from which data is to be restored.
-        destination (str): The destination path to which data is to be restored.
+        source (str): The path to the source directory to be backed up.
+        most_recent_backup (str): The path to the most recent backup directory.
     Returns:
-        bool: True if the restore and validation are successful, False otherwise.
+        bool: True if the data has changed and a backup is needed, False otherwise.
+    Logs:
+        - Error if there is not enough storage space available.
+        - Error if unable to collect data from the source or destination.
+    """
+
+    ret_destination, output_destination, dest_file_size_total, dest_total_file_count = collector.collect_file_info(
+        most_recent_backup
+    )
+
+    ret_source, output_source, source_file_size_total, source_total_file_size = collector.collect_file_info(source)
+
+    # calculate free space available on destination (most_recent_back) volume.
+    if not home_automation_common.calculate_enough_space_available(most_recent_backup, source_file_size_total):
+        logger = structlog.get_logger()
+        logger.error(
+            "Not enough storage",
+            module="backup_master._has_data_changed_since_last_backup",
+            message=f"There is not enough storage space to run backup. {source_file_size_total} is needed."
+        )
+        return False
+
+    if ret_source and ret_destination:
+        files_unchanged = compare.compare_files(output_source, output_destination)
+        files_have_not_moved = compare.files_have_moved(source, most_recent_backup)
+        if files_unchanged and files_have_not_moved:
+            home_automation_common.send_email(
+                "Backup not run.",
+                "There was no need to backup files as the content hasn't changed.",
+            )
+            return False
+        else:
+            return True
+    else:
+        logger = structlog.get_logger()
+        logger.error(
+            "Unable to collect data.",
+            module="backup_master._has_data_changed_since_last_backup",
+        )
+        return False
+
+
+def _backup_and_validate(source, destination):
+    """
+    Backs up the source directory to the destination directory and validates the backup.
+    Args:
+        source (str): The source directory to back up.
+        destination (str): The destination directory where the backup will be stored.
+    Returns:
+        bool: True if the backup and validation are successful, False otherwise.
+    Raises:
+        Exception: If there is an error during the backup process.
+    Logs:
+        Logs the start and end time of the backup process, as well as the duration.
+        Logs an error message if the backup fails.
+    Sends Email:
+        Sends an email notification if the backup fails.
     """
 
     logger = structlog.get_logger()
-
+    destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
-
-    restore_result = robocopy_helper.execute_robocopy(source, destination)
-    # restore_result = True
+    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup")
+    # backup_result = True
+    if not backup_result:
+        subject = "BACKUP FAILED!"
+        body = "The backup failed. Please review the logs and rerun."
+        home_automation_common.send_email(subject, body)
+        return False
 
     end_time = time.time()
     backup_duration = end_time - start_time
+    logger.info(
+        "Backup completed.",
+        module="backup_master._backup_and_validate",
+        message="Backup completed.",
+        start_time=start_time,
+        end_time=end_time,
+        duration=backup_duration,
+    )
 
-    if not restore_result:
-        subject = "RESTORE FAILED!"
-        body = "The restore failed. Please review the logs and rerun."
-        home_automation_common.send_email(subject, body)
-
-        logger.error(
-            "Restore failed.",
-            module="restore_master._handle_restore_and_validate",
-            message="The restore failed. Please review the logs and rerun",
-            start_time=start_time,
-            end_time=end_time,
-            duration=backup_duration,
-            source=source,
-            destination=destination,
-        )
-
-        return False
-    else:
-
-        logger.info(
-            "Restore completed.",
-            module="restore_master._handle_restore_and_validate",
-            message="Backup completed.",
-            start_time=start_time,
-            end_time=end_time,
-            duration=backup_duration,
-            source=source,
-            destination=destination,
-        )
-
-        return _validate_results(source, destination)
+    return _validate_backup_results(source, destination)
 
 
-def _validate_results(source, destination):
+
+def _validate_backup_results(source, destination):
     """
-    Validate the results of a backup operation by comparing the source and destination file information.
+    Validate the results of a backup operation by comparing the source and destination files.
+    This function collects file information from the source and destination directories,
+    compares the files, and sends an email notification if the backup is successful.
     Args:
-        source (str): The source directory or file path to validate.
-        destination (str): The destination directory or file path to validate.
+        source (str): The path to the source directory.
+        destination (str): The path to the destination directory.
     Returns:
-        bool: True if the source and destination are identical, indicating a successful restore.
-              False if there are differences or if an error occurred during validation.
-    Logs:
-        Logs information about the validation process, including the output of the file collector,
-        and whether the restore was successful or not.
-    Sends Email:
-        Sends an email notification if the restore is successful, indicating that the source and
-        destination are identical.
+        bool: True if the backup is successful and the files match, False otherwise.
     """
 
     logger = structlog.get_logger()
 
     # After backup, validate backup was successful (i.e. matches source file counts and sizes.)
-    ret_source, output_source = collector.collect_file_info(source)
-    if ret_source:
-        logger.info(
-            "Collector output.",
-            module="backup_master._validate_results",
-            message=f"output file: {output_source}",
-        )
+    ret_source, output_source, file_size_total = collector.collect_file_info(source)
 
-    ret_destination, output_destination = collector.collect_file_info(destination)
-    if ret_destination:
-        logger.info(
-            "Collector output",
-            module="backup_master._validate_results",
-            message=f"output file: {output_destination}",
-        )
+    ret_destination, output_destination, file_size_total = collector.collect_file_info(destination)
 
-    # validate source and destination have same content
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
-            subject = "Successful restore"
-            body = "The restore was successful. Source and destination are identical. Restore has been validated."
+            subject = "Successful backup"
+            body = "The files match"
             home_automation_common.send_email(subject, body)
-            logger.info(
-                "Restore validated.",
-                module="restore_master._validate_results",
-                message="Source and destination are identical. Restore has been validated.",
-            )
-
             return True
         else:
-            logger.error(
-                "Restore not valid.",
-                module="restore_master._validate_results",
-                message="Source and destination are different. Restore unsuccessful, review and retry.",
-            )
             return False
     else:
         logger.error(
-            "Restore validation failed.",
-            module="restore_master._validate_results",
-            message="An error occurred while validating source and destination. Restore failed, review and retry.",
+            "Unable to collect data.",
+            module="backup_master._validate_backup_results",
+            message="Unable to validate if the backup matches the source.",
         )
         return False
 
 
-def coordinate_restore_process(source, destination, create_logger=True):
+def coordinate_backup_process(source, destination, create_logger=True):
     """
-    Coordinates the restore process from a source to a destination.
+    Coordinates the backup process between the source and destination.
     Args:
-        source (str): The source path where the backup is located.
-        destination (str): The destination path where the backup should be restored.
-        create_logger (bool, optional): Flag to create a logger for the restore process. Defaults to True.
+        source (str): The source directory or file path to be backed up.
+        destination (str): The destination directory or file path where the backup will be stored.
+        create_logger (bool, optional): If True, a logger will be created for the module. Defaults to True.
     Returns:
-        bool: True if the restore and validation process is successful, False otherwise.
+        bool: True if the backup was needed and successfully executed, False otherwise.
     """
 
     if create_logger:
-        home_automation_common.create_logger("restore")
+        home_automation_common.create_logger(module_name="backup_master")
 
-    backup_is_available, backup_file_source = _backup_available(source)
     # execute backup if needed.
-    if backup_is_available:
-        return _restore_and_validate(backup_file_source, destination)
+    if _backup_needed(source, destination):
+        return _backup_and_validate(source, destination)
     else:
         return False
 
 
 def _list_and_sort_directories(path):
     """
-    List and sort directories in the given path that match the format 'BU-YYYYMMDD'.
+    List and sort directories in the given path that match the format 'BU-YYYY-MM-DD'.
     Args:
-        path (str): The path to the directory containing subdirectories to be listed and sorted.
+        path (str): The path to the directory containing the directories to be listed and sorted.
     Returns:
-        list: A list of directory names sorted by the date part in descending order. If an error occurs, an empty list is returned.
+        list: A list of directory names sorted by date in descending order. If an error occurs, an empty list is returned.
     Raises:
-        ValueError: If the date part of a directory name does not match the expected format.
-        Exception: For any other exceptions that occur during the listing and sorting process.
-    Example:
-        Given the following directory structure:
-        /path/to/dir/
-            BU-20230101/
-            BU-20230201/
-            BU-20230301/
-            other_dir/
-        Calling _list_and_sort_directories('/path/to/dir') will return:
-        ['BU-20230301', 'BU-20230201', 'BU-20230101']
+        ValueError: If the date part of the directory name is not a valid date.
+    The function performs the following steps:
+        1. Lists all items in the given path and filters out non-directory items.
+        2. Filters directories that match the format 'BU-YYYY-MM-DD'.
+        3. Validates the date part of the directory name.
+        4. Sorts the filtered directories by date in descending order.
+        5. Returns the sorted list of directory names.
     """
 
     logger = structlog.get_logger()
@@ -301,7 +287,7 @@ def _list_and_sort_directories(path):
     except Exception as e:
         logger.exception(
             "File collection exception found.",
-            module="restore_master._list_and_sort_directories",
+            module="backup_master._list_and_sort_directories",
             message=f"An error occurred: {e}",
         )
         return []
@@ -310,4 +296,4 @@ def _list_and_sort_directories(path):
 if __name__ == "__main__":
 
     args = _get_arguments()
-    coordinate_restore_process(args.source, args.destination, True)
+    coordinate_backup_process(args.source, args.destination, True)

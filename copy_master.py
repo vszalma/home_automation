@@ -75,21 +75,24 @@ def _are_the_directories_different(source, destination):
         - Error if unable to collect data from the source or destination.
     """
 
-    ret_destination, output_destination, file_size_total = collector.collect_file_info(
+    if not os.path.exists(destination):
+        os.makedirs(destination, exist_ok=True)
+
+    ret_destination, output_destination, dest_file_size_total, dest_total_file_count = collector.collect_file_info(
         destination
     )
 
+    ret_source, output_source, source_file_size_total, source_total_file_count = collector.collect_file_info(source)
+
     # calculate free space available on destination (most_recent_back) volume.
-    if not home_automation_common.calculate_enough_space_available(destination, file_size_total):
+    if not home_automation_common.calculate_enough_space_available(destination, source_file_size_total):
         logger = structlog.get_logger()
         logger.error(
             "Not enough storage",
             module="compare_dirs._are_the_directories_different",
-            message=f"There is not enough storage space to copy to destination. {file_size_total} is needed."
+            message=f"There is not enough storage space to copy to destination. {source_file_size_total} is needed."
         )
         return False
-
-    ret_source, output_source, file_size_total = collector.collect_file_info(source)
 
     if ret_source and ret_destination:
         files_unchanged = compare.compare_files(output_source, output_destination)
@@ -109,7 +112,7 @@ def _are_the_directories_different(source, destination):
                 message=f"Source ({source}) and destination ({destination}) contain differences. Preparing to copy files."
             )
 
-            _copy_files(source, destination)
+            _copy_files(source, destination, source_total_file_count)
 
             logger.info(
                 "Copy completed.",
@@ -126,7 +129,7 @@ def _are_the_directories_different(source, destination):
         )
         return False
 
-def _copy_files(source, destination):
+def _copy_files(source, destination, total_files=0):
     """
     Copies files from the source directory to the destination directory.
     Args:
@@ -143,10 +146,11 @@ def _copy_files(source, destination):
         message=f"Copying files from {source} to {destination}."
     )
 
-    robocopy_helper.execute_robocopy(source, destination, action="Copy")   
+    robocopy_helper.execute_robocopy(source, destination, action="Copy", total_files=total_files)   
 
 
 if __name__ == "__main__":
 
     args = _get_arguments()
+
     _are_the_directories_different(args.source, args.destination)

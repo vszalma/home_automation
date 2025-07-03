@@ -6,6 +6,9 @@ from datetime import datetime
 import os
 import argparse
 
+from tqdm import tqdm
+import re
+
 
 def _get_arguments():
     """
@@ -58,7 +61,7 @@ def _get_arguments():
     return args
 
 
-def _run_robocopy(source, destination, options=None, log_file="robocopy_log.txt"):
+def _run_robocopy_old(source, destination, options=None, log_file="robocopy_log.txt"):
     """
     Executes the robocopy command to copy files from the source to the destination.
     Parameters:
@@ -111,8 +114,123 @@ def _run_robocopy(source, destination, options=None, log_file="robocopy_log.txt"
         )
         return False
 
+def _count_files(directory):
+    return sum(len(files) for _, _, files in os.walk(directory))
 
-def execute_robocopy(source, destination, action="Backup"):
+def _run_robocopy(source, destination, options=None, log_file=None, total_files=0):
+    """
+    Executes the robocopy command with live output, error logging, tqdm progress bar,
+    and a final summary table.
+    """
+    logger = structlog.get_logger()
+
+    try:
+        command = ["robocopy", source, destination]
+        if options:
+            command.extend(options)
+
+        logger.info("Starting robocopy", command=" ".join(command))
+
+        log = open(log_file, "w") if log_file else None
+
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            bufsize=1,
+        )
+
+        progress_bar = tqdm(total=total_files, unit="files", desc="Copying", ncols=80)
+        file_counter = 0
+        summary_lines = []
+        header_prefixes = ("Source :", "Dest :", "Files :", "Options :", "EXCLUDING")
+        failed_files = set()
+        header_mode = None  # Track if we're in a multi-line header block like excluded dirs
+
+        for line in process.stdout:
+            line = line.strip("\r\n")  # strip newline but keep indent info
+            raw_line = line  # keep the unstripped version for indent checking
+
+            if log:
+                log.write(line + "\n")
+
+            if file_counter == 0 and not re.search(r"\bNew File\b", line):
+                summary_lines.append(line)
+
+            # Track robocopy summary lines
+            # if any(line.startswith(prefix) for prefix in ("Dirs :", "Files:", "Bytes:", "Times:", "Ended :", "Speed:")):
+            if file_counter == total_files and not re.search(r"\bNew File\b", line):
+                summary_lines.append(line)
+
+            # Detect and print multi-line header sections
+            # if line.startswith("Source :") or line.startswith("Dest :") or line.startswith("Files :") or line.startswith("Options :"):
+            #     print(line)
+            #     header_mode = None  # reset in case it was in multi-line block
+
+            # elif line.startswith("Exc Dirs :"):
+            #     print(line)
+            #     header_mode = "Exc Dirs"
+
+            # elif header_mode == "Exc Dirs" and raw_line.startswith(" "):
+            #     print(line)  # continuation of excluded dirs
+
+            # else:
+            #     header_mode = None  # no longer in special multi-line block
+
+            # Log errors and track failed file paths
+            if (file_counter < total_files) and ("ERROR" in line or "fail" in line.lower()):
+                logger.error("Robocopy error", detail=line)
+                source_pattern = re.escape(source)
+                match = re.search(rf'({source_pattern}[^:*?"<>|\r\n]*)', line, re.IGNORECASE)
+                # match = re.search(r'(Copying File|Changing File Attributes|New File)\s+(.*)', line, re.IGNORECASE)
+                # match = re.search(r'Copying File\s+(.*)', line, re.IGNORECASE)
+                if match:
+                    failed_file = match.group(2).strip()
+                    failed_files.add(failed_file)
+                    summary_lines.append(line)
+
+            # Update progress bar based on actual file copy events
+            if re.search(r"\bNew File\b", line):
+                file_counter += 1
+                progress_bar.update(1)
+
+        process.stdout.close()
+        return_code = process.wait()
+        progress_bar.close()
+        if log:
+            log.close()
+
+        # Write failed files to a text file if there are any
+        if failed_files:
+            today = datetime.now().date()
+            failed_files_path = home_automation_common.get_full_filename("output", f"{today}_robocopy_failed_files.txt")
+            with open(failed_files_path, "w", encoding="utf-8") as f:
+                for file in sorted(failed_files):
+                    f.write(file + "\n")
+
+        # Summary output
+        print("\n---------------- Robocopy Summary ----------------\n")
+        for line in summary_lines:
+            print(line)
+
+        # Exit code handling
+        if return_code == 0:
+            logger.info("Robocopy completed successfully.")
+        elif 1 <= return_code <= 7:
+            logger.warning("Robocopy completed with warnings.", code=return_code)
+        else:
+            logger.error("Robocopy failed with error code.", code=return_code)
+            return False
+
+        return True
+
+    except Exception as e:
+        logger.exception("Exception occurred while executing robocopy", error=str(e))
+        return False
+
+
+def execute_robocopy(source, destination, action="Backup", total_files=0):
     """
     Executes the Robocopy command to copy files from the source to the destination.
     Parameters:
@@ -148,12 +266,15 @@ def execute_robocopy(source, destination, action="Backup"):
         # logger.error("File does not exist", module="robocopy_helper.execute_robocopy", message="Destination file location does not exist", location=destination)
         # return False
 
+    if total_files <= 0:
+        total_files = _count_files(source)
+
     logger.info(
         f"{action} running.",
         module="robocopy_helper.execute_robocopy",
         message="robocopy is being run.",
     )
-    options = ["/E", "/MT:8", "/XA:S", "/xo", "/nfl", "/ndl"]
+    options = ["/E", "/MT:8", "/XA:S", "/xo", "/ndl", "/R:3", "/W:5"]
     # options = ["/E", "/MT:8", "/xo"]
 
     # Add excluded folders (relative or absolute)
@@ -162,7 +283,7 @@ def execute_robocopy(source, destination, action="Backup"):
     # Combine options
     options += excluded_folders
 
-    isCompleted = _run_robocopy(source, destination, options, output_file)
+    isCompleted = _run_robocopy(source, destination, options, output_file, total_files)
 
     if isCompleted:
         end_time = datetime.now().time()
@@ -194,4 +315,4 @@ if __name__ == "__main__":
 
     logger = structlog.get_logger()
 
-    result = execute_robocopy(args.source, args.destination, args.action)
+    result = execute_robocopy(args.source, args.destination, args.action, total_files=0)

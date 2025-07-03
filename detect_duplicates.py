@@ -182,7 +182,7 @@ def main():
 
     logger.info(
         f"Process completed.",
-        module="detect_duplicates.__main__",
+        module="detect_duplicates.main",
         message=f"Process completed. Output file written to {OUTPUT_CSV}",
         start_time=start_time,
         end_time=end_time,

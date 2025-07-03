@@ -92,18 +92,33 @@ def cleanup_empty_dirs(start_path: Path, stop_path: Path):
         try:
             if not any(current.iterdir()):
                 current.rmdir()
-                logging.info(f"Deleted empty folder: {current}")
+                logger = structlog.get_logger()
+                logger.info(
+                "Deleted empty folder",
+                module="move_duplicates.cleanup_empty_dirs",
+                message=f"Empty folder {current} has been deleted.",
+                )
             else:
                 break
         except Exception as e:
-            logging.warning(f"Failed to remove folder {current}: {e}")
+            logger = structlog.get_logger()
+            logger.warning(
+            "Failed to delete empty folder",
+            module="move_duplicates.cleanup_empty_dirs",
+            message=f"Unable to delete mpty folder {current}: {e}.",
+            )
             break
         current = current.parent
 
 def move_file(row, source_root: Path, archive_root: Path):
     original_path = Path(row["path"])
     if not original_path.exists():
-        logging.warning(f"File not found: {original_path}")
+        logger = structlog.get_logger()
+        logger.warning(
+        "File not found while moving duplicate.",
+        module="move_duplicates.move_file",
+        message=f"File {original_path} was not found and so has not been deleted.",
+        )
         row["archive_location"] = "NOT_FOUND"
         return row
 
@@ -112,13 +127,23 @@ def move_file(row, source_root: Path, archive_root: Path):
         archive_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(original_path), str(archive_path))
         row["archive_location"] = str(archive_path)
-        logging.info(f"Moved {original_path} -> {archive_path}")
+        logger = structlog.get_logger()
+        logger.info(
+        "Duplicate file moved",
+        module="move_duplicates.move_file",
+        message=f"Duplicate file moved {original_path} -> {archive_path}",
+        )
 
         # Attempt to remove now-empty folders
         cleanup_empty_dirs(original_path.parent, source_root)
 
     except Exception as e:
-        logging.error(f"Failed to move {original_path}: {e}")
+        logger = structlog.get_logger()
+        logger.error(
+        "Failed to move duplicate file",
+        module="move_duplicates.move_file",
+        message=f"Failed to move {original_path}: {e}",
+        )
         row["archive_location"] = "ERROR"
     return row
 
@@ -145,8 +170,6 @@ def main():
         )
         return
 
-
-    ARCHIVE_ROOT = Path("duplicate_archive")
     MAX_WORKERS = 4  # Default number of threads
 
     if args.threads.isdigit():
@@ -180,6 +203,8 @@ def main():
         )
         return
 
+    start_time = datetime.now().time()
+
     logger.info(
         "Starting to move duplicates.",
         module="move_duplicates.main",
@@ -202,10 +227,17 @@ def main():
 
     updated_df = pd.concat([df[df["duplicate_status"] != "duplicate delete"], pd.DataFrame(results)], ignore_index=True)
     updated_df.to_csv("duplicates_moved.csv", index=False)
+
+    end_time = datetime.now().time()
+    duration = home_automation_common.duration_from_times(end_time, start_time)
+
     logger.info(
         "Duplicate move process completed.",
         module="move_duplicates.main",
         message=f"Duplicates archived to {args.archive} and output written to {args.output}.",
+        start_time=start_time,
+        end_time=end_time,
+        duration=duration,
     )
 
 if __name__ == "__main__":

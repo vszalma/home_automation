@@ -73,7 +73,7 @@ def collect_file_info(directory):
     exclusions = home_automation_common.get_exclusion_list("collector")
     filetype_lookup = _build_reverse_filetype_lookup(FILE_TYPE_GROUPS)
     if os.path.isdir(directory):
-        file_info, file_size_total = _calculate_file_info(
+        file_info, file_size_total, total_file_count = _calculate_file_info(
             directory, logger, exclusions, filetype_lookup
         )
         output_file = _output_file_info(directory, file_info)
@@ -86,8 +86,9 @@ def collect_file_info(directory):
             duration=duration,
             file=output_file,
             total_size=file_size_total,
+            total_file_count=total_file_count,
         )
-        return True, output_file, file_size_total
+        return True, output_file, file_size_total, total_file_count
     else:
         logger.error(
             "Invalid directory.",
@@ -192,6 +193,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
         directory = os.path.abspath(directory)
 
     file_size_total = 0
+    total_file_count = 0
 
     # Walk through the directory tree
     for root, dirs, files in os.walk(directory):
@@ -217,6 +219,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
                 file_size = os.path.getsize(file_path)
                 group_name = filetype_lookup.get(file_extension, "unknown")
                 file_size_total += file_size
+                total_file_count += 1
             except OSError:
                 logger.warning(
                     "File skipped.",
@@ -230,7 +233,7 @@ def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
             file_info[file_extension]["size"] += file_size
             file_info[file_extension]["group"] += group_name
 
-    return file_info, file_size_total
+    return file_info, file_size_total, total_file_count
 
 
 def _output_file_info(directory, file_info):
@@ -277,4 +280,4 @@ if __name__ == "__main__":
 
     args = _get_arguments()
 
-    ret, output_file, file_size_total = collect_file_info(args.directory)
+    ret, output_file, file_size_total, total_file_count = collect_file_info(args.directory)

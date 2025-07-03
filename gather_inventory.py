@@ -123,6 +123,7 @@ if __name__ == "__main__":
     HASH_SAMPLE_SIZE = 1024
     EXCLUDED_DIRS = {f"{args.directory}\\System Volume Information", f"{args.directory}\\$RECYCLE.BIN"}
 
+    start_time = datetime.now().time()
 
     logger = structlog.get_logger()
     logger.info(
@@ -133,8 +134,14 @@ if __name__ == "__main__":
 
     gather_inventory_multithreaded(ROOT_DIR, OUTPUT_FILE)
 
+    end_time = datetime.now().time()
+    duration = home_automation_common.duration_from_times(end_time, start_time)
+
     logger.info(
         "Inventory gathering completed.",
         module="gather_inventory.__main__",
-        message=f"Output saved to {OUTPUT_FILE}."
+        message=f"Output saved to {OUTPUT_FILE}.",
+        start_time=start_time,
+        end_time=end_time,
+        duration=duration,
     )
