@@ -6,7 +6,7 @@ from mailersend import emails
 from datetime import datetime, time
 from datetime import timedelta
 import shutil
-
+import re
 
 def configure_logging(log_file_name, log_level=logging.INFO):
     """
@@ -44,6 +44,23 @@ def configure_logging(log_file_name, log_level=logging.INFO):
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+def _clean_filename(filename, replacement="_"):
+    """
+    Cleans a user-provided file name to ensure it contains only valid characters.
+    Args:
+        filename (str): The user-provided file name.
+        replacement (str): The character to replace invalid characters with (default is '_').
+    Returns:
+        str: A cleaned file name with only valid characters.
+    """
+    # Define a regex pattern to match invalid characters (anything except alphanumeric, dash, underscore, or dot)
+    invalid_chars = r'[<>:"/\\|?*\x00-\x1F]'
+    
+    # Replace invalid characters with the replacement character
+    cleaned_filename = re.sub(invalid_chars, replacement, filename)
+    
+    # Optionally, strip leading/trailing whitespace
+    return cleaned_filename.strip()
 
 
 def create_logger(module_name="backup_master"):
@@ -78,6 +95,8 @@ def get_full_filename(directory_name, file_name):
     """
     # Get the directory where the script is located
     curr_dir = os.path.dirname(os.path.abspath(__file__))
+
+    file_name = _clean_filename(file_name)
 
     # Define the output file path relative to the script's directory
     output_file = os.path.join(curr_dir, directory_name, file_name)

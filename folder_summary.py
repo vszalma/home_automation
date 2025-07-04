@@ -1,15 +1,19 @@
 
+import argparse
+from datetime import datetime
 import os
 import csv
 import logging
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import structlog
 from tqdm import tqdm
 
+import home_automation_common
+
 # Configuration
-ROOT_DIR = Path("D:/source")  # Change this to your actual source root
-OUTPUT_FILE = "folder_summary.csv"
-MAX_WORKERS = 8
+output_file = "folder_summary.csv"
+max_workers = 8
 
 # Setup logging
 logging.basicConfig(
@@ -18,6 +22,46 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+def _get_arguments():
+    """
+    Parses command-line arguments for file operations.
+    This function sets up an argument parser to handle command-line arguments
+    for processing a directory and file type for file operations. It supports
+    the following arguments:
+    - --source (-s): Path to the source directory to process (required).
+    - --threads (-t): Maximum number of worker threads to use to process files.
+    Returns:
+        argparse.Namespace: Parsed command-line arguments.
+    Raises:
+        ArgumentError: If the provided action is not 'backup' or 'restore'.
+    """
+    parser = argparse.ArgumentParser(
+        description="Process a directory and file type for file operations."
+    )
+
+    # Add named arguments
+    parser.add_argument(
+        "--source",
+        "-s",
+        type=str,
+        required=True,
+        help="Path to the source directory to process.",
+    )
+    parser.add_argument(
+        "--threads",
+        "-t",
+        required=False,
+        default=4,
+        type=str,
+        help="Maximum number of worker threads to use to process files.",
+    )
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Return arguments as a dictionary (or list if preferred)
+    return args
 
 def analyze_folder(folder_path: Path, root: Path):
     try:
@@ -35,8 +79,13 @@ def analyze_folder(folder_path: Path, root: Path):
                     total_size += stat.st_size
                     file_count += 1
                     file_types.add(file_path.suffix.lower())
-                except Exception:
-                    logging.warning(f"Unable to access file: {file_path}")
+                except Exception as e:
+                    logger = structlog.get_logger()
+                    logger.warning(
+                        "Unable to access file.",
+                        module="folder_summary.analyze_folder",
+                        message=f"Unable to access file: {file_path}: {e}",
+                        )
                     continue
 
         depth = len(folder_path.relative_to(root).parts)
@@ -50,28 +99,80 @@ def analyze_folder(folder_path: Path, root: Path):
         }
 
     except Exception as e:
-        logging.error(f"Error analyzing folder {folder_path}: {e}")
+        logger = structlog.get_logger()
+        logger.error(
+            f"Error analyzing folder.",
+            module="folder_summary.analyze_folder",
+            message=f"Error analyzing folder {folder_path}: {e}",
+            )
         return None
 
 def main():
-    logging.info(f"Starting folder summary analysis on: {ROOT_DIR}")
-    all_folders = [Path(dirpath) for dirpath, _, _ in os.walk(ROOT_DIR)]
+    
+    args = _get_arguments()
+
+    source = args.source
+    max_workers = int(args.threads) if args.threads.isdigit() else 4
+
+
+    output_file = f"{datetime.now().date()}_{source}_folder_summary_output.csv"
+
+    output_file = home_automation_common.get_full_filename("output", output_file)
+
+
+    start_time = datetime.now().time()
+
+    today = datetime.now().date()
+
+    log_file = f"{today}_folder_summary_log.txt"
+
+    log_file = home_automation_common.get_full_filename("log", log_file)
+
+    home_automation_common.configure_logging(log_file)
+
+    logger = structlog.get_logger()
+
+
+    logger.info(
+        f"Process started.",
+        module="folder_summary.main",
+        message="Folder summary started.",
+        start_time=start_time,
+        threads=max_workers,
+        source=source,
+        output_file=output_file,
+        )
+
+    all_folders = [Path(dirpath) for dirpath, _, _ in os.walk(source)]
     results = []
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(analyze_folder, folder, ROOT_DIR): folder for folder in all_folders}
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(analyze_folder, folder, source): folder for folder in all_folders}
         for future in tqdm(as_completed(futures), total=len(futures), desc="Analyzing folders"):
             result = future.result()
             if result:
                 results.append(result)
 
-    with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as f:
+    with open(output_file, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["folder", "total_size_mb", "file_count", "folder_count", "depth", "file_types"])
         writer.writeheader()
         for row in results:
             writer.writerow(row)
 
-    logging.info(f"Folder summary written to {OUTPUT_FILE}")
+    end_time = datetime.now().time()
+    duration = home_automation_common.duration_from_times(end_time, start_time)
+
+    logger.info(
+        f"Process completed.",
+        module="folder_summary.main",
+        message="Folder summary written to CSV file.",
+        start_time=start_time,
+        end_time=end_time,
+        duration=duration,
+        source=source,
+        output_file=output_file,
+        )
+
 
 if __name__ == "__main__":
     main()
