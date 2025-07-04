@@ -183,9 +183,9 @@ def _validate_backup_results(source, destination):
     logger = structlog.get_logger()
 
     # After backup, validate backup was successful (i.e. matches source file counts and sizes.)
-    ret_source, output_source, file_size_total = collector.collect_file_info(source)
+    ret_source, output_source, _, _ = collector.collect_file_info(source)
 
-    ret_destination, output_destination, file_size_total = collector.collect_file_info(destination)
+    ret_destination, output_destination, _, _ = collector.collect_file_info(destination)
 
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
