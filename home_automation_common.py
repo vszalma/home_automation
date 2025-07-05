@@ -8,7 +8,7 @@ from datetime import timedelta
 import shutil
 import re
 
-def configure_logging(log_file_name, log_level=logging.INFO):
+def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
     """
     Configures logging for the application.
     This function sets up logging to both a file and the console. It also configures
@@ -32,7 +32,9 @@ def configure_logging(log_file_name, log_level=logging.INFO):
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)
     root_logger.addHandler(file_handler)
-    root_logger.addHandler(console_handler)
+    if log_console:
+        # Only add console handler if log_console is True
+        root_logger.addHandler(console_handler)
 
     # Configure structlog
     structlog.configure(

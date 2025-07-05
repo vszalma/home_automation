@@ -11,18 +11,6 @@ from tqdm import tqdm
 
 import home_automation_common
 
-# Configuration
-output_file = "folder_summary.csv"
-max_workers = 8
-
-# Setup logging
-logging.basicConfig(
-    filename="folder_summary.log",
-    filemode="w",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 def _get_arguments():
     """
     Parses command-line arguments for file operations.
@@ -75,6 +63,7 @@ def analyze_folder(folder_path: Path, root: Path):
             for file in filenames:
                 file_path = Path(dirpath) / file
                 try:
+                    file_path = Path(f"\\\\?\\{file_path}")
                     stat = file_path.stat()
                     total_size += stat.st_size
                     file_count += 1
@@ -114,11 +103,12 @@ def main():
     source = args.source
     max_workers = int(args.threads) if args.threads.isdigit() else 4
 
+    # Trim the file name to a maximum of 12 characters
+    limited_source = source[:12]
 
-    output_file = f"{datetime.now().date()}_{source}_folder_summary_output.csv"
+    output_file = f"{datetime.now().date()}_{limited_source}_folder_summary_output.csv"
 
     output_file = home_automation_common.get_full_filename("output", output_file)
-
 
     start_time = datetime.now().time()
 
