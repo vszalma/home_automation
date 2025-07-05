@@ -59,6 +59,7 @@ def analyze_folder(folder_path: Path, root: Path):
         file_types = set()
 
         for dirpath, dirnames, filenames in os.walk(folder_path):
+
             folder_count += len(dirnames)
             for file in filenames:
                 file_path = Path(dirpath) / file
@@ -133,7 +134,18 @@ def main():
         output_file=output_file,
         )
 
+    exclusions = home_automation_common.get_exclusion_list("collector")
+    # Convert exclusions to lowercase for case-insensitive comparison
+    # exclusions = {exclusion.lower() for exclusion in exclusions}
+
+
     all_folders = [Path(dirpath) for dirpath, _, _ in os.walk(source)]
+
+    all_folders = [
+        folder for folder in all_folders
+        if not any(exclusion in folder.parts for exclusion in exclusions)
+        ]
+
     results = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:

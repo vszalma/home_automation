@@ -23,7 +23,7 @@
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", "image"], // args for validate_file
             // "args": ["-s", "G:\\Backups\\BU-2024-12-12", "-d", "G:\\Backups", "-a backup"], // args for robocopy_helper
             // "args": ["-s", "N:\\_testcopy", "-d", "F:\\Backups"]   // args for backup_master and copy_master
-            "args": ["-s", "N:\\CathyJ\\Lenovo X1 Final Backup\\Documents\\Documents\\Visual Studio 2013\\Projects\\", "-t", "2"]   // args for folder_summary
+            "args": ["-s", "N:\\", "-t", "2"]   // args for folder_summary
             // "args": ["-t", "4", "-d", "X:\\"]   // args for gather_inventory
             // "args": ["-i", "E:\\vszalma\\Source\\Repos\\home-automation\\home_automation\\log\\2025-06-27_gather_inventory_log.log", "-o", "detect_duplicates.csv", "-f", "False"]   // args for detect_duplicates
             // "args": ["-s", "D:\\_bu-2024-11-16","-d", "N:\\"]   // args for restore_master
