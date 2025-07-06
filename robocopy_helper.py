@@ -163,21 +163,6 @@ def _run_robocopy(source, destination, options=None, log_file=None, total_files=
             if file_counter == total_files and not re.search(r"\bNew File\b", line):
                 summary_lines.append(line)
 
-            # Detect and print multi-line header sections
-            # if line.startswith("Source :") or line.startswith("Dest :") or line.startswith("Files :") or line.startswith("Options :"):
-            #     print(line)
-            #     header_mode = None  # reset in case it was in multi-line block
-
-            # elif line.startswith("Exc Dirs :"):
-            #     print(line)
-            #     header_mode = "Exc Dirs"
-
-            # elif header_mode == "Exc Dirs" and raw_line.startswith(" "):
-            #     print(line)  # continuation of excluded dirs
-
-            # else:
-            #     header_mode = None  # no longer in special multi-line block
-
             # Log errors and track failed file paths
             if (file_counter < total_files) and ("ERROR" in line or "fail" in line.lower()):
                 logger.error("Robocopy error", detail=line)
@@ -269,19 +254,27 @@ def execute_robocopy(source, destination, action="Backup", total_files=0):
     if total_files <= 0:
         total_files = _count_files(source)
 
+    core_count = os.cpu_count()
+    if core_count is None:
+        core_count = 2 
+
     logger.info(
         f"{action} running.",
         module="robocopy_helper.execute_robocopy",
         message="robocopy is being run.",
     )
-    options = ["/E", "/MT:8", "/XA:S", "/xo", "/ndl", "/R:3", "/W:5"]
-    # options = ["/E", "/MT:8", "/xo"]
+    options = ["/E", f"/MT:{core_count}", "/XA:S", "/xo", "/ndl", "/R:3", "/W:5"]
 
-    # Add excluded folders (relative or absolute)
-    excluded_folders = ["/XD", "System Volume Information", "$RECYCLE.BIN"] 
+    exclusions = home_automation_common.get_exclusion_list("collector")
 
-    # Combine options
-    options += excluded_folders
+    if exclusions:
+        options += ["/XD"] + exclusions
+
+    # # Add excluded folders (relative or absolute)
+    # excluded_folders = ["/XD", "System Volume Information", "$RECYCLE.BIN"] 
+
+    # # Combine options
+    # options += excluded_folders
 
     isCompleted = _run_robocopy(source, destination, options, output_file, total_files)
 

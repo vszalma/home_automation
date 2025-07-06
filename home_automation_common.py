@@ -135,6 +135,25 @@ def duration_from_times(start_time, end_time):
     return duration
 
 def send_email(subject, body):
+    import smtplib
+    from email.mime.text import MIMEText
+
+    sender = "victorszalma@gmail.com"
+    recipient = "vszalma@hotmail.com"
+    password = "vwhu jnnn tqwy konw"  # Use app password if 2FA is enabled
+
+    msg = MIMEText(body, "html")  # Use "plain" for plaintext emails
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = recipient
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()
+        server.login(sender, password)
+        server.send_message(msg)
+
+
+def send_email_old(subject, body):
     """
     Sends an email with the specified subject and body using mailersend SMTP service.
     Args:
