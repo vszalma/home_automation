@@ -38,13 +38,6 @@ def _get_arguments():
         required=True,
         help="Path to the directory to gather inventory from.",
     )
-    parser.add_argument(
-        "--threads",
-        "-t",
-        type=str,
-        required=True,
-        help="Number of threads to use to gather file metadata inventory.",
-    )
 
     # Parse the arguments
     args = parser.parse_args()
@@ -116,7 +109,13 @@ if __name__ == "__main__":
     OUTPUT_FILE = home_automation_common.get_full_filename("output", output_file)
 
     ROOT_DIR = args.directory
-    MAX_WORKERS = int(args.threads)
+
+        
+    core_count = os.cpu_count()
+    if core_count is None:
+        core_count = 2 
+
+    MAX_WORKERS = core_count
 
     # Configuration
     OUTPUT_FILE = home_automation_common.get_full_filename("output", log_file)

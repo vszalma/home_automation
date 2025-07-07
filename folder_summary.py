@@ -18,7 +18,6 @@ def _get_arguments():
     for processing a directory and file type for file operations. It supports
     the following arguments:
     - --source (-s): Path to the source directory to process (required).
-    - --threads (-t): Maximum number of worker threads to use to process files.
     Returns:
         argparse.Namespace: Parsed command-line arguments.
     Raises:
@@ -35,14 +34,6 @@ def _get_arguments():
         type=str,
         required=True,
         help="Path to the source directory to process.",
-    )
-    parser.add_argument(
-        "--threads",
-        "-t",
-        required=False,
-        default=4,
-        type=str,
-        help="Maximum number of worker threads to use to process files.",
     )
 
     # Parse the arguments
@@ -102,7 +93,13 @@ def main():
     args = _get_arguments()
 
     source = args.source
-    max_workers = int(args.threads) if args.threads.isdigit() else 4
+    
+    core_count = os.cpu_count()
+
+    if core_count is None:
+        core_count = 2 
+
+    max_workers = core_count
 
     # Trim the file name to a maximum of 12 characters
     limited_source = source[:12]
