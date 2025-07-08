@@ -45,9 +45,15 @@ def _get_arguments():
     # Return arguments as a namespace object
     return args
 
-
 def is_excluded(path: Path) -> bool:
-    return any(str(path).startswith(excluded) for excluded in EXCLUDED_DIRS)
+    """
+    Check if the given path contains any excluded folder names at any level.
+    Args:
+        path (Path): The path to check.
+    Returns:
+        bool: True if the path contains an excluded folder name, False otherwise.
+    """
+    return any(part in EXCLUDED_DIRS for part in path.parts)
 
 def get_file_metadata(file_path: Path):
     try:
@@ -117,10 +123,12 @@ if __name__ == "__main__":
 
     MAX_WORKERS = core_count
 
-    # Configuration
-    OUTPUT_FILE = home_automation_common.get_full_filename("output", log_file)
     HASH_SAMPLE_SIZE = 1024
-    EXCLUDED_DIRS = {f"{args.directory}\\System Volume Information", f"{args.directory}\\$RECYCLE.BIN"}
+
+
+    global EXCLUDED_DIRS
+    EXCLUDED_DIRS = home_automation_common.get_exclusion_list("collector")
+    # EXCLUDED_DIRS = {f"{args.directory}\\System Volume Information", f"{args.directory}\\$RECYCLE.BIN"}
 
     start_time = datetime.now().time()
 
