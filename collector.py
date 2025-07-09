@@ -10,6 +10,7 @@ import time
 import home_automation_common
 from validate_file import FILE_TYPE_GROUPS
 import argparse
+from tqdm import tqdm
 
 """ 
     Collects and analyzes file information (e.g., counts, sizes) based on their types within a specified directory.
@@ -168,8 +169,50 @@ def _is_hidden_or_system(file_path):
         # For non-Windows systems, return False (no hidden/system attributes)
         return False
 
-
 def _calculate_file_info(directory, logger, exclusions, filetype_lookup):
+    file_info = defaultdict(lambda: {"count": 0, "size": 0, "group": ""})
+
+    if os.name == "nt":
+        directory = r"\\?\\" + os.path.abspath(directory)
+    else:
+        directory = os.path.abspath(directory)
+
+    file_size_total = 0
+    total_file_count = 0
+    all_files = []
+
+    # First pass: gather file paths and show a spinner/progress
+    with tqdm(desc=f"Counting files in {directory}", unit="file") as pbar:
+        for root, dirs, files in os.walk(directory):
+            dirs[:] = [d for d in dirs if d not in exclusions]
+            for file in files:
+                file_path = os.path.join(root, file)
+                all_files.append(file_path)
+                pbar.update(1)
+
+    # Second pass: Process files with full tqdm bar
+    for file_path in tqdm(all_files, desc=f"Scanning files in {directory}", unit="file"):
+        file_extension = os.path.splitext(file_path)[1].lower()
+        try:
+            file_size = os.path.getsize(file_path)
+            group_name = filetype_lookup.get(file_extension, "unknown")
+            file_size_total += file_size
+            total_file_count += 1
+        except OSError:
+            logger.warning(
+                "File skipped.",
+                module="collector.collect_file_info",
+                message=f"Skipped file {file_path} due to error.",
+            )
+            continue
+
+        file_info[file_extension]["count"] += 1
+        file_info[file_extension]["size"] += file_size
+        file_info[file_extension]["group"] = group_name  # not +=
+
+    return file_info, file_size_total, total_file_count
+
+def _calculate_file_info_old(directory, logger, exclusions, filetype_lookup):
     """
     Calculate file information for a given directory, excluding specified directories.
     Args:

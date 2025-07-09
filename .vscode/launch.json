@@ -22,14 +22,14 @@
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", ".jpg"], // args for find_duplicates
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", "image"], // args for validate_file
             // "args": ["-s", "G:\\Backups\\BU-2024-12-12", "-d", "G:\\Backups", "-a backup"], // args for robocopy_helper
-            // "args": ["-s", "N:\\_testcopy", "-d", "F:\\Backups"]   // args for backup_master and copy_master
+            "args": ["--source", "J:\\", "--destination", "N:\\CathyJ"]   // args for backup_master and copy_master
             // "args": ["-s", "N:\\"]   // args for folder_summary
             // "args": ["-d", "X:\\"]   // args for gather_inventory
             // "args": ["-i", "E:\\vszalma\\Source\\Repos\\home-automation\\home_automation\\log\\2025-06-27_gather_inventory_log.log", "-o", "detect_duplicates.csv", "-f", "False"]   // args for detect_duplicates
             // "args": ["-s", "D:\\_bu-2024-11-16","-d", "N:\\"]   // args for restore_master
             // "args": ["--directory", "E:\\vszalma\\Source\\Repos\\MusicJournal", "--output", "MusicJournal.source.txt", "--extensions", ".cs", ".js", ".css", ".json", ".sln", ".html", ".razor", ".csproj"]   // args for fs_to_text
-            // "args": ["-d", "F:\\_bu-2024-11-16"] // args for collectory.py
-            "args": ["--csv", "C:\\Users\\vszal\\Documents\\code\\home_automation\\output\\2025-07-07_detect_duplicates.csv", "--archive-root", "N:\\_testcopy\\archive", "--directory", "N:\\_testcopy"] // args for move_duplicates.py
+            // "args": ["-d", "N:\\CathyJ"] // args for collectory.py
+            // "args": ["--csv", "C:\\Users\\vszal\\Documents\\code\\home_automation\\output\\2025-07-07_detect_duplicates.csv", "--archive-root", "N:\\_testcopy\\archive", "--directory", "N:\\_testcopy"] // args for move_duplicates.py
             // "args": ["-d1", "F:\\_bu-2024-11-16", "-d2", "G:\\Backups\\BU-2024-12-12",  "-f", ".txt"] // args for compare_files_by_type
             // "args": ["-f1", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-F_bu-2024-11-16.csv", "-f2", "E:\\vszalma\\Source\\Repos\\home-automation\\home-automation\\output\\2024-12-13-collector-output-GBackupsBU-2024-12-12.csv"] // args for compare.py
         }

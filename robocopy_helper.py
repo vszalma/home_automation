@@ -268,7 +268,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0):
     exclusions = home_automation_common.get_exclusion_list("collector")
 
     if exclusions:
-        options += ["/XD"] + exclusions
+        options += ["/XD"] + list(exclusions if isinstance(exclusions, (list, set)) else [exclusions])
 
     # # Add excluded folders (relative or absolute)
     # excluded_folders = ["/XD", "System Volume Information", "$RECYCLE.BIN"] 
