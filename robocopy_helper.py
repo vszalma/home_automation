@@ -256,7 +256,8 @@ def execute_robocopy(source, destination, action="Backup", total_files=0):
 
     core_count = os.cpu_count()
     if core_count is None:
-        core_count = 2 
+        core_count = 2  # fallback
+    core_count = max(1, core_count - 1)
 
     logger.info(
         f"{action} running.",
