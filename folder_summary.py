@@ -97,8 +97,8 @@ def main():
     core_count = os.cpu_count()
 
     if core_count is None:
-        core_count = 2 
-
+        core_count = 2  # fallback
+    core_count = max(1, core_count - 1)
     max_workers = core_count
 
     # Trim the file name to a maximum of 12 characters

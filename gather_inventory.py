@@ -119,8 +119,8 @@ if __name__ == "__main__":
         
     core_count = os.cpu_count()
     if core_count is None:
-        core_count = 2 
-
+        core_count = 2  # fallback
+    core_count = max(1, core_count - 1)
     MAX_WORKERS = core_count
 
     HASH_SAMPLE_SIZE = 1024
