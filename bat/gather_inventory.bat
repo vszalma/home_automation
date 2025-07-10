@@ -12,6 +12,6 @@ echo Running gather_inventory.py script...
 echo Python: %PYTHON_EXE%
 
 REM Call script interactively (console remains open)
-%PYTHON_EXE% gather_inventory.py --directory "N:\_testcopy"
+%PYTHON_EXE% gather_inventory.py --directory N:\CathyJ
 
 pause

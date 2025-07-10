@@ -12,6 +12,6 @@ echo Running detect_duplicates.py script...
 echo Python: %PYTHON_EXE%
 
 REM Call script interactively (console remains open)
-%PYTHON_EXE% detect_duplicates.py --input "C:\Users\vszal\Documents\code\home_automation\output\2025-07-07_gather_inventory_output.csv" --output "detect_duplicates.csv"
+%PYTHON_EXE% detect_duplicates.py --input "C:\\Users\\vszal\\Documents\\code\\home_automation\\output\\2025-07-09_gather_inventory_output.csv" --output "detect_duplicates.csv" --fullhash True
 
 pause
