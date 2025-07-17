@@ -215,7 +215,7 @@ def _run_robocopy(source, destination, options=None, log_file=None, total_files=
         return False
 
 
-def execute_robocopy(source, destination, action="Backup", total_files=0):
+def execute_robocopy(source, destination, action="Backup", total_files=0, move=False):
     """
     Executes the Robocopy command to copy files from the source to the destination.
     Parameters:
@@ -270,6 +270,9 @@ def execute_robocopy(source, destination, action="Backup", total_files=0):
 
     if exclusions:
         options += ["/XD"] + list(exclusions if isinstance(exclusions, (list, set)) else [exclusions])
+
+    if move:
+        options.append("/MOV")
 
     # # Add excluded folders (relative or absolute)
     # excluded_folders = ["/XD", "System Volume Information", "$RECYCLE.BIN"] 

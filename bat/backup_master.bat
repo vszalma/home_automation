@@ -14,8 +14,8 @@ if "%SESSIONNAME%"=="" (
     echo Date: %date%, Time: %time% > "%LOGFILE%"
     echo Running Python script... >> "%LOGFILE%"
 
-    "%PYTHON_EXE%" C:\Users\vszal\Documents\code\home_automation\backup_master.py --source "N:\_testcopy" --destination F:\backups" >> "%LOGFILE%" 2>&1
+    "%PYTHON_EXE%" C:\Users\vszal\Documents\code\home_automation\backup_master.py --source "N:\" --destination E:\Backups" >> "%LOGFILE%" 2>&1
 ) else (
     echo Detected interactive execution. >> "%DEBUGLOG%"
-    "%PYTHON_EXE%" C:\Users\vszal\Documents\code\home_automation\backup_master.py --source "N:\_testcopy" --destination F:\backups"
+    "%PYTHON_EXE%" C:\Users\vszal\Documents\code\home_automation\backup_master.py --source "N:\" --destination E:\Backups"
 )

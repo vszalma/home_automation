@@ -136,6 +136,7 @@ def main():
                 )
 
     output_path = home_automation_common.get_full_filename("output", f"{datetime.now().date()}_matching_folders_output.csv")
+    output_path = Path(output_path)
     with output_path.open("w", encoding="utf-8") as f:
         f.write("folder_path,file_count,total_size_bytes\n")
         for path, count, size in results:
