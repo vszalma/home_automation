@@ -45,6 +45,13 @@ def _get_arguments():
         type=str,
         help="Path to the destination directory to process.",
     )
+    parser.add_argument(
+        "--retry",
+        "-r",
+        required=True,
+        type=str,
+        help="Maximum number of retries for robocopy.",
+    )
 
     # Parse the arguments
     args = parser.parse_args()
@@ -145,7 +152,7 @@ def _backup_and_validate(source, destination):
     logger = structlog.get_logger()
     destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
-    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup")
+    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup", args.retry)
     # backup_result = True
     if not backup_result:
         subject = "BACKUP FAILED!"

@@ -96,7 +96,7 @@ def collect_file_info(directory):
             module="collector.collect_file_info",
             message="Invalid directory. Please correct and try again.",
         )
-        return False, "Invalid directory. Please try again.", 0
+        return False, "Invalid directory. Please try again.", 0, 0
 
 
 def _build_reverse_filetype_lookup(file_type_groups):

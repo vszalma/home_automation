@@ -44,6 +44,14 @@ def _get_arguments():
         type=str,
         help="Path to the destination directory to process.",
     )
+    parser.add_argument(
+        "--retry",
+        "-r",
+        required=False,
+        default=5,
+        type=str,
+        help="Path to the destination directory to process.",
+    )
 
     # Parse the arguments
     args = parser.parse_args()
@@ -146,7 +154,7 @@ def _copy_files(source, destination, total_files=0):
         message=f"Copying files from {source} to {destination}."
     )
 
-    robocopy_helper.execute_robocopy(source, destination, action="Copy", total_files=total_files)   
+    robocopy_helper.execute_robocopy(source, destination, action="Copy", total_files=total_files, retry_count=args.retry)   
 
 
 if __name__ == "__main__":

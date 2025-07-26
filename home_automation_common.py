@@ -8,6 +8,8 @@ from datetime import timedelta
 import shutil
 import re
 
+CURRENT_LOG_PATH = None
+
 def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
     """
     Configures logging for the application.
@@ -19,6 +21,7 @@ def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
     Returns:
         None
     """
+    CURRENT_LOG_PATH = log_file_name
     # Create handlers
     file_handler = logging.FileHandler(log_file_name, mode="a")
     file_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
@@ -46,6 +49,10 @@ def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+
+def get_log_path():
+    return CURRENT_LOG_PATH
+
 def _clean_filename(filename, replacement="_"):
     """
     Cleans a user-provided file name to ensure it contains only valid characters.
