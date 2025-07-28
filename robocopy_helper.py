@@ -73,7 +73,7 @@ def _count_files(directory):
 
 def make_unc_path(path: str) -> str:
     """
-    Converts a local or UNC path to an extended-length path using the \\?\ prefix.
+    Converts a local or UNC path to an extended-length path using the \\?\\ prefix.
     Handles both local (e.g., C:\...) and network (e.g., \\Server\Share\...) paths.
     """
     path = os.path.abspath(path)
@@ -318,4 +318,4 @@ if __name__ == "__main__":
 
     logger = structlog.get_logger()
 
-    result = execute_robocopy(args.source, args.destination, args.action, total_files=0)
+    result = execute_robocopy(args.source, args.destination, args.action, total_files=0, move=False, retry_count=10)

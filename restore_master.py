@@ -155,7 +155,7 @@ def _restore_and_validate(source, destination):
     logger = structlog.get_logger()
     # destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
-    restore_result = robocopy_helper.execute_robocopy(source, destination, "Restore", retry_count=100)
+    restore_result = robocopy_helper.execute_robocopy(source, destination, "Restore", move=False, retry_count=100)
     # backup_result = True
     if not restore_result:
         subject = "RESTORE FAILED!"

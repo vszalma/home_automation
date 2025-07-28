@@ -7,5 +7,5 @@
 
 C:\Users\vszal\Documents\code\home_automation\.venv\Scripts\python.exe ^
     C:\Users\vszal\Documents\code\home_automation\compare_files_by_type.py --directory1 F:\Backups\BU-2024-12-12 ^
-                                                                           --directory2  N: --filetype .xlsm ^
+                                                                           --directory2  N: --filetype .jpg ^
     > C:\Users\vszal\Documents\code\home_automation\log\compare_files_by_type_bat.log 2>&1

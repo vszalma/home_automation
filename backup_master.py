@@ -74,7 +74,10 @@ def _backup_needed(source, destination):
     backup_dir_list = _list_and_sort_directories(destination)
 
     if not backup_dir_list:
-        return True
+        if os.path.exists(destination):
+            return _has_data_changed_since_last_backup(source, destination)
+        else:
+            return True
     else:
         most_recent_backup = os.path.join(destination, backup_dir_list[0])
         return _has_data_changed_since_last_backup(source, most_recent_backup)
@@ -114,7 +117,10 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
 
     if ret_source and ret_destination:
         files_unchanged = compare.compare_files(output_source, output_destination)
-        files_have_moved = compare.files_have_moved(source, most_recent_backup)
+        if dest_total_file_count == 0:
+            files_have_moved = True
+        else:
+            files_have_moved = compare.files_have_moved(source, most_recent_backup)
         if files_unchanged and not files_have_moved:
             home_automation_common.send_email(
                 "Backup not run.",
@@ -150,9 +156,11 @@ def _backup_and_validate(source, destination):
     """
 
     logger = structlog.get_logger()
-    destination = fr"{destination}\BU-{datetime.now().date()}"
+
+    if not os.path.exists(destination):
+        destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
-    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup", args.retry)
+    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup", total_files=0, move=False, retry=int(args.retry))
     # backup_result = True
     if not backup_result:
         subject = "BACKUP FAILED!"
@@ -172,6 +180,8 @@ def _backup_and_validate(source, destination):
     )
 
     return _validate_backup_results(source, destination)
+
+
 
 
 
@@ -201,6 +211,9 @@ def _validate_backup_results(source, destination):
             home_automation_common.send_email(subject, body)
             return True
         else:
+            subject = "Backup validation failed"
+            body = "The files do not match. Please review the logs and rerun."
+            home_automation_common.send_email(subject, body)
             return False
     else:
         logger.error(

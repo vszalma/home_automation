@@ -154,7 +154,7 @@ def _copy_files(source, destination, total_files=0):
         message=f"Copying files from {source} to {destination}."
     )
 
-    robocopy_helper.execute_robocopy(source, destination, action="Copy", total_files=total_files, retry_count=args.retry)   
+    robocopy_helper.execute_robocopy(source, destination, action="Copy", total_files=total_files, move=False, retry_count=args.retry)   
 
 
 if __name__ == "__main__":

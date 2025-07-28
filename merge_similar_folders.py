@@ -86,7 +86,7 @@ def main():
                 execute_robocopy(
                     source=str(source_path),
                     destination=str(archive_path),
-                    action="move",
+                    action="Move",
                     move=True
                 )
                 continue
@@ -96,7 +96,8 @@ def main():
                 execute_robocopy(
                     source=str(source_path),
                     destination=str(destination_path),
-                    action="copy"
+                    action="copy",
+                    move=False
                 )
 
 if __name__ == "__main__":
