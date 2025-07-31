@@ -59,15 +59,32 @@ def _get_arguments():
     # Return arguments as a dictionary (or list if preferred)
     return args
 
-"""
-    code here needs to mimic backup_master.py
-    It should compare the source directory with the destination directory.
-    
-    if they are different display the list of dirs and their counts. from collect_file_info function.
-"""
+def _compare_files(source, destination):
+    """
+    Compares files in the source and destination directories to determine if they are the same.
+    Args:
+        source (str): The path to the source directory to compare.
+        destination (str): The path to the destination directory to compare.
+    Returns:
+        bool: True if files are the same, False if they differ.
+    """
+    ret_destination, output_destination, dest_file_size_total, dest_total_file_count = collector.collect_file_info(destination)
 
+    ret_source, output_source, source_file_size_total, source_total_file_count = collector.collect_file_info(source)
     
-def _are_the_directories_different(source, destination):
+    if ret_source and ret_destination:
+        files_match = compare.compare_files(output_source, output_destination)
+        return files_match, source_file_size_total, source_total_file_count
+    else:
+        logger = structlog.get_logger()
+        logger.error(
+            "Unable to compare files, exiting. Retry.",
+            module="compare_dirs._compare_files",
+            message=f"An error appeared while running collector.collect_file_info."
+            )
+        sys.exit(1)
+    
+def _coordinate_copy_process(source, destination):
     """
     Checks if the data in the source directory is different than the destination directory.
     This function collects file information from the source and destination directories,
@@ -86,30 +103,21 @@ def _are_the_directories_different(source, destination):
     if not os.path.exists(destination):
         os.makedirs(destination, exist_ok=True)
 
-    ret_destination, output_destination, dest_file_size_total, dest_total_file_count = collector.collect_file_info(
-        destination
-    )
+    folders_already_match, source_file_size_total, source_total_file_count = _compare_files(source, destination)
 
-    ret_source, output_source, source_file_size_total, source_total_file_count = collector.collect_file_info(source)
+    # ret_destination, output_destination, dest_file_size_total, dest_total_file_count = collector.collect_file_info(destination)
 
-    # calculate free space available on destination (most_recent_back) volume.
-    if not home_automation_common.calculate_enough_space_available(destination, source_file_size_total):
-        logger = structlog.get_logger()
-        logger.error(
-            "Not enough storage",
-            module="compare_dirs._are_the_directories_different",
-            message=f"There is not enough storage space to copy to destination. {source_file_size_total} is needed."
-        )
-        return False
+    # ret_source, output_source, source_file_size_total, source_total_file_count = collector.collect_file_info(source)
 
-    if ret_source and ret_destination:
-        files_unchanged = compare.compare_files(output_source, output_destination)
-        if files_unchanged:
+    
+    if not folders_already_match:
+        # calculate free space available on destination (most_recent_back) volume.
+        if not home_automation_common.calculate_enough_space_available(destination, source_file_size_total):
             logger = structlog.get_logger()
-            logger.info(
-                "Directories are the same.",
+            logger.error(
+                "Not enough storage",
                 module="compare_dirs._are_the_directories_different",
-                message=f"Source ({source}) and destination ({destination}) are the same."
+                message=f"There is not enough storage space to copy to destination. {source_file_size_total} is needed."
             )
             return False
         else:
@@ -118,24 +126,27 @@ def _are_the_directories_different(source, destination):
                 "Directories are different.",
                 module="compare_dirs._are_the_directories_different",
                 message=f"Source ({source}) and destination ({destination}) contain differences. Preparing to copy files."
-            )
-
-            _copy_files(source, destination, source_total_file_count)
-
-            logger.info(
-                "Copy completed.",
-                module="compare_dirs._are_the_directories_different",
-                message=f"Source ({source}) and destination ({destination}) contain differences. Preparing to copy files."
-            )
-
-            return True
+                )
     else:
         logger = structlog.get_logger()
-        logger.error(
-            "Unable to collect data.",
-            module="copy_master._are_the_directories_different",
+        logger.info(
+            "Directories are the same.",
+            module="compare_dirs._are_the_directories_different",
+            message=f"Source ({source}) and destination ({destination}) are the same."
         )
         return False
+
+    _copy_files(source, destination, source_total_file_count)
+
+    logger.info(
+        "Copy completed.",
+        module="copy_master._coordinate_copy_process",
+        message=f"Source ({source}) has been copied to ({destination}). Preparing to compare files to ensure they are the same."
+    )
+
+    files_now_match, _, _ = _compare_files(source, destination)
+
+    return files_now_match
 
 def _copy_files(source, destination, total_files=0):
     """
@@ -157,8 +168,19 @@ def _copy_files(source, destination, total_files=0):
     robocopy_helper.execute_robocopy(source, destination, action="Copy", total_files=total_files, move=False, retry_count=args.retry)   
 
 
+
+
 if __name__ == "__main__":
 
     args = _get_arguments()
 
-    _are_the_directories_different(args.source, args.destination)
+    folders_match = _coordinate_copy_process(args.source, args.destination)
+
+    logger = structlog.get_logger()
+
+    if folders_match:
+        logger.info(
+            "Folders now match.",
+            module="copy_master.__main__",
+            message=f"Folder {args.destination} matches {args.source}."
+        )

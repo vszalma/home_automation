@@ -15,13 +15,21 @@ def _get_arguments():
     )
     parser.add_argument("--directory1", "-d1", type=str, required=True, help="Path to first directory to compare.")
     parser.add_argument("--directory2", "-d2", type=str, required=True, help="Path to second directory to compare.")
-    parser.add_argument("--filetype", "-f", type=str, default=".jpg", help="The filetype to search for differences.")
+    parser.add_argument("--filetype", "-f", type=str, default=".jpg", help="The filetype to search for differences. Use 'none' for files without an extension")
     return parser.parse_args()
 
 def _output_file_name(file_extension):
     sanitized_extension = file_extension.replace(".", "")
     output_file = f"{datetime.now().date()}-compare-by-type-output-{sanitized_extension}.csv"
     return home_automation_common.get_full_filename("output", output_file)
+
+def _pretty_path(path):
+    path = str(path)
+    if path.startswith("\\\\?\\UNC\\"):
+        return "\\" + path[7:]  # Strip \\?\UNC and restore leading slash
+    elif path.startswith("\\\\?\\"):
+        return path[4:]  # Strip \\?\
+    return path
 
 def compare_file_structures(root1, root2, file_extension, output_file):
     root1, root2 = Path(root1), Path(root2)
@@ -31,12 +39,16 @@ def compare_file_structures(root1, root2, file_extension, output_file):
         file_dict = {}
         exclusions = home_automation_common.get_exclusion_list("collector", None)
         if os.name == "nt":
-            root = r"\\?\\" + os.path.abspath(root)
-        with tqdm(desc=f"Scanning {Path(root).name}", unit="dir") as pbar:
+            root = home_automation_common.normalize_path(root)
+            # root = r"\\?\\" + os.path.abspath(root)
+        with tqdm(desc=f"Scanning {_pretty_path(root)}", unit="dir") as pbar:
             for dirpath, dirs, filenames in os.walk(root):
                 dirs[:] = [d for d in dirs if d not in exclusions]
                 for filename in filenames:
-                    if os.path.splitext(filename)[1].lower() == file_extension.lower():
+                    filename_extension = os.path.splitext(filename)[1].lower()
+                    if (file_extension.lower() == "none" and filename_extension == "") or \
+                       (file_extension.lower() != "none" and filename_extension == file_extension.lower()):
+                    # if os.path.splitext(filename)[1].lower() == file_extension.lower():
                         full_path = Path(dirpath) / filename
                         relative_path = full_path.relative_to(root)
                         file_info = {

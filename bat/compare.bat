@@ -1,8 +1,17 @@
 @echo off
+REM filepath: C:\Users\vszal\Documents\code\home_automation\bat\compare.bat
 
-    @REM Arguments:
-    @REM     --file1, -f1 (str, required): Path to the file to compare to file2.
-    @REM     --file2, -f2 (str, required): Path to the file to be compared to file1.
+REM Set Python executable from virtual environment
+set PYTHON_EXE=C:\Users\vszal\Documents\code\home_automation\.venv\Scripts\python.exe
 
-C:\Users\vszal\Documents\code\home_automation\.venv\Scripts\python.exe ^
-    C:\Users\vszal\Documents\code\home_automation\compare.py --file1 N:\\path\to\file.ext --file2 N:\\path\to\file.ext
+REM Change directory to project root so relative imports work
+cd /d C:\Users\vszal\Documents\code\home_automation
+
+REM Display what is being executed
+echo Running compare.py script...
+echo Python: %PYTHON_EXE%
+
+REM Call script interactively (console remains open)
+%PYTHON_EXE% compare.py --file1 "C:\Users\vszal\Documents\code\home_automation\output\2025-07-30-collector-output-NCathyJ.csv" --file2 "C:\Users\vszal\Documents\code\home_automation\output\2025-07-30-collector-output-E_tempCathyJ.csv"
+
+pause
