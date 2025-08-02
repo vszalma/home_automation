@@ -117,7 +117,7 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
 
     if ret_source and ret_destination:
         files_unchanged = compare.compare_files(output_source, output_destination)
-        if dest_total_file_count == 0:
+        if not files_unchanged or dest_total_file_count == 0:
             files_have_moved = True
         else:
             files_have_moved = compare.files_have_moved(source, most_recent_backup)

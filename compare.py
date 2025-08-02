@@ -56,6 +56,13 @@ def calculate_file_hash(file_path, chunk_size=8192):
             hasher.update(chunk)
     return hasher.hexdigest()
 
+def quick_compare_metadata(path1, path2):
+    try:
+        stat1 = os.stat(path1)
+        stat2 = os.stat(path2)
+        return stat1.st_size == stat2.st_size and int(stat1.st_mtime) == int(stat2.st_mtime)
+    except Exception:
+        return False
 
 def build_file_metadata(directory):
     """
@@ -74,8 +81,45 @@ def build_file_metadata(directory):
                 print(f"Error processing {file_path}: {e}")
     return file_metadata
 
+def files_have_moved(dir1, dir2, use_full_hash=False):
+    logger = structlog.get_logger()
+    metadata2 = {}
 
-def files_have_moved(dir1, dir2):
+    logger.info("Building file metadata for directory 2...", dir=str(dir2))
+    for root, _, files in os.walk(dir2):
+        for file in files:
+            file_path = Path(root) / file
+            try:
+                if use_full_hash:
+                    file_hash = calculate_file_hash(file_path)
+                else:
+                    file_hash = f"{os.path.getsize(file_path)}-{int(os.path.getmtime(file_path))}"
+                metadata2[file_hash] = str(file_path.relative_to(dir2))
+            except Exception as e:
+                logger.warning("Error processing file in dir2", file=str(file_path), error=str(e))
+
+    logger.info("Checking for moved files from directory 1...", dir=str(dir1))
+    for root, _, files in os.walk(dir1):
+        for file in files:
+            file_path = Path(root) / file
+            try:
+                if use_full_hash:
+                    file_hash = calculate_file_hash(file_path)
+                else:
+                    file_hash = f"{os.path.getsize(file_path)}-{int(os.path.getmtime(file_path))}"
+
+                path1_rel = str(file_path.relative_to(dir1))
+                path2_rel = metadata2.get(file_hash)
+
+                if path2_rel and path1_rel != path2_rel:
+                    logger.info("Moved file detected", hash=file_hash, from_path=path1_rel, to_path=path2_rel)
+                    return True
+            except Exception as e:
+                logger.warning("Error processing file in dir1", file=str(file_path), error=str(e))
+
+    return False
+
+def files_have_moved_orig(dir1, dir2):
     """
     Check if there are any moved files between two directories.
     Returns True if any file has been moved, otherwise False.
