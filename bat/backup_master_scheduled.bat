@@ -10,4 +10,4 @@ echo ==== New Scheduled Execution: %date% %time% ==== >> "%DEBUGLOG%"
 echo Date: %date%, Time: %time% > "%LOGFILE%"
 echo Running Python script from task scheduler... >> "%LOGFILE%"
 
-%PYTHON_EXE% C:\home_automation\backup_master.py --source E:\test_source --destination E:\Backups >> %LOGFILE% 2>&1
+%PYTHON_EXE% C:\home_automation\backup_master.py --source N:\ --destination E:\Backups >> %LOGFILE% 2>&1
