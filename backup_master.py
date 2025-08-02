@@ -11,6 +11,8 @@ import time
 import home_automation_common
 import structlog
 import logging
+from pathlib import Path
+import re
 
 """ 
     The script backs up a source directory to a destination directory.
@@ -71,16 +73,21 @@ def _backup_needed(source, destination):
     """
 
     # Get most recent backup file location.
-    backup_dir_list = _list_and_sort_directories(destination)
-
-    if not backup_dir_list:
+    if _is_specific_backup_folder(destination):
         if os.path.exists(destination):
             return _has_data_changed_since_last_backup(source, destination)
         else:
             return True
     else:
-        most_recent_backup = os.path.join(destination, backup_dir_list[0])
-        return _has_data_changed_since_last_backup(source, most_recent_backup)
+        backup_dir_list = _list_and_sort_directories(destination)
+        if backup_dir_list:
+            most_recent_backup = os.path.join(destination, backup_dir_list[0])
+            return _has_data_changed_since_last_backup(source, most_recent_backup)
+        else:
+            if os.path.exists(destination):
+                return _has_data_changed_since_last_backup(source, destination)
+            else:
+                return True
     
 
 def _has_data_changed_since_last_backup(source, most_recent_backup):
@@ -170,8 +177,11 @@ def _backup_and_validate(source, destination):
 
     logger = structlog.get_logger()
 
-    if not os.path.exists(destination):
+    if not _is_specific_backup_folder(destination):
         destination = fr"{destination}\BU-{datetime.now().date()}"
+    # else:
+    #     if not os.path.exists(destination):
+    #         destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
     backup_result = robocopy_helper.execute_robocopy(source, destination, action="Backup", total_files=0, move=False, retry_count=int(args.retry))
     # backup_result = True
@@ -195,7 +205,14 @@ def _backup_and_validate(source, destination):
     return _validate_backup_results(source, destination)
 
 
-
+def _is_specific_backup_folder(path_str):
+    """
+    Determines if the path ends with a specific backup folder like BU-2025-07-22.
+    Returns True if yes, False if it's just the backup root.
+    """
+    path = Path(path_str)
+    folder_name = path.name
+    return bool(re.match(r"^BU-\d{4}-\d{2}-\d{2}$", folder_name))
 
 
 def _validate_backup_results(source, destination):

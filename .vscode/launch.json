@@ -22,7 +22,7 @@
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", ".jpg"], // args for find_duplicates
             // "args": ["-d", "G:\\Backups\\BU-2024-12-12", "-f", "image"], // args for validate_file
             // "args": ["-s", "G:\\Backups\\BU-2024-12-12", "-d", "G:\\Backups", "-a backup"], // args for robocopy_helper
-            "args": ["--source", "E:\\test_source", "--destination", "E:\\Backups\\BU-2025-07-26", "--retry", "50"]   // args for backup_master and copy_master
+            "args": ["--source", "E:\\test_source", "--destination", "E:\\Backups", "--retry", "50"]   // args for backup_master and copy_master
             // "args": ["-s", "N:\\"]   // args for folder_summary
             // "args": ["-d", "X:\\"]   // args for gather_inventory
             // "args": ["-i", "E:\\vszalma\\Source\\Repos\\home-automation\\home_automation\\log\\2025-06-27_gather_inventory_log.log", "-o", "detect_duplicates.csv", "-f", "False"]   // args for detect_duplicates
