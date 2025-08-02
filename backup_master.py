@@ -173,7 +173,7 @@ def _backup_and_validate(source, destination):
     if not os.path.exists(destination):
         destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
-    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup", total_files=0, move=False, retry=int(args.retry))
+    backup_result = robocopy_helper.execute_robocopy(source, destination, action="Backup", total_files=0, move=False, retry_count=int(args.retry))
     # backup_result = True
     if not backup_result:
         subject = "BACKUP FAILED!"
