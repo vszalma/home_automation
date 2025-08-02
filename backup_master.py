@@ -118,17 +118,30 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
     if ret_source and ret_destination:
         files_unchanged = compare.compare_files(output_source, output_destination)
         if not files_unchanged or dest_total_file_count == 0:
-            files_have_moved = True
+            logger = structlog.get_logger()
+            logger.info(
+                "Data has changed since last backup.",
+                module="backup_master._has_data_changed_since_last_backup",
+            )
+            # files_have_moved = True
+            return True
         else:
             files_have_moved = compare.files_have_moved(source, most_recent_backup)
-        if files_unchanged and not files_have_moved:
-            home_automation_common.send_email(
-                "Backup not run.",
-                "There was no need to backup files as the content hasn't changed.",
-            )
-            return False
-        else:
-            return True
+            if files_have_moved:
+                logger = structlog.get_logger()
+                logger.info(
+                    "Data was found to have moved.",
+                    module="backup_master._has_data_changed_since_last_backup",
+                )
+                return True
+            else:
+                home_automation_common.send_email(
+                    "Backup not run.",
+                    "There was no need to backup files as the content hasn't changed.",
+                )
+                return False
+        # else:
+        #     return True
     else:
         logger = structlog.get_logger()
         logger.error(
