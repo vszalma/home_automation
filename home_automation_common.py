@@ -225,7 +225,9 @@ def get_exclusion_list(exclusion_type, start_folder=None):
 
     logger = structlog.get_logger()
 
-    exclusion_file = f"{exclusion_type}_exclusions.txt"
+    # Get current script/module directory
+    base_dir = Path(__file__).resolve().parent
+    exclusion_file = base_dir / f"{exclusion_type}_exclusions.txt"
 
     # Load exclusions
     exclusions = set()
