@@ -156,10 +156,11 @@ def _restore_and_validate(source, destination):
     # destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
     restore_result = robocopy_helper.execute_robocopy(source, destination, "Restore", move=False, retry_count=100)
-    # backup_result = True
-    if not restore_result:
+    restore_success, restore_message = restore_result
+    # restore_result = True
+    if not restore_success:
         subject = "RESTORE FAILED!"
-        body = "The restore failed. Please review the logs and rerun."
+        body = f"The restore failed. The message is {restore_message}. Please review the logs for more details and rerun."
         home_automation_common.send_email(subject, body)
         return False
 

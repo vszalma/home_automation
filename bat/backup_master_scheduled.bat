@@ -2,7 +2,7 @@
 REM filepath: C:\Users\vszal\Documents\code\home_automation\bat\backup_master.bat
 
 set LOGROOT=C:\home_automation\log
-set LOGFILE=%LOGROOT%\backup_master_bat.log
+set LOGFILE=%LOGROOT%\backup_master_scheduled_bat.log
 set DEBUGLOG=%LOGROOT%\debug.log
 set PYTHON_EXE=C:\python313\python.exe
 

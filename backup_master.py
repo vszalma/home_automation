@@ -184,10 +184,10 @@ def _backup_and_validate(source, destination):
     #         destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
     backup_result = robocopy_helper.execute_robocopy(source, destination, action="Backup", total_files=0, move=False, retry_count=int(args.retry))
-    # backup_result = True
-    if not backup_result:
+    backup_success, backup_message = backup_result
+    if not backup_success:
         subject = "BACKUP FAILED!"
-        body = "The backup failed. Please review the logs and rerun."
+        body = f"The backup failed. {backup_message}  Please review the logs and rerun."
         home_automation_common.send_email(subject, body)
         return False
 
@@ -230,19 +230,33 @@ def _validate_backup_results(source, destination):
     logger = structlog.get_logger()
 
     # After backup, validate backup was successful (i.e. matches source file counts and sizes.)
-    ret_source, output_source, _, _ = collector.collect_file_info(source)
+    ret_source, output_source, source_count, source_size = collector.collect_file_info(source)
 
-    ret_destination, output_destination, _, _ = collector.collect_file_info(destination)
+    ret_destination, output_destination, destination_count, destination_size = collector.collect_file_info(destination)
 
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
             subject = "Successful backup"
-            body = "The files match"
+            body = (
+                    f"The backup {destination} files match the source {source}.\n\n"
+                    f"Backup was successful.\n\n"
+                    f"File count: {source_count}\n"
+                    f"File size: {source_size} bytes."
+                )
+
             home_automation_common.send_email(subject, body)
             return True
         else:
             subject = "Backup validation failed"
-            body = "The files do not match. Please review the logs and rerun."
+            body = (
+                    f"The backup {destination}, does not match the source: {source}.\n\n"
+                    f"Source counts are.\n\n"
+                    f"File count: {source_count}\n"
+                    f"File size: {source_size} bytes."
+                    f"Destination counts are.\n\n"
+                    f"File count: {source_count}\n"
+                    f"File size: {source_size} bytes."
+                )
             home_automation_common.send_email(subject, body)
             return False
     else:

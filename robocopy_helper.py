@@ -240,7 +240,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
             message="Source file location does not exist",
             location=source,
         )
-        return False
+        return False, f"Source {source} does not exist."
 
     if not os.path.exists(destination):
         os.makedirs(os.path.dirname(destination), exist_ok=True)
@@ -301,7 +301,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
             source=source,
             destination=destination,
         )
-        return True
+        return True, "Robocopy completed successfully."
 
 
 if __name__ == "__main__":
@@ -318,4 +318,5 @@ if __name__ == "__main__":
 
     logger = structlog.get_logger()
 
-    result = execute_robocopy(args.source, args.destination, args.action, total_files=0, move=False, retry_count=10)
+    robocopy_result = execute_robocopy(args.source, args.destination, args.action, total_files=0, move=False, retry_count=10)
+    robocopy_success, robocopy_message = robocopy_result
