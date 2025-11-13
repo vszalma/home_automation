@@ -232,6 +232,13 @@ def get_exclusion_list(exclusion_type, start_folder=None):
     # Load exclusions
     exclusions = set()
     if exclusion_file:
+        count = len(exclusions)
+        logger.info(
+            "Exclusions found.",
+            module="home_automation_common.get_exclusion_list",
+            message=f"Exclusion file {exclusion_file} was found. Continuing using exclusions.", 
+            count=count,
+        )
         try:
             with open(exclusion_file, "r", encoding="utf-8") as f:
                 # exclusions = set(line.strip() for line in f if line.strip())
