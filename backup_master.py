@@ -254,8 +254,8 @@ def _validate_backup_results(source, destination):
                     f"File count: {source_count}\n"
                     f"File size: {source_size} bytes."
                     f"Destination counts are.\n\n"
-                    f"File count: {source_count}\n"
-                    f"File size: {source_size} bytes."
+                    f"File count: {destination_count}\n"
+                    f"File size: {destination_size} bytes."
                 )
             home_automation_common.send_email(subject, body)
             return False
