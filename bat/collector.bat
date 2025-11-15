@@ -12,6 +12,6 @@ echo Running compare.py script...
 echo Python: %PYTHON_EXE%
 
 REM Call script interactively (console remains open)
-%PYTHON_EXE% collector.py --directory "N:\CathyJ\Other HD\Documents\FY12"
+%PYTHON_EXE% collector.py --directory "E:\_temp\CathyJ"
 
 pause

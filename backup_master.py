@@ -11,6 +11,8 @@ import time
 import home_automation_common
 import structlog
 import logging
+from pathlib import Path
+import re
 
 """ 
     The script backs up a source directory to a destination directory.
@@ -45,6 +47,13 @@ def _get_arguments():
         type=str,
         help="Path to the destination directory to process.",
     )
+    parser.add_argument(
+        "--retry",
+        "-r",
+        required=True,
+        type=str,
+        help="Maximum number of retries for robocopy.",
+    )
 
     # Parse the arguments
     args = parser.parse_args()
@@ -64,13 +73,21 @@ def _backup_needed(source, destination):
     """
 
     # Get most recent backup file location.
-    backup_dir_list = _list_and_sort_directories(destination)
-
-    if not backup_dir_list:
-        return True
+    if _is_specific_backup_folder(destination):
+        if os.path.exists(destination):
+            return _has_data_changed_since_last_backup(source, destination)
+        else:
+            return True
     else:
-        most_recent_backup = os.path.join(destination, backup_dir_list[0])
-        return _has_data_changed_since_last_backup(source, most_recent_backup)
+        backup_dir_list = _list_and_sort_directories(destination)
+        if backup_dir_list:
+            most_recent_backup = os.path.join(destination, backup_dir_list[0])
+            return _has_data_changed_since_last_backup(source, most_recent_backup)
+        else:
+            if os.path.exists(destination):
+                return _has_data_changed_since_last_backup(source, destination)
+            else:
+                return True
     
 
 def _has_data_changed_since_last_backup(source, most_recent_backup):
@@ -107,15 +124,31 @@ def _has_data_changed_since_last_backup(source, most_recent_backup):
 
     if ret_source and ret_destination:
         files_unchanged = compare.compare_files(output_source, output_destination)
-        files_have_moved = compare.files_have_moved(source, most_recent_backup)
-        if files_unchanged and not files_have_moved:
-            home_automation_common.send_email(
-                "Backup not run.",
-                "There was no need to backup files as the content hasn't changed.",
+        if not files_unchanged or dest_total_file_count == 0:
+            logger = structlog.get_logger()
+            logger.info(
+                "Data has changed since last backup.",
+                module="backup_master._has_data_changed_since_last_backup",
             )
-            return False
-        else:
+            # files_have_moved = True
             return True
+        else:
+            files_have_moved = compare.files_have_moved(source, most_recent_backup)
+            if files_have_moved:
+                logger = structlog.get_logger()
+                logger.info(
+                    "Data was found to have moved.",
+                    module="backup_master._has_data_changed_since_last_backup",
+                )
+                return True
+            else:
+                home_automation_common.send_email(
+                    "Backup not run.",
+                    "There was no need to backup files as the content hasn't changed.",
+                )
+                return False
+        # else:
+        #     return True
     else:
         logger = structlog.get_logger()
         logger.error(
@@ -143,13 +176,18 @@ def _backup_and_validate(source, destination):
     """
 
     logger = structlog.get_logger()
-    destination = fr"{destination}\BU-{datetime.now().date()}"
+
+    if not _is_specific_backup_folder(destination):
+        destination = fr"{destination}\BU-{datetime.now().date()}"
+    # else:
+    #     if not os.path.exists(destination):
+    #         destination = fr"{destination}\BU-{datetime.now().date()}"
     start_time = time.time()
-    backup_result = robocopy_helper.execute_robocopy(source, destination, "Backup")
-    # backup_result = True
-    if not backup_result:
+    backup_result = robocopy_helper.execute_robocopy(source, destination, action="Backup", total_files=0, move=False, retry_count=int(args.retry))
+    backup_success, backup_message = backup_result
+    if not backup_success:
         subject = "BACKUP FAILED!"
-        body = "The backup failed. Please review the logs and rerun."
+        body = f"The backup failed. {backup_message}  Please review the logs and rerun."
         home_automation_common.send_email(subject, body)
         return False
 
@@ -167,6 +205,15 @@ def _backup_and_validate(source, destination):
     return _validate_backup_results(source, destination)
 
 
+def _is_specific_backup_folder(path_str):
+    """
+    Determines if the path ends with a specific backup folder like BU-2025-07-22.
+    Returns True if yes, False if it's just the backup root.
+    """
+    path = Path(path_str)
+    folder_name = path.name
+    return bool(re.match(r"^BU-\d{4}-\d{2}-\d{2}$", folder_name))
+
 
 def _validate_backup_results(source, destination):
     """
@@ -183,17 +230,34 @@ def _validate_backup_results(source, destination):
     logger = structlog.get_logger()
 
     # After backup, validate backup was successful (i.e. matches source file counts and sizes.)
-    ret_source, output_source, _, _ = collector.collect_file_info(source)
+    ret_source, output_source, source_count, source_size = collector.collect_file_info(source)
 
-    ret_destination, output_destination, _, _ = collector.collect_file_info(destination)
+    ret_destination, output_destination, destination_count, destination_size = collector.collect_file_info(destination)
 
     if ret_source and ret_destination:
         if compare.compare_files(output_source, output_destination):
             subject = "Successful backup"
-            body = "The files match"
+            body = (
+                    f"The backup {destination} files match the source {source}.\n\n"
+                    f"Backup was successful.\n\n"
+                    f"File count: {source_count}\n"
+                    f"File size: {source_size} bytes."
+                )
+
             home_automation_common.send_email(subject, body)
             return True
         else:
+            subject = "Backup validation failed"
+            body = (
+                    f"The backup {destination}, does not match the source: {source}.\n\n"
+                    f"Source counts are.\n\n"
+                    f"File count: {source_count}\n"
+                    f"File size: {source_size} bytes."
+                    f"Destination counts are.\n\n"
+                    f"File count: {destination_count}\n"
+                    f"File size: {destination_size} bytes."
+                )
+            home_automation_common.send_email(subject, body)
             return False
     else:
         logger.error(

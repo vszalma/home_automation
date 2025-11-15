@@ -12,6 +12,6 @@ echo Running find_similar_folders.py script...
 echo Python: %PYTHON_EXE%
 
 REM Call script interactively (console remains open)
-%PYTHON_EXE% find_similar_folders.py -d N:\ -m FY12 -t exact
+%PYTHON_EXE% find_similar_folders.py -d N:\ -m FY11 -t exact
 
 pause

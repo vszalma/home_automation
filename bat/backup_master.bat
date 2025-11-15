@@ -10,11 +10,13 @@ echo ==== New Execution: %date% %time% ==== >> "%DEBUGLOG%"
 
 REM Check if SESSIONNAME is empty (indicates non-interactive session, like Task Scheduler)
 if "%SESSIONNAME%"=="" (
+    set LOGROOT=C:\home_automation\log
+    set PYTHON_EXE=C:\python313\python.exe
     echo Detected scheduled (non-interactive) execution. >> "%DEBUGLOG%"
     echo Date: %date%, Time: %time% > "%LOGFILE%"
     echo Running Python script... >> "%LOGFILE%"
 
-    "%PYTHON_EXE%" C:\Users\vszal\Documents\code\home_automation\backup_master.py --source "N:\" --destination E:\Backups" >> "%LOGFILE%" 2>&1
+    "%PYTHON_EXE%" C:\home_automation\backup_master.py --source "N:\" --destination E:\Backups" >> "%LOGFILE%" 2>&1
 ) else (
     echo Detected interactive execution. >> "%DEBUGLOG%"
     "%PYTHON_EXE%" C:\Users\vszal\Documents\code\home_automation\backup_master.py --source "N:\" --destination E:\Backups"

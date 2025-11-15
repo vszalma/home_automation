@@ -5,7 +5,7 @@
     @REM     directory2 (str): Path to the second directory to compare.
     @REM     filetype (str): The file type to search for differences in the two file structures. Defaults to ".jpg".
 
-C:\Users\vszal\Documents\code\home_automation\.venv\Scripts\python.exe ^
-    C:\Users\vszal\Documents\code\home_automation\compare_files_by_type.py --directory1 D:\_BU-2024-11-16 ^
-                                                                           --directory2  N: --filetype .log ^
-    > C:\Users\vszal\Documents\code\home_automation\log\compare_files_by_type_bat.log 2>&1
+set LOGROOT=C:\home_automation\log
+set PYTHON_EXE=C:\python313\python.exe
+
+%PYTHON_EXE% C:\home_automation\compare_files_by_type.py --directory1 E:\Backups\BU-2025-11-13 --directory2  N:\ --filetype .db

@@ -1,3 +1,4 @@
+import shlex
 import subprocess
 import sys
 import structlog
@@ -5,9 +6,11 @@ import home_automation_common
 from datetime import datetime
 import os
 import argparse
+import unicodedata
 
 from tqdm import tqdm
 import re
+from home_automation_common import get_log_path
 
 
 def _get_arguments():
@@ -61,61 +64,33 @@ def _get_arguments():
     return args
 
 
-def _run_robocopy_old(source, destination, options=None, log_file="robocopy_log.txt"):
-    """
-    Executes the robocopy command to copy files from the source to the destination.
-    Parameters:
-    source (str): The source directory path.
-    destination (str): The destination directory path.
-    options (list, optional): Additional options for the robocopy command. Defaults to None.
-    log_file (str, optional): The file path to write the robocopy log. Defaults to "robocopy_log.txt".
-    Returns:
-    bool: True if the robocopy command executed successfully or with warnings, False if an error occurred.
-    """
-
-    logger = structlog.get_logger()
-
-    try:
-        # Construct the robocopy command
-        command = ["robocopy", source, destination]
-        if options:
-            command.extend(options)
-
-        # Open the log file for writing
-        with open(log_file, "w") as log:
-            result = subprocess.run(command, stdout=log, stderr=log, text=True)
-
-        # Check the exit code
-        if result.returncode == 0:
-            logger.info(
-                "Robocopy completed successfully.",
-                module="robocopy_helper._run_robocopy",
-            )
-        elif result.returncode >= 1 and result.returncode <= 7:
-            logger.warning(
-                "Robocopy completed with warnings or skipped files.",
-                module="robocopy_helper._run_robocopy",
-                message="Check the log for details.",
-            )
-        else:
-            logger.error(
-                "Robocopy encountered an error.",
-                module="robocopy_helper._run_robocopy",
-                message="Check the log for details.",
-            )
-
-        return True
-
-    except Exception as e:
-        logger.error(
-            "Error executing robocopy",
-            module="robocopy_helper._run_robocopy",
-            message=e,
-        )
-        return False
+def sanitize_path(path):
+    """Remove control characters and quotes from a path."""
+    return ''.join(c for c in path if unicodedata.category(c)[0] != "C").strip('"')
 
 def _count_files(directory):
     return sum(len(files) for _, _, files in os.walk(directory))
+
+def make_unc_path(path: str) -> str:
+    """
+    Converts a local or UNC path to an extended-length path using the \\?\\ prefix.
+    Handles both local (e.g., C:\...) and network (e.g., \\Server\Share\...) paths.
+    """
+    path = os.path.abspath(path)
+
+    # If already using extended-length format, return as-is
+    if path.startswith(r"\\?\\"):
+        return path
+
+    # If it's a UNC path (starts with double backslash), convert to \\?\UNC\ format
+    if path.startswith(r"\\"):
+        # Strip leading backslashes and prefix with \\?\UNC\
+        unc_path = path.lstrip("\\")
+        return f"\\\\?\\UNC\\{unc_path}"
+
+    # Otherwise, it's a local path (e.g., C:\...), prefix with \\?\
+    return f"\\\\?\\{path}"
+
 
 def _run_robocopy(source, destination, options=None, log_file=None, total_files=0):
     """
@@ -125,57 +100,55 @@ def _run_robocopy(source, destination, options=None, log_file=None, total_files=
     logger = structlog.get_logger()
 
     try:
+        source = make_unc_path(source)
+        destination = make_unc_path(destination)
+
         command = ["robocopy", source, destination]
         if options:
             command.extend(options)
 
-        logger.info("Starting robocopy", command=" ".join(command))
+        logger.info("Starting robocopy", command=shlex.join(command))
 
-        log = open(log_file, "w") if log_file else None
+        log = open(log_file, "w", encoding="utf-8", errors="replace") if log_file else None
 
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
+            encoding="utf-8",
+            errors="replace",
             bufsize=1,
         )
 
         progress_bar = tqdm(total=total_files, unit="files", desc="Copying", ncols=80)
         file_counter = 0
         summary_lines = []
-        header_prefixes = ("Source :", "Dest :", "Files :", "Options :", "EXCLUDING")
         failed_files = set()
-        header_mode = None  # Track if we're in a multi-line header block like excluded dirs
 
         for line in process.stdout:
-            line = line.strip("\r\n")  # strip newline but keep indent info
-            raw_line = line  # keep the unstripped version for indent checking
-
+            line = line.strip("\r\n")
             if log:
                 log.write(line + "\n")
 
+            # Summary capture (first time + final stats)
             if file_counter == 0 and not re.search(r"\bNew File\b", line):
                 summary_lines.append(line)
-
-            # Track robocopy summary lines
-            # if any(line.startswith(prefix) for prefix in ("Dirs :", "Files:", "Bytes:", "Times:", "Ended :", "Speed:")):
-            if file_counter == total_files and not re.search(r"\bNew File\b", line):
+            elif file_counter == total_files and not re.search(r"\bNew File\b", line):
                 summary_lines.append(line)
 
-            # Log errors and track failed file paths
+            # Error detection and failed file extraction
             if (file_counter < total_files) and ("ERROR" in line or "fail" in line.lower()):
                 logger.error("Robocopy error", detail=line)
-                source_pattern = re.escape(source)
-                match = re.search(rf'({source_pattern}[^:*?"<>|\r\n]*)', line, re.IGNORECASE)
-                # match = re.search(r'(Copying File|Changing File Attributes|New File)\s+(.*)', line, re.IGNORECASE)
-                # match = re.search(r'Copying File\s+(.*)', line, re.IGNORECASE)
+                match = re.search(r'Copying File\s+(.*)', line, re.IGNORECASE)
                 if match:
-                    failed_file = match.group(2).strip()
+                    failed_file = sanitize_path(match.group(1))
                     failed_files.add(failed_file)
-                    summary_lines.append(line)
+                else:
+                    failed_files.add(line)  # fallback if no path found
+                summary_lines.append(line)
 
-            # Update progress bar based on actual file copy events
+            # Progress bar update
             if re.search(r"\bNew File\b", line):
                 file_counter += 1
                 progress_bar.update(1)
@@ -186,11 +159,11 @@ def _run_robocopy(source, destination, options=None, log_file=None, total_files=
         if log:
             log.close()
 
-        # Write failed files to a text file if there are any
+        # Write failed files to output file
         if failed_files:
             today = datetime.now().date()
             failed_files_path = home_automation_common.get_full_filename("output", f"{today}_robocopy_failed_files.txt")
-            with open(failed_files_path, "w", encoding="utf-8") as f:
+            with open(failed_files_path, "w", encoding="utf-8", errors="replace") as f:
                 for file in sorted(failed_files):
                     f.write(file + "\n")
 
@@ -199,7 +172,7 @@ def _run_robocopy(source, destination, options=None, log_file=None, total_files=
         for line in summary_lines:
             print(line)
 
-        # Exit code handling
+        # Exit code interpretation
         if return_code == 0:
             logger.info("Robocopy completed successfully.")
         elif 1 <= return_code <= 7:
@@ -214,8 +187,32 @@ def _run_robocopy(source, destination, options=None, log_file=None, total_files=
         logger.exception("Exception occurred while executing robocopy", error=str(e))
         return False
 
+def _run_robocopy_include_hidden_files(source, destination, options, output_file):
+    logger = structlog.get_logger()
+    source = make_unc_path(source)
+    destination = make_unc_path(destination)
 
-def execute_robocopy(source, destination, action="Backup", total_files=0, move=False):
+    # Build robocopy command
+    command = ["robocopy", source, destination]
+    command.extend(options)
+
+    logger.info("Running secondary robocopy pass to include hidden files", command=shlex.join(command))
+    
+    try:
+        with open(output_file, "a", encoding="utf-8", errors="replace") as log:
+            result = subprocess.run(command, stdout=log, stderr=log, text=True)
+        
+        if result.returncode > 7:
+            logger.warning("Secondary robocopy pass completed with errors", code=result.returncode)
+            return False
+        return True
+
+    except Exception as e:
+        logger.exception("Error in secondary robocopy for hidden files", error=str(e))
+        return False
+
+
+def execute_robocopy(source, destination, action="Backup", total_files=0, move=False, retry_count=3):
     """
     Executes the Robocopy command to copy files from the source to the destination.
     Parameters:
@@ -243,7 +240,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
             message="Source file location does not exist",
             location=source,
         )
-        return False
+        return False, f"Source {source} does not exist."
 
     if not os.path.exists(destination):
         os.makedirs(os.path.dirname(destination), exist_ok=True)
@@ -264,7 +261,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
         module="robocopy_helper.execute_robocopy",
         message="robocopy is being run.",
     )
-    options = ["/E", f"/MT:{core_count}", "/XA:S", "/xo", "/ndl", "/R:3", "/W:5"]
+    options = ["/E", f"/MT:{core_count}", "/XA:S", "/xo", "/ndl", f"/R:{retry_count}", "/W:5", "/256", "/A-:SHR"]
 
     exclusions = home_automation_common.get_exclusion_list("collector")
 
@@ -283,6 +280,15 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
     isCompleted = _run_robocopy(source, destination, options, output_file, total_files)
 
     if isCompleted:
+        # Optional second pass to include important hidden files
+        options = ["/E", f"/MT:{core_count}", "/xo", "/ndl", f"/R:{retry_count}", "/W:5", "/256", "/IF"]
+        extra_hidden_files = [".gitignore", ".gitattributes", "*.onetoc2"]
+        options += extra_hidden_files
+        if exclusions:
+            options += ["/XD"] + list(exclusions if isinstance(exclusions, (list, set)) else [exclusions])
+        isCompleted = _run_robocopy_include_hidden_files(source, destination, options, output_file)
+
+    if isCompleted:
         end_time = datetime.now().time()
         duration = home_automation_common.duration_from_times(end_time, start_time)
         logger.info(
@@ -295,7 +301,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
             source=source,
             destination=destination,
         )
-        return True
+        return True, "Robocopy completed successfully."
 
 
 if __name__ == "__main__":
@@ -312,4 +318,5 @@ if __name__ == "__main__":
 
     logger = structlog.get_logger()
 
-    result = execute_robocopy(args.source, args.destination, args.action, total_files=0)
+    robocopy_result = execute_robocopy(args.source, args.destination, args.action, total_files=0, move=False, retry_count=10)
+    robocopy_success, robocopy_message = robocopy_result

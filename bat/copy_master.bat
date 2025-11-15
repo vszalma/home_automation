@@ -12,6 +12,6 @@ echo Running copy_master.py script...
 echo Python: %PYTHON_EXE%
 
 REM Call script interactively (console remains open)
-%PYTHON_EXE% copy_master.py --source Y:\ --destination Z:\CathyK
+%PYTHON_EXE% copy_master.py --source E:\_temp\CathyK --destination N:\CathyK --retry 50
 
 pause

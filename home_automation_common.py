@@ -7,6 +7,9 @@ from datetime import datetime, time
 from datetime import timedelta
 import shutil
 import re
+from pathlib import Path
+
+CURRENT_LOG_PATH = None
 
 def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
     """
@@ -19,6 +22,7 @@ def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
     Returns:
         None
     """
+    CURRENT_LOG_PATH = log_file_name
     # Create handlers
     file_handler = logging.FileHandler(log_file_name, mode="a")
     file_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
@@ -46,6 +50,10 @@ def configure_logging(log_file_name, log_level=logging.INFO, log_console=False):
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+
+def get_log_path():
+    return CURRENT_LOG_PATH
+
 def _clean_filename(filename, replacement="_"):
     """
     Cleans a user-provided file name to ensure it contains only valid characters.
@@ -153,68 +161,6 @@ def send_email(subject, body):
         server.send_message(msg)
 
 
-def send_email_old(subject, body):
-    """
-    Sends an email with the specified subject and body using mailersend SMTP service.
-    Args:
-        subject (str): The subject of the email.
-        body (str): The body content of the email, can be in HTML or plaintext format.
-    Raises:
-        Exception: If there is an error sending the email, it will be logged and raised.
-    Example:
-        send_email("Test Subject", "<p>This is a test email body.</p>")
-    """
-    try:
-
-        mailer = emails.NewEmail(
-            "mlsn.011b4017977722058e2195d23680a996ed8e5204da1922fefe9e8e23a30bbc2f"
-        )
-
-        mail_body = {}
-
-        mail_from = {
-            "name": "me",
-            "email": "MS_eLLyva@trial-x2p034766dkgzdrn.mlsender.net",
-        }
-
-        recipients = [
-            {
-                "name": "Victor Szalma",
-                "email": "vszalma@hotmail.com",
-            }
-        ]
-
-        reply_to = {
-            "name": "Victor Szalma",
-            "email": "vszalma@hotmail.com",
-        }
-
-        mailer.set_mail_from(mail_from, mail_body)
-        mailer.set_mail_to(recipients, mail_body)
-        mailer.set_subject(subject, mail_body)
-        mailer.set_html_content(body, mail_body)
-        mailer.set_plaintext_content(body, mail_body)
-        mailer.set_reply_to(reply_to, mail_body)
-
-        mailer.send(mail_body)
-
-        logger = structlog.get_logger()
-
-        logger.info(
-            "Email sent.",
-            module="home_automation_common.send_email",
-            message=f"Email sent to {recipients}",
-        )
-
-    except Exception as e:
-        logger.error(
-            "Email failure.",
-            module="home_automation_common.send_email",
-            message="Error sending email.",
-            exception=e,
-        )
-
-
 def _normalize_path(path, directory=None):
     """
     Normalize a given file path by optionally prepending a directory and normalizing the resulting path.
@@ -252,6 +198,19 @@ def sanitize_filename(directory):
     return sanitized
 
 
+def normalize_path(directory):
+    directory = str(directory)
+    # If already extended path, return as-is
+    if directory.startswith("\\\\?\\"):
+        return directory
+    # If UNC path, add extended prefix directly
+    if directory.startswith("\\\\"):
+        return f"\\\\?\\UNC\\{directory[2:]}"
+    # Otherwise, local path
+    return f"\\\\?\\{os.path.abspath(directory)}"
+
+
+
 def get_exclusion_list(exclusion_type, start_folder=None):
     """
     Retrieve a set of exclusions from a file based on the given exclusion type.
@@ -266,11 +225,20 @@ def get_exclusion_list(exclusion_type, start_folder=None):
 
     logger = structlog.get_logger()
 
-    exclusion_file = f"{exclusion_type}_exclusions.txt"
+    # Get current script/module directory
+    base_dir = Path(__file__).resolve().parent
+    exclusion_file = base_dir / f"{exclusion_type}_exclusions.txt"
 
     # Load exclusions
     exclusions = set()
     if exclusion_file:
+        count = len(exclusions)
+        logger.info(
+            "Exclusions found.",
+            module="home_automation_common.get_exclusion_list",
+            message=f"Exclusion file {exclusion_file} was found. Continuing using exclusions.", 
+            count=count,
+        )
         try:
             with open(exclusion_file, "r", encoding="utf-8") as f:
                 # exclusions = set(line.strip() for line in f if line.strip())
