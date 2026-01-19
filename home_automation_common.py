@@ -209,6 +209,32 @@ def normalize_path(directory):
     # Otherwise, local path
     return f"\\\\?\\{os.path.abspath(directory)}"
 
+def get_unique_destination_path(target: Path) -> Path:
+    """
+    Return a unique destination path by appending (2), (3), etc. if needed.
+    Works even when the filename already ends with (number).
+    """
+    target = Path(target)
+    if not target.exists():
+        return target
+
+    stem = target.stem
+    suffix = target.suffix
+
+    match = re.match(r"^(?P<base>.*)\s\((?P<num>\d+)\)$", stem)
+    if match:
+        base_stem = match.group("base")
+        counter = int(match.group("num")) + 1
+    else:
+        base_stem = stem
+        counter = 2
+
+    while True:
+        candidate = target.with_name(f"{base_stem} ({counter}){suffix}")
+        if not candidate.exists():
+            return candidate
+        counter += 1
+
 
 
 def get_exclusion_list(exclusion_type, start_folder=None):
