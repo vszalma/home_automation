@@ -261,7 +261,7 @@ def execute_robocopy(source, destination, action="Backup", total_files=0, move=F
         module="robocopy_helper.execute_robocopy",
         message="robocopy is being run.",
     )
-    options = ["/E", f"/MT:{core_count}", "/XA:S", "/xo", "/ndl", f"/R:{retry_count}", "/W:5", "/256", "/A-:SHR"]
+    options = ["/E", f"/MT:{core_count}", "/XA:S", "/xo", "/ndl", f"/R:{retry_count}", "/W:5", "/256", "/A-:SHA"]
 
     exclusions = home_automation_common.get_exclusion_list("collector")
 
