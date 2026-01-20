@@ -58,6 +58,24 @@ def _get_arguments():
         required=False,
         help="Path to report CSV. Defaults to destination-root/<YYYY-MM-DD>-organize-media-report.csv.",
     )
+    parser.add_argument(
+        "--video-date-source",
+        choices=["filesystem", "ffprobe"],
+        default="filesystem",
+        help="Choose how to derive video date metadata. Defaults to filesystem.",
+    )
+    parser.add_argument(
+        "--ffprobe-path",
+        type=str,
+        required=False,
+        help="Path to ffprobe executable. If not provided, will attempt to locate via PATH.",
+    )
+    parser.add_argument(
+        "--ffprobe-timeout",
+        type=int,
+        default=10,
+        help="Timeout in seconds for ffprobe calls. Defaults to 10.",
+    )
     return parser.parse_args()
 
 
@@ -158,6 +176,15 @@ def _resolve_collision(base_path):
     return resolved, True, suffix
 
 
+def _resolve_ffprobe_path(explicit_path):
+    if explicit_path:
+        candidate = Path(explicit_path)
+        if candidate.exists():
+            return str(candidate)
+        return None
+    return shutil.which("ffprobe")
+
+
 def main():
     args = _get_arguments()
 
@@ -180,6 +207,19 @@ def main():
         report_csv = destination_root / f"{today}-organize-media-report.csv"
 
     start_time = datetime.now()
+
+    ffprobe_path = _resolve_ffprobe_path(args.ffprobe_path)
+    ffprobe_available = bool(ffprobe_path and Path(ffprobe_path).exists())
+
+    logger.info(
+        "ffprobe resolution",
+        module="organize_media_by_date.main",
+        requested_path=args.ffprobe_path or "",
+        resolved_path=ffprobe_path or "",
+        available=ffprobe_available,
+        video_date_source=args.video_date_source,
+        ffprobe_timeout=args.ffprobe_timeout,
+    )
 
     logger.info(
         "Starting media organization.",
