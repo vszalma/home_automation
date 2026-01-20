@@ -154,7 +154,7 @@ def _get_effective_date(
 
     if media_kind == "video":
         if args.video_date_source == "ffprobe":
-            ffprobe_allowed_exts = {".mp4", ".mov", ".m4v"}
+            ffprobe_allowed_exts = {".mp4", ".mov", ".m4v", ".avi"}
             if extension.lower() not in ffprobe_allowed_exts:
                 logger.debug(
                     "Skipping ffprobe for unsupported video extension.",
