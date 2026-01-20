@@ -1,8 +1,10 @@
 import argparse
 import csv
+import json
 import os
 import re
 import shutil
+import subprocess
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -183,6 +185,76 @@ def _resolve_ffprobe_path(explicit_path):
             return str(candidate)
         return None
     return shutil.which("ffprobe")
+
+
+def _parse_ffprobe_datetime(value):
+    try:
+        if not value:
+            return None
+        normalized = value.strip()
+        if normalized.endswith("Z"):
+            normalized = normalized[:-1] + "+00:00"
+        dt = datetime.fromisoformat(normalized)
+        if dt.tzinfo:
+            return dt.astimezone().replace(tzinfo=None)
+        return dt
+    except Exception:
+        return None
+
+
+def _extract_video_creation_time_ffprobe(path: Path, ffprobe_path: str, timeout: int):
+    try:
+        result = subprocess.run(
+            [
+                ffprobe_path,
+                "-v",
+                "error",
+                "-print_format",
+                "json",
+                "-show_entries",
+                "format_tags=creation_time:stream_tags=creation_time",
+                "-i",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except Exception as exc:
+        return None, f"ffprobe error: {exc}"
+
+    if result.returncode != 0:
+        return None, f"ffprobe exited with {result.returncode}"
+
+    try:
+        data = json.loads(result.stdout or "{}")
+    except Exception as exc:
+        return None, f"ffprobe json parse error: {exc}"
+
+    # Prefer format-level creation_time.
+    try:
+        format_tags = data.get("format", {}).get("tags", {})
+        creation_time = format_tags.get("creation_time")
+        if creation_time:
+            parsed = _parse_ffprobe_datetime(creation_time)
+            if parsed:
+                return parsed, ""
+    except Exception:
+        pass
+
+    # Fall back to first stream with creation_time.
+    try:
+        for stream in data.get("streams", []):
+            creation_time = stream.get("tags", {}).get("creation_time")
+            if creation_time:
+                parsed = _parse_ffprobe_datetime(creation_time)
+                if parsed:
+                    return parsed, ""
+    except Exception:
+        pass
+
+    return None, "creation_time not found"
 
 
 def main():
