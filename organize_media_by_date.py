@@ -137,6 +137,7 @@ def _get_filesystem_date(stat):
 def _get_effective_date(
     path,
     media_kind,
+    extension,
     stat,
     args,
     ffprobe_info,
@@ -153,6 +154,14 @@ def _get_effective_date(
 
     if media_kind == "video":
         if args.video_date_source == "ffprobe":
+            ffprobe_allowed_exts = {".mp4", ".mov", ".m4v"}
+            if extension.lower() not in ffprobe_allowed_exts:
+                logger.debug(
+                    "Skipping ffprobe for unsupported video extension.",
+                    module="organize_media_by_date._get_effective_date",
+                    extension=extension,
+                )
+                return _get_filesystem_date(stat), "filesystem", notes
             if ffprobe_info["available"]:
                 ffprobe_date, ffprobe_note = _extract_video_creation_time_ffprobe(
                     path, ffprobe_info["path"], ffprobe_info["timeout"]
@@ -401,6 +410,7 @@ def main():
                 effective_date, metadata_source, notes = _get_effective_date(
                     path,
                     media_kind,
+                    extension,
                     stat,
                     args,
                     ffprobe_info,
