@@ -13,6 +13,6 @@ echo Running organize_media_by_date.py script...
 echo Python: %PYTHON_EXE%
 
 REM Call script interactively (console remains open)
-%PYTHON_EXE% %SCRIPT_PATH%organize_media_by_date.py --source N:\CathyK --destination N:\MediaArchive --mode report
+%PYTHON_EXE% %SCRIPT_PATH%organize_media_by_date.py --source N:\CathyK --destination D:\MediaArchive --mode report
 
 pause
