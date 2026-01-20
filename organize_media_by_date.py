@@ -134,7 +134,15 @@ def _get_filesystem_date(stat):
     return datetime.fromtimestamp(stat.st_mtime)
 
 
-def _get_effective_date(path, media_kind, stat):
+def _get_effective_date(
+    path,
+    media_kind,
+    stat,
+    args,
+    ffprobe_info,
+    warn_state,
+    logger,
+):
     notes = []
     if media_kind == "image":
         exif_date, exif_note = _extract_exif_date(path)
@@ -142,7 +150,27 @@ def _get_effective_date(path, media_kind, stat):
             notes.append(exif_note)
         if exif_date:
             return exif_date, "exif", notes
-    # For videos, or when EXIF is missing/invalid, fallback to filesystem timestamps.
+
+    if media_kind == "video":
+        if args.video_date_source == "ffprobe":
+            if ffprobe_info["available"]:
+                ffprobe_date, ffprobe_note = _extract_video_creation_time_ffprobe(
+                    path, ffprobe_info["path"], ffprobe_info["timeout"]
+                )
+                if ffprobe_date:
+                    return ffprobe_date, "ffprobe", notes
+                if ffprobe_note:
+                    notes.append(ffprobe_note)
+            else:
+                if not warn_state["ffprobe_warned"]:
+                    logger.warning(
+                        "ffprobe not available; falling back to filesystem dates for videos.",
+                        module="organize_media_by_date._get_effective_date",
+                    )
+                    warn_state["ffprobe_warned"] = True
+        return _get_filesystem_date(stat), "filesystem", notes
+
+    # Default fallback for other media kinds or when EXIF is missing/invalid.
     return _get_filesystem_date(stat), "filesystem", notes
 
 
@@ -282,6 +310,12 @@ def main():
 
     ffprobe_path = _resolve_ffprobe_path(args.ffprobe_path)
     ffprobe_available = bool(ffprobe_path and Path(ffprobe_path).exists())
+    ffprobe_info = {
+        "path": ffprobe_path,
+        "available": ffprobe_available,
+        "timeout": args.ffprobe_timeout,
+    }
+    warn_state = {"ffprobe_warned": False}
 
     logger.info(
         "ffprobe resolution",
@@ -364,7 +398,15 @@ def main():
 
             try:
                 stat = path.stat()
-                effective_date, metadata_source, notes = _get_effective_date(path, media_kind, stat)
+                effective_date, metadata_source, notes = _get_effective_date(
+                    path,
+                    media_kind,
+                    stat,
+                    args,
+                    ffprobe_info,
+                    warn_state,
+                    logger,
+                )
             except Exception as exc:
                 errors += 1
                 logger.error(
