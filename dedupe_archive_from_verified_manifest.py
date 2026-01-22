@@ -78,7 +78,7 @@ def _ensure_writer(path, fieldnames, append):
 def _parse_year_from_path(destination_path: Path, archive_root: Path):
     """
     Extract the year folder immediately under the archive root.
-    Example: archive_root=D:\MediaArchive, destination=D:\MediaArchive\2016\file.jpg -> year=2016.
+    Example: archive_root=D:\\MediaArchive, destination=D:\\MediaArchive\\2016\\file.jpg -> year=2016.
     """
     try:
         rel = destination_path.resolve(strict=False).relative_to(archive_root.resolve(strict=False))
