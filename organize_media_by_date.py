@@ -433,6 +433,12 @@ def main():
     moved = 0
     skipped_by_date = 0
     errors = 0
+    bytes_candidates_total = 0
+    bytes_processed_total = 0
+    bytes_copied_total = 0
+    bytes_moved_total = 0
+    bytes_skipped_by_date_total = 0
+    bytes_error_total = 0
     warned_extensions = set()
     rows_since_flush = 0
     report_writer = None
@@ -489,6 +495,8 @@ def main():
 
             try:
                 stat = path.stat()
+                bytes_candidates_total += stat.st_size
+                bytes_processed_total += stat.st_size
                 effective_date, metadata_source, notes = _get_effective_date(
                     path,
                     media_kind,
@@ -501,6 +509,11 @@ def main():
                 )
             except Exception as exc:
                 errors += 1
+                try:
+                    if "stat" in locals():
+                        bytes_error_total += stat.st_size
+                except Exception:
+                    pass
                 logger.error(
                     "Failed to determine effective date.",
                     module="organize_media_by_date.main",
@@ -542,6 +555,10 @@ def main():
 
             if date_filter_result != "included":
                 skipped_by_date += 1
+                try:
+                    bytes_skipped_by_date_total += stat.st_size
+                except Exception:
+                    pass
 
             destination_path = _build_destination_path(destination_root, effective_date, path)
             destination_path, collision_resolved, collision_suffix = _resolve_collision(destination_path)
@@ -602,11 +619,13 @@ def main():
                 destination_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path, destination_path)
                 copied += 1
+                bytes_copied_total += file_size
                 _maybe_set_dest_created_time(destination_path, effective_date, args, notes, logger)
             elif args.mode == "move":
                 destination_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(path, destination_path)
                 moved += 1
+                bytes_moved_total += file_size
                 _maybe_set_dest_created_time(destination_path, effective_date, args, notes, logger)
 
             row_data["notes"] = "; ".join(notes)
@@ -632,6 +651,12 @@ def main():
         moved=moved,
         skipped_by_date=skipped_by_date,
         errors=errors,
+        bytes_candidates_total=bytes_candidates_total,
+        bytes_processed_total=bytes_processed_total,
+        bytes_copied_total=bytes_copied_total,
+        bytes_moved_total=bytes_moved_total,
+        bytes_skipped_by_date_total=bytes_skipped_by_date_total,
+        bytes_error_total=bytes_error_total,
         report_path=str(report_csv) if report_csv else "",
         duration=str(duration),
     )

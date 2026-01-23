@@ -113,6 +113,24 @@ def _prevalidate_run_ids(manifest_path, expected_run_id, start_offset, limit):
     return inferred, mismatches
 
 
+def _get_source_size(row, logger):
+    try:
+        size_raw = row.get("file_size_bytes", "")
+        return int(size_raw)
+    except Exception:
+        try:
+            source_path = Path(row.get("source_path", ""))
+            return source_path.stat().st_size
+        except Exception as exc:
+            logger.warning(
+                "Failed to determine source size.",
+                module="apply_deletion_manifest.size",
+                file=row.get("source_path", ""),
+                error=str(exc),
+            )
+            return 0
+
+
 def _process_row(row, args, logger, quarantine_root):
     action = "skipped"
     notes = []
@@ -215,6 +233,11 @@ def main():
     errors = 0
     next_cursor = start_offset
     start_time = datetime.now()
+    bytes_processed_total = 0
+    bytes_quarantined_total = 0
+    bytes_deleted_total = 0
+    bytes_skipped_total = 0
+    bytes_error_total = 0
 
     try:
         with open(args.manifest, "r", encoding="utf-8", newline="") as infile:
@@ -226,18 +249,25 @@ def main():
                 if processed >= args.limit:
                     break
 
+                size_bytes = _get_source_size(row, logger)
+                bytes_processed_total += size_bytes
+
                 action, destination_quarantine_path, notes = _process_row(
                     row, args, logger, args.quarantine_root
                 )
 
                 if action == "quarantine":
                     quarantined += 1
+                    bytes_quarantined_total += size_bytes
                 elif action == "delete":
                     deleted += 1
+                    bytes_deleted_total += size_bytes
                 elif action == "error":
                     errors += 1
+                    bytes_error_total += size_bytes
                 else:
                     skipped += 1
+                    bytes_skipped_total += size_bytes
 
                 results_writer.writerow({
                     "run_id": row.get("run_id", ""),
@@ -265,6 +295,11 @@ def main():
         deleted=deleted,
         skipped=skipped,
         errors=errors,
+        bytes_processed_total=bytes_processed_total,
+        bytes_quarantined_total=bytes_quarantined_total,
+        bytes_deleted_total=bytes_deleted_total,
+        bytes_skipped_total=bytes_skipped_total,
+        bytes_error_total=bytes_error_total,
         duration=str(duration),
         next_cursor=next_cursor,
         state_file=args.state_file or "",

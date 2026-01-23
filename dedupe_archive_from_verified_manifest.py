@@ -166,6 +166,8 @@ def _build_groups(args, logger):
     mismatches = []
     inferred_run_id = None
     verified_rows_read = 0
+    destination_files_considered = 0
+    bytes_considered_total = 0
     with open(args.manifest, "r", encoding="utf-8", newline="") as infile:
         reader = csv.DictReader(infile)
         for idx, row in enumerate(reader):
@@ -218,6 +220,9 @@ def _build_groups(args, logger):
             except Exception:
                 size_int = 0
 
+            destination_files_considered += 1
+            bytes_considered_total += size_int
+
             key = (year_val if args.scope == "year" else "global", hash_value)
             groups.setdefault(key, []).append(
                 {
@@ -229,13 +234,21 @@ def _build_groups(args, logger):
                 }
             )
             verified_rows_read += 1
-    return groups, mismatches, (inferred_run_id if args.expected_run_id == "auto" else args.expected_run_id), verified_rows_read
+    return (
+        groups,
+        mismatches,
+        (inferred_run_id if args.expected_run_id == "auto" else args.expected_run_id),
+        verified_rows_read,
+        destination_files_considered,
+        bytes_considered_total,
+    )
 
 
 def _compute_actions(groups, scope):
     actions = []
     keep_records = {}
     duplicate_groups_found = 0
+    duplicate_files_identified = 0
 
     for key in sorted(groups.keys()):
         entries = groups[key]
@@ -254,6 +267,7 @@ def _compute_actions(groups, scope):
         for entry in sorted(entries, key=lambda e: str(e["dest_path"])):
             if entry is best:
                 continue
+            duplicate_files_identified += 1
             actions.append(
                 {
                     "entry": entry,
@@ -265,7 +279,7 @@ def _compute_actions(groups, scope):
                     "keep_reason": keep_reason,
                 }
             )
-    return actions, keep_records, duplicate_groups_found
+    return actions, keep_records, duplicate_groups_found, duplicate_files_identified
 
 
 def _quarantine_destination(quarantine_root: Path, entry):
@@ -283,7 +297,14 @@ def main():
     state_cursor = _load_state(args.state_file)
     append_mode = bool(args.state_file)
 
-    groups, mismatches, expected_run_id, verified_rows_read = _build_groups(args, logger)
+    (
+        groups,
+        mismatches,
+        expected_run_id,
+        verified_rows_read,
+        destination_files_considered,
+        bytes_considered_total,
+    ) = _build_groups(args, logger)
 
     if mismatches:
         for idx, reason in mismatches:
@@ -302,7 +323,7 @@ def main():
         verified_rows=verified_rows_read,
     )
 
-    actions, keep_records, duplicate_groups_found = _compute_actions(groups, args.scope)
+    actions, keep_records, duplicate_groups_found, duplicate_files_identified = _compute_actions(groups, args.scope)
 
     keep_fields = ["run_id", "scope", "year", "hash", "kept_destination_path", "keep_reason"]
     dupes_fields = ["run_id", "scope", "year", "hash", "duplicate_destination_path", "quarantine_path", "action_taken", "notes"]
@@ -399,6 +420,7 @@ def main():
         module="dedupe_archive_from_verified_manifest",
         verified_rows_read=verified_rows_read,
         duplicate_groups_found=duplicate_groups_found,
+        duplicate_files_identified=duplicate_files_identified,
         duplicates_quarantined=duplicates_quarantined,
         bytes_quarantined=bytes_quarantined,
         errors=errors,
@@ -406,6 +428,8 @@ def main():
         next_cursor=next_cursor,
         state_file=args.state_file or "",
         expected_run_id=expected_run_id or "",
+        destination_files_considered=destination_files_considered,
+        bytes_considered_total=bytes_considered_total,
     )
 
 

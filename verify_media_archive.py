@@ -194,6 +194,11 @@ def main():
     unverified_count = 0
     reason_counts = {}
     next_cursor = start_offset
+    rows_missing_size = 0
+    bytes_processed_total = 0
+    bytes_verified_total = 0
+    bytes_unverified_total = 0
+    bytes_hashed_total = 0
 
     try:
         with open(args.input_csv, "r", encoding="utf-8", newline="") as infile:
@@ -204,6 +209,15 @@ def main():
                     continue
                 if processed >= args.limit:
                     break
+
+                file_size_raw = row.get("file_size_bytes", "")
+                try:
+                    size_int = int(file_size_raw)
+                except Exception:
+                    size_int = 0
+                    rows_missing_size += 1
+
+                bytes_processed_total += size_int
 
                 status, notes, source_hash, destination_hash, run_id, file_size_bytes = _verify_row(
                     row, args.hash, logger
@@ -223,9 +237,12 @@ def main():
                 if status == "verified":
                     verified_writer.writerow(output_row)
                     verified_count += 1
+                    bytes_verified_total += size_int
+                    bytes_hashed_total += size_int * 2  # hashed source and destination
                 else:
                     unverified_writer.writerow(output_row)
                     unverified_count += 1
+                    bytes_unverified_total += size_int
                     for note in notes:
                         reason_counts[note] = reason_counts.get(note, 0) + 1
 
@@ -250,6 +267,11 @@ def main():
         duration=str(duration),
         next_cursor=next_cursor,
         state_file=args.state_file or "",
+        rows_missing_size=rows_missing_size,
+        bytes_processed_total=bytes_processed_total,
+        bytes_verified_total=bytes_verified_total,
+        bytes_unverified_total=bytes_unverified_total,
+        bytes_hashed_total=bytes_hashed_total,
     )
 
 
