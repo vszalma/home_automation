@@ -78,6 +78,11 @@ def _get_arguments():
         default=10,
         help="Timeout in seconds for ffprobe calls. Defaults to 10.",
     )
+    parser.add_argument(
+        "--set-destination-created-time",
+        action="store_true",
+        help="On Windows, set destination file creation time to the effective date after copy/move.",
+    )
     return parser.parse_args()
 
 
@@ -129,8 +134,7 @@ def _extract_exif_date(image_path):
 
 
 def _get_filesystem_date(stat):
-    if os.name == "nt":
-        return datetime.fromtimestamp(stat.st_ctime)
+    # Prefer modified time (mtime) on all platforms for consistency.
     return datetime.fromtimestamp(stat.st_mtime)
 
 
@@ -161,7 +165,7 @@ def _get_effective_date(
                     module="organize_media_by_date._get_effective_date",
                     extension=extension,
                 )
-                return _get_filesystem_date(stat), "filesystem", notes
+                return _get_filesystem_date(stat), "filesystem_mtime", notes
             if ffprobe_info["available"]:
                 ffprobe_date, ffprobe_note = _extract_video_creation_time_ffprobe(
                     path, ffprobe_info["path"], ffprobe_info["timeout"]
@@ -177,10 +181,10 @@ def _get_effective_date(
                         module="organize_media_by_date._get_effective_date",
                     )
                     warn_state["ffprobe_warned"] = True
-        return _get_filesystem_date(stat), "filesystem", notes
+        return _get_filesystem_date(stat), "filesystem_mtime", notes
 
     # Default fallback for other media kinds or when EXIF is missing/invalid.
-    return _get_filesystem_date(stat), "filesystem", notes
+    return _get_filesystem_date(stat), "filesystem_mtime", notes
 
 
 def _sanitize_filename(name):
@@ -292,6 +296,84 @@ def _extract_video_creation_time_ffprobe(path: Path, ffprobe_path: str, timeout:
         pass
 
     return None, "creation_time not found"
+
+
+def _datetime_to_filetime(dt: datetime):
+    # FILETIME is 100-ns intervals since January 1, 1601 (UTC).
+    # Convert naive local time to UTC before computing FILETIME.
+    if dt.tzinfo is None:
+        dt = dt.astimezone().replace(tzinfo=None)
+    epoch_as_filetime = 116444736000000000  # difference between 1601 and 1970 in 100ns units
+    hundreds_of_ns = int(dt.timestamp() * 10_000_000)
+    return epoch_as_filetime + hundreds_of_ns
+
+
+def set_windows_creation_time(path: Path, dt: datetime):
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        import ctypes.wintypes as wt
+    except Exception:
+        return
+
+    GENERIC_WRITE = 0x40000000
+    OPEN_EXISTING = 3
+    FILE_FLAG_BACKUP_SEMANTICS = 0x02000000
+
+    CreateFileW = ctypes.windll.kernel32.CreateFileW
+    SetFileTime = ctypes.windll.kernel32.SetFileTime
+    CloseHandle = ctypes.windll.kernel32.CloseHandle
+
+    CreateFileW.argtypes = [
+        wt.LPCWSTR,
+        wt.DWORD,
+        wt.DWORD,
+        wt.LPVOID,
+        wt.DWORD,
+        wt.DWORD,
+        wt.HANDLE,
+    ]
+    CreateFileW.restype = wt.HANDLE
+
+    SetFileTime.argtypes = [wt.HANDLE, wt.LPFILETIME, wt.LPFILETIME, wt.LPFILETIME]
+    SetFileTime.restype = wt.BOOL
+
+    handle = CreateFileW(
+        str(path),
+        GENERIC_WRITE,
+        0,
+        None,
+        OPEN_EXISTING,
+        FILE_FLAG_BACKUP_SEMANTICS,
+        None,
+    )
+    if handle == wt.HANDLE(-1).value:
+        return
+
+    try:
+        ft = _datetime_to_filetime(dt)
+        c_time = wt.FILETIME(ft & 0xFFFFFFFF, ft >> 32)
+        if not SetFileTime(handle, ctypes.byref(c_time), None, None):
+            return
+    finally:
+        CloseHandle(handle)
+
+
+def _maybe_set_dest_created_time(destination_path, effective_date, args, notes, logger):
+    if not args.set_destination_created_time:
+        return
+    try:
+        set_windows_creation_time(destination_path, effective_date)
+        notes.append("dest_created_time_set")
+    except Exception as exc:
+        notes.append(f"dest_created_time_failed:{exc.__class__.__name__}")
+        logger.warning(
+            "Failed to set destination creation time.",
+            module="organize_media_by_date.main",
+            file=str(destination_path),
+            error=str(exc),
+        )
 
 
 def main():
@@ -472,7 +554,7 @@ def main():
             if args.dry_run and status == "ok":
                 notes.append("dry run")
 
-            report_writer.writerow({
+            row_data = {
                 "schema_version": "1.0",
                 "run_id": run_id,
                 "action": action,
@@ -490,14 +572,16 @@ def main():
                 "metadata_source": metadata_source,
                 "date_filter_result": date_filter_result,
                 "status": status,
-                "notes": "; ".join(notes),
-            })
-            rows_since_flush += 1
-            if rows_since_flush >= 1000:
-                report_file.flush()
-                rows_since_flush = 0
+                "notes": "",  # filled later
+            }
 
             if date_filter_result != "included":
+                row_data["notes"] = "; ".join(notes)
+                report_writer.writerow(row_data)
+                rows_since_flush += 1
+                if rows_since_flush >= 1000:
+                    report_file.flush()
+                    rows_since_flush = 0
                 continue
 
             if args.dry_run:
@@ -506,16 +590,31 @@ def main():
                     module="organize_media_by_date.main",
                     message=f"Would {action} {path} to {destination_path}.",
                 )
+                row_data["notes"] = "; ".join(notes)
+                report_writer.writerow(row_data)
+                rows_since_flush += 1
+                if rows_since_flush >= 1000:
+                    report_file.flush()
+                    rows_since_flush = 0
                 continue
 
             if args.mode == "copy":
                 destination_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path, destination_path)
                 copied += 1
+                _maybe_set_dest_created_time(destination_path, effective_date, args, notes, logger)
             elif args.mode == "move":
                 destination_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(path, destination_path)
                 moved += 1
+                _maybe_set_dest_created_time(destination_path, effective_date, args, notes, logger)
+
+            row_data["notes"] = "; ".join(notes)
+            report_writer.writerow(row_data)
+            rows_since_flush += 1
+            if rows_since_flush >= 1000:
+                report_file.flush()
+                rows_since_flush = 0
     finally:
         if report_file:
             report_file.close()
