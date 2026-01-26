@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,6 +13,10 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import sqlite3
 import structlog
+try:
+    from tqdm import tqdm
+except ImportError:  # pragma: no cover - ensure graceful behavior without tqdm
+    tqdm = None
 
 import home_automation_common
 from db import open_db, utc_now_iso, begin_run, end_run_failed, end_run_ok
@@ -48,6 +53,15 @@ VIDEO_EXTS: Set[str] = {
 }
 SKIP_DIRS = {"$RECYCLE.BIN", "System Volume Information", ".git", ".svn"}
 HASH_CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
+TQDM_AVAILABLE = tqdm is not None
+
+
+def _tqdm_enabled() -> bool:
+    if not TQDM_AVAILABLE:
+        return False
+    if os.environ.get("CI", "").lower() in {"1", "true", "yes"}:
+        return False
+    return sys.stdout.isatty()
 
 
 def parse_args() -> argparse.Namespace:
@@ -75,6 +89,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--dry-run", action="store_true", help="Do not write to DB or hash; just report counts.")
     parser.add_argument("--verbose", action="store_true", help="Verbose logging.")
+    parser.add_argument(
+        "--max-errors",
+        type=int,
+        default=0,
+        help="Maximum per-file errors before aborting (0 = unlimited; for debugging).",
+    )
     return parser.parse_args()
 
 
@@ -193,148 +213,217 @@ def scan_root(
     include_filter = sanitize_ext_list(args.include_ext)
     pending_hashes: List[Dict[str, object]] = []
     seen_paths: Set[str] = set()
+    error_count = 0
+    sample_logged = 0
+    progress = tqdm(
+        total=None,
+        desc=f"{root['name']} {root['base_path']}",
+        unit="files",
+        leave=False,
+        disable=not _tqdm_enabled(),
+    ) if _tqdm_enabled() else None
 
     if not base_path.exists():
-        logger.warning(
-            "Base path missing; skipping root",
-            module="scan.scan_root",
-            base_path=str(base_path),
-            run_id=run_id,
-        )
+        msg = "Base path missing; skipping root"
+        if progress:
+            tqdm.write(msg)
+            progress.close()
+        logger.warning(msg, module="scan.scan_root", base_path=str(base_path), run_id=run_id)
         return
 
     if not args.dry_run:
         conn.execute("BEGIN;")
 
-    for dirpath, dirnames, filenames in os.walk(base_path):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
-        for filename in filenames:
-            try:
+    try:
+        for dirpath, dirnames, filenames in os.walk(base_path):
+            dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+            for filename in filenames:
+                rel_path = ""
                 full_path = Path(dirpath) / filename
-                rel_path = str(full_path.relative_to(base_path))
-                ext = full_path.suffix.lower()
-                if not should_include(ext, include_filter, args.media_type):
-                    continue
-
-                seen_paths.add(rel_path)
                 try:
-                    st = full_path.stat()
+                    try:
+                        rel_path = str(full_path.relative_to(base_path))
+                    except ValueError:
+                        rel_path = os.path.relpath(full_path, base_path)
+                    ext = full_path.suffix.lower()
+                    if not should_include(ext, include_filter, args.media_type):
+                        continue
+                    if args.verbose and sample_logged < 5:
+                        msg = "Example file discovered"
+                        if progress:
+                            tqdm.write(msg)  # keep progress bar clean while logging
+                        logger.info(
+                            msg,
+                            module="scan.scan_root",
+                            file=str(full_path),
+                            root=root["name"],
+                            base_path=str(base_path),
+                            run_id=run_id,
+                        )
+                        sample_logged += 1
+
+                    seen_paths.add(rel_path)
+                    try:
+                        st = full_path.stat()
+                    except Exception as exc:  # noqa: BLE001
+                        msg = "Stat failed; skipping file"
+                        if progress:
+                            tqdm.write(msg)
+                        logger.warning(
+                            msg,
+                            module="scan.scan_root",
+                            file=str(full_path),
+                            error=str(exc),
+                            run_id=run_id,
+                        )
+                        continue
+
+                    mtime_iso = iso_from_timestamp(st.st_mtime)
+                    size_bytes = int(st.st_size)
+                    media_type = resolve_media_type(ext)
+                    if media_type not in {"image", "video", "other"}:
+                        media_type = "other"
+
+                    prev = load_existing_file(conn, root["root_id"], rel_path)
+                    file_id = None
+                    prev_size = prev["size_bytes"] if prev else None
+                    prev_mtime = prev["mtime_utc"] if prev else None
+                    prev_sha = prev["sha256"] if prev else None
+
+                    hash_needed = False
+                    if args.hash_mode != "none" and not args.dry_run:
+                        if args.hash_mode == "missing":
+                            hash_needed = prev_sha is None
+                        else:  # missing_or_changed
+                            hash_needed = prev_sha is None or prev_size != size_bytes or prev_mtime != mtime_iso
+
+                    now = utc_now_iso()
+
+                    if args.dry_run:
+                        if prev:
+                            counts["updated"] += 1
+                        else:
+                            counts["inserted"] += 1
+                        if hash_needed:
+                            counts["hash_needed"] += 1
+                        counts["files_seen"] += 1
+                        continue
+
+                    if prev:
+                        conn.execute(
+                            """
+                            UPDATE files
+                            SET size_bytes=?, mtime_utc=?, status='active', last_seen_run_id=?, updated_utc=?, media_type=?
+                            WHERE file_id=?
+                            """,
+                            (size_bytes, mtime_iso, run_id, now, media_type, prev["file_id"]),
+                        )
+                        file_id = prev["file_id"]
+                        counts["updated"] += 1
+                    else:
+                        cur = conn.execute(
+                            """
+                            INSERT INTO files(root_id, path, filename, extension, size_bytes, mtime_utc,
+                                              status, created_utc, updated_utc, last_seen_run_id, media_type)
+                            VALUES(?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
+                            """,
+                            (
+                                root["root_id"],
+                                rel_path,
+                                filename,
+                                ext,
+                                size_bytes,
+                                mtime_iso,
+                                now,
+                                now,
+                                run_id,
+                                media_type,
+                            ),
+                        )
+                        file_id = int(cur.lastrowid)
+                        counts["inserted"] += 1
+
+                    counts["files_seen"] += 1
+
+                    if hash_needed and file_id is not None:
+                        pending_hashes.append(
+                            {
+                                "file_id": file_id,
+                                "path": full_path,
+                                "size": size_bytes,
+                                "prev_sha": prev_sha,
+                                "media_type": media_type,
+                                "role": role,
+                            }
+                        )
                 except Exception as exc:  # noqa: BLE001
-                    logger.warning(
-                        "Stat failed; skipping file",
+                    error_count += 1
+                    # Log full path and error details to diagnose UNC vs mapped drive issues, relpath errors, or DB constraints.
+                    logger.exception(
+                        "Unexpected error processing file",
                         module="scan.scan_root",
-                        file=str(full_path),
+                        file=filename,
+                        full_path=str(full_path) if "full_path" in locals() else "",
+                        root=root["name"],
+                        base_path=str(base_path),
+                        rel_path=rel_path if "rel_path" in locals() else "",
+                        error_type=type(exc).__name__,
                         error=str(exc),
                         run_id=run_id,
                     )
-                    continue
-
-                mtime_iso = iso_from_timestamp(st.st_mtime)
-                size_bytes = int(st.st_size)
-                media_type = resolve_media_type(ext)
-
-                prev = load_existing_file(conn, root["root_id"], rel_path)
-                file_id = None
-                prev_size = prev["size_bytes"] if prev else None
-                prev_mtime = prev["mtime_utc"] if prev else None
-                prev_sha = prev["sha256"] if prev else None
-
-                hash_needed = False
-                if args.hash_mode != "none" and not args.dry_run:
-                    if args.hash_mode == "missing":
-                        hash_needed = prev_sha is None
-                    else:  # missing_or_changed
-                        hash_needed = prev_sha is None or prev_size != size_bytes or prev_mtime != mtime_iso
-
-                now = utc_now_iso()
-
-                if args.dry_run:
-                    if prev:
-                        counts["updated"] += 1
-                    else:
-                        counts["inserted"] += 1
-                    if hash_needed:
-                        counts["hash_needed"] += 1
-                    counts["files_seen"] += 1
-                    continue
-
-                if prev:
-                    conn.execute(
-                        """
-                        UPDATE files
-                        SET size_bytes=?, mtime_utc=?, status='active', last_seen_run_id=?, updated_utc=?, media_type=?
-                        WHERE file_id=?
-                        """,
-                        (size_bytes, mtime_iso, run_id, now, media_type, prev["file_id"]),
-                    )
-                    file_id = prev["file_id"]
-                    counts["updated"] += 1
-                else:
-                    cur = conn.execute(
-                        """
-                        INSERT INTO files(root_id, path, filename, extension, size_bytes, mtime_utc,
-                                          status, created_utc, updated_utc, last_seen_run_id, media_type)
-                        VALUES(?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
-                        """,
-                        (
-                            root["root_id"],
-                            rel_path,
-                            filename,
-                            ext,
-                            size_bytes,
-                            mtime_iso,
-                            now,
-                            now,
-                            run_id,
-                            media_type,
-                        ),
-                    )
-                    file_id = int(cur.lastrowid)
-                    counts["inserted"] += 1
-
-                counts["files_seen"] += 1
-
-                if hash_needed and file_id is not None:
-                    pending_hashes.append(
-                        {
-                            "file_id": file_id,
-                            "path": full_path,
-                            "size": size_bytes,
-                            "prev_sha": prev_sha,
-                            "media_type": media_type,
-                            "role": role,
-                        }
-                    )
-            except Exception as exc:  # noqa: BLE001
-                logger.exception(
-                    "Unexpected error processing file",
-                    module="scan.scan_root",
-                    file=filename,
-                    run_id=run_id,
-                )
+                    if args.max_errors and error_count >= args.max_errors:
+                        logger.error(
+                            "Max errors reached; aborting scan",
+                            module="scan.scan_root",
+                            run_id=run_id,
+                            max_errors=args.max_errors,
+                            error_count=error_count,
+                        )
+                        raise
+                finally:
+                    if progress:
+                        progress.update(1)
+    finally:
+        if progress:
+            progress.close()
 
     if not args.dry_run:
         missing = mark_missing(conn, root["root_id"], run_id)
         counts["missing_marked"] += missing
 
         if args.hash_mode != "none":
-            if args.workers and args.workers > 0:
-                with ThreadPoolExecutor(max_workers=args.workers) as executor:
-                    future_to_item = {executor.submit(hash_file, item["path"]): item for item in pending_hashes}
-                    for future in as_completed(future_to_item):
-                        item = future_to_item[future]
-                        digest, err = future.result()
+            hash_progress = tqdm(
+                total=len(pending_hashes),
+                desc="Hashing files",
+                unit="files",
+                leave=False,
+                disable=not _tqdm_enabled(),
+            ) if _tqdm_enabled() else None
+            try:
+                if args.workers and args.workers > 0:
+                    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+                        future_to_item = {executor.submit(hash_file, item["path"]): item for item in pending_hashes}
+                        for future in as_completed(future_to_item):
+                            item = future_to_item[future]
+                            digest, err = future.result()
+                            if err or digest is None:
+                                counts["hash_errors"] += 1
+                            else:
+                                apply_hash_updates(conn, item, digest, run_id, counts)
+                            if hash_progress:
+                                hash_progress.update(1)
+                else:
+                    for item in pending_hashes:
+                        digest, err = hash_file(item["path"])
                         if err or digest is None:
                             counts["hash_errors"] += 1
-                            continue
-                        apply_hash_updates(conn, item, digest, run_id, counts)
-            else:
-                for item in pending_hashes:
-                    digest, err = hash_file(item["path"])
-                    if err or digest is None:
-                        counts["hash_errors"] += 1
-                        continue
-                    apply_hash_updates(conn, item, digest, run_id, counts)
+                        else:
+                            apply_hash_updates(conn, item, digest, run_id, counts)
+                        if hash_progress:
+                            hash_progress.update(1)
+            finally:
+                if hash_progress:
+                    hash_progress.close()
 
         conn.commit()
 
@@ -365,6 +454,8 @@ def main() -> None:
     home_automation_common.create_logger("scan")
     logging.getLogger().setLevel(logging.DEBUG if args.verbose else logging.INFO)
     logger = structlog.get_logger().bind(module="scan.main")
+    if not TQDM_AVAILABLE:
+        logger.info("tqdm not installed; progress bars disabled")
 
     counts = {
         "roots_scanned": 0,
