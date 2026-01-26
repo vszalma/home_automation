@@ -11,7 +11,9 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 import sqlite3
+import structlog
 
+import home_automation_common
 from db import open_db, utc_now_iso, begin_run, end_run_failed, end_run_ok
 
 IMAGE_EXTS: Set[str] = {
@@ -74,13 +76,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dry-run", action="store_true", help="Do not write to DB or hash; just report counts.")
     parser.add_argument("--verbose", action="store_true", help="Verbose logging.")
     return parser.parse_args()
-
-
-def setup_logging(verbose: bool) -> None:
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
 
 
 def resolve_media_type(ext: str) -> str:
@@ -191,7 +186,7 @@ def scan_root(
     args: argparse.Namespace,
     run_id: Optional[int],
     counts: Dict[str, int],
-    logger: logging.Logger,
+    logger,
 ) -> None:
     base_path = Path(root["base_path"])
     role = {"original": "original", "library": "library", "staging": "staging"}.get(root["type"], "library")
@@ -200,7 +195,12 @@ def scan_root(
     seen_paths: Set[str] = set()
 
     if not base_path.exists():
-        logger.warning("Base path missing; skipping root", extra={"base_path": str(base_path)})
+        logger.warning(
+            "Base path missing; skipping root",
+            module="scan.scan_root",
+            base_path=str(base_path),
+            run_id=run_id,
+        )
         return
 
     if not args.dry_run:
@@ -220,7 +220,13 @@ def scan_root(
                 try:
                     st = full_path.stat()
                 except Exception as exc:  # noqa: BLE001
-                    logger.warning("Stat failed; skipping file", extra={"file": str(full_path), "error": str(exc)})
+                    logger.warning(
+                        "Stat failed; skipping file",
+                        module="scan.scan_root",
+                        file=str(full_path),
+                        error=str(exc),
+                        run_id=run_id,
+                    )
                     continue
 
                 mtime_iso = iso_from_timestamp(st.st_mtime)
@@ -300,7 +306,12 @@ def scan_root(
                         }
                     )
             except Exception as exc:  # noqa: BLE001
-                logger.error("Unexpected error processing file", extra={"error": str(exc), "file": filename})
+                logger.exception(
+                    "Unexpected error processing file",
+                    module="scan.scan_root",
+                    file=filename,
+                    run_id=run_id,
+                )
 
     if not args.dry_run:
         missing = mark_missing(conn, root["root_id"], run_id)
@@ -351,8 +362,9 @@ def apply_hash_updates(
 
 def main() -> None:
     args = parse_args()
-    setup_logging(args.verbose)
-    logger = logging.getLogger("scan")
+    home_automation_common.create_logger("scan")
+    logging.getLogger().setLevel(logging.DEBUG if args.verbose else logging.INFO)
+    logger = structlog.get_logger().bind(module="scan.main")
 
     counts = {
         "roots_scanned": 0,
@@ -368,7 +380,7 @@ def main() -> None:
     try:
         conn = open_db(Path(args.db))
     except Exception as exc:  # noqa: BLE001
-        logging.error("Failed to open DB", extra={"error": str(exc)})
+        logger.exception("Failed to open DB", error=str(exc))
         raise SystemExit(1)
 
     run_id: Optional[int] = None
@@ -379,7 +391,8 @@ def main() -> None:
             cmdline = "scan.py"
             args_json = json.dumps(vars(args), default=str)
             run_id = begin_run(conn, cmdline, args_json)
-            logger.info("Run started", extra={"run_id": run_id})
+            logger = logger.bind(run_id=run_id)
+            logger.info("Run started")
 
         roots = fetch_roots(conn, args.root)
         if not roots:
@@ -389,12 +402,23 @@ def main() -> None:
             return
 
         for root in roots:
-            logger.info("Scanning root", extra={"root": root["name"], "base_path": root["base_path"]})
+            logger.info(
+                "Scanning root",
+                module="scan.main",
+                root=root["name"],
+                base_path=root["base_path"],
+                run_id=run_id,
+            )
             try:
                 scan_root(conn, root, args, run_id, counts, logger)
                 counts["roots_scanned"] += 1
             except Exception as exc:  # noqa: BLE001
-                logger.error("Error scanning root", extra={"root": root["name"], "error": str(exc)})
+                logger.exception(
+                    "Error scanning root",
+                    module="scan.main",
+                    root=root["name"],
+                    run_id=run_id,
+                )
                 if not args.dry_run:
                     conn.rollback()
                 raise
@@ -408,13 +432,14 @@ def main() -> None:
             "hashed": counts["hashed"],
             "hash_errors": counts["hash_errors"],
         }
-        logger.info("Scan complete", extra=summary)
+        logger.info("Scan complete", **summary)
 
         if run_id is not None and not args.dry_run:
             end_run_ok(conn, run_id, json.dumps(summary))
     except Exception as exc:  # noqa: BLE001
         if run_id is not None and not args.dry_run:
             end_run_failed(conn, run_id, str(exc))
+        logger.exception("Scan failed", module="scan.main", run_id=run_id)
         raise SystemExit(1)
     finally:
         conn.close()
