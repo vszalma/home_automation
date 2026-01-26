@@ -248,14 +248,14 @@ def scan_root(
                     ext = full_path.suffix.lower()
                     if not should_include(ext, include_filter, args.media_type):
                         continue
-                    if args.verbose and sample_logged < 5:
-                        msg = "Example file discovered"
-                        if progress:
-                            tqdm.write(msg)  # keep progress bar clean while logging
-                        logger.info(
-                            msg,
-                            module="scan.scan_root",
-                            file=str(full_path),
+                if args.verbose and sample_logged < 5:
+                    msg = "Example file discovered"
+                    if progress is not None:
+                        tqdm.write(msg)  # keep progress bar clean while logging
+                    logger.info(
+                        msg,
+                        module="scan.scan_root",
+                        file=str(full_path),
                             root=root["name"],
                             base_path=str(base_path),
                             run_id=run_id,
@@ -267,7 +267,7 @@ def scan_root(
                         st = full_path.stat()
                     except Exception as exc:  # noqa: BLE001
                         msg = "Stat failed; skipping file"
-                        if progress:
+                        if progress is not None:
                             tqdm.write(msg)
                         logger.warning(
                             msg,
