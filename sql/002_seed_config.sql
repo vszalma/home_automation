@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- Seed roots with placeholder paths (safe, idempotent).
 INSERT OR IGNORE INTO roots (name, type, base_path, is_active) VALUES
-    ('Original', 'original', '\\\\CHANGE_ME\\Media\\Original', 1),
-    ('Library', 'library',  '\\\\CHANGE_ME\\Media\\Library', 1),
-    ('Staging', 'staging',  'C:\\media_pipeline\\staging', 0);
+    ('Original', 'original', 'N:\\CathyK', 1),
+    ('Library', 'library',  'D:\\MediaArchive', 1),
+    ('Staging', 'staging',  'D:\\MediaArchive_quarantine', 0);
 
 -- Seed default settings (idempotent).
 INSERT OR IGNORE INTO settings (key, value, updated_utc) VALUES
