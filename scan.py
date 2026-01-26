@@ -225,7 +225,7 @@ def scan_root(
 
     if not base_path.exists():
         msg = "Base path missing; skipping root"
-        if progress:
+        if progress is not None:
             tqdm.write(msg)
             progress.close()
         logger.warning(msg, module="scan.scan_root", base_path=str(base_path), run_id=run_id)
@@ -381,10 +381,10 @@ def scan_root(
                         )
                         raise
                 finally:
-                    if progress:
+                    if progress is not None:
                         progress.update(1)
     finally:
-        if progress:
+        if progress is not None:
             progress.close()
 
     if not args.dry_run:
@@ -410,7 +410,7 @@ def scan_root(
                                 counts["hash_errors"] += 1
                             else:
                                 apply_hash_updates(conn, item, digest, run_id, counts)
-                            if hash_progress:
+                            if hash_progress is not None:
                                 hash_progress.update(1)
                 else:
                     for item in pending_hashes:
@@ -419,10 +419,10 @@ def scan_root(
                             counts["hash_errors"] += 1
                         else:
                             apply_hash_updates(conn, item, digest, run_id, counts)
-                        if hash_progress:
+                        if hash_progress is not None:
                             hash_progress.update(1)
             finally:
-                if hash_progress:
+                if hash_progress is not None:
                     hash_progress.close()
 
         conn.commit()
