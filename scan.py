@@ -508,6 +508,7 @@ def main() -> None:
                     "Error scanning root",
                     module="scan.main",
                     root=root["name"],
+                    message=str(exc),
                     run_id=run_id,
                 )
                 if not args.dry_run:
