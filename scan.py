@@ -323,7 +323,7 @@ def scan_root(
                     else:
                         cur = conn.execute(
                             """
-                            INSERT INTO files(root_id, path, filename, extension, size_bytes, mtime_utc,
+                            INSERT INTO files(root_id, path, filename, ext, size_bytes, mtime_utc,
                                               status, created_utc, updated_utc, last_seen_run_id, media_type)
                             VALUES(?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
                             """,
