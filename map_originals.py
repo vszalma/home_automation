@@ -60,7 +60,7 @@ from tqdm import tqdm
 
 
 # ---- Adjust if your files table PK differs ----
-FILES_ID_COL = "id"  # Change to "file_id" if needed.
+FILES_ID_COL = "file_id"
 
 def init_logger(module_name: str, verbose: bool = False):
     """
