@@ -48,6 +48,11 @@ import argparse
 import difflib
 import os
 import sqlite3
+
+import logging
+import structlog
+import home_automation_common
+
 from dataclasses import dataclass
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -57,27 +62,23 @@ from tqdm import tqdm
 # ---- Adjust if your files table PK differs ----
 FILES_ID_COL = "id"  # Change to "file_id" if needed.
 
-
-def get_logger():
+def init_logger(module_name: str, verbose: bool = False):
     """
-    Try to use your repo's shared logging helper.
-    Falls back gracefully if import fails.
+    Configure repo-standard logging and return a structlog logger.
+
+    Pattern matches scan.py:
+      - create_logger(module_name): sets up handlers + log file location
+      - stdlib root logger level set based on --verbose
+      - structlog logger returned with module binding
+
+    Note: This returns a *structlog* logger, so calls like:
+        logger.info("msg", db=..., groups=...)
+    are valid and expected.
     """
-    try:
-        import home_automation_common  # type: ignore
+    home_automation_common.create_logger(module_name)
+    logging.getLogger().setLevel(logging.DEBUG if verbose else logging.INFO)
+    return structlog.get_logger().bind(module=f"{module_name}.main")
 
-        if hasattr(home_automation_common, "get_logger"):
-            return home_automation_common.get_logger(__name__)
-    except Exception:
-        pass
-
-    import logging
-
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    return logging.getLogger("map_originals")
-
-
-logger = get_logger()
 
 
 def table_columns(conn: sqlite3.Connection, table: str) -> List[str]:
@@ -403,6 +404,7 @@ def main():
             "hash_group to have some canonical anchor even when the content has not been ingested into the Library."
         ),
     )
+    ap.add_argument("--verbose", action="store_true", help="Enable DEBUG logging.")
     ap.add_argument("--append-provenance", action="store_true",
                     help="Do not delete existing provenance rows for sha before inserting.")
     ap.add_argument("--min-weight", type=float, default=0.0,
@@ -414,6 +416,8 @@ def main():
     ap.add_argument("--summary-sample", type=int, default=0,
                     help="Include up to N example sha256 values for key categories in the summary (0=off).")
     args = ap.parse_args()
+
+    logger = init_logger("map_originals", verbose=getattr(args, "verbose", False))
 
     conn = sqlite3.connect(args.db)
     conn.row_factory = sqlite3.Row
