@@ -26,6 +26,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional, Sequence, Tuple
 
+import torch
+from PIL import Image, ImageOps
 from tqdm import tqdm
 
 # Prefer your existing logging helper if present.
@@ -211,17 +213,29 @@ def get_image_for_ai(conn: sqlite3.Connection, sha256: str, roles: Sequence[str]
     return ImageSource(sha256=sha256, file_id=file_id, abs_path=abs_path, profile="orig")
 
 
-def caption_image(pipeline_obj, image_path: Path, decode_params: dict) -> str:
-    # HF pipelines can accept a path directly.
-    # For determinism, we run with no sampling (do_sample=False) where supported.
-    out = pipeline_obj(str(image_path), **decode_params)
-    # pipeline(image-to-text) typically returns list[dict] with 'generated_text'
-    if isinstance(out, list) and out:
-        if "generated_text" in out[0]:
-            return (out[0]["generated_text"] or "").strip()
-    if isinstance(out, dict) and "generated_text" in out:
-        return (out["generated_text"] or "").strip()
-    return ""
+def caption_image_blip(model, processor, image_path: Path, decode_params: dict) -> str:
+    """
+    Generate a caption using BLIP in CPU-only mode.
+    """
+    image = Image.open(image_path).convert("RGB")
+    image = ImageOps.exif_transpose(image)
+
+    inputs = processor(images=image, return_tensors="pt")
+
+    # Map decode params with safe defaults
+    gen_kwargs = {
+        "max_new_tokens": decode_params.get("max_new_tokens", decode_params.get("max_length")),
+        "num_beams": decode_params.get("num_beams", 1),
+        "do_sample": False,
+    }
+    # remove None to avoid HF warnings
+    gen_kwargs = {k: v for k, v in gen_kwargs.items() if v is not None}
+
+    with torch.inference_mode():
+        generated_ids = model.generate(**inputs, **gen_kwargs)
+
+    caption = processor.decode(generated_ids[0], skip_special_tokens=True)
+    return caption.strip()
 
 
 def simple_tagger_from_caption(caption: str) -> list[Tuple[str, float, str]]:
@@ -274,7 +288,7 @@ def main() -> None:
     ensure_ai_schema_present(conn)
 
     # Import transformers lazily so the script can error early on schema issues.
-    from transformers import pipeline  # type: ignore
+    from transformers import BlipForConditionalGeneration, BlipProcessor  # type: ignore
 
     # CPU-safe decode params (deterministic-ish)
     # NOTE: some models may ignore some params; that's OK.
@@ -284,15 +298,15 @@ def main() -> None:
         "num_beams": 1,
     }
 
-    log.info("Loading model/pipeline", extra={"model": args.model, "device": args.device, "revision": args.revision})
-    # device=-1 is CPU for HF pipeline
-    device_arg = -1 if "cpu" in args.device else 0
-    pipe = pipeline(
-        task="image-to-text",
-        model=args.model,
+    log.info("Loading BLIP model", extra={"model": args.model, "device": args.device, "revision": args.revision})
+    torch.set_num_threads(2)
+    processor = BlipProcessor.from_pretrained(args.model, revision=args.revision)
+    model = BlipForConditionalGeneration.from_pretrained(
+        args.model,
         revision=args.revision,
-        device=device_arg
+        torch_dtype=torch.float32
     )
+    model.eval()
 
     run_id = upsert_model_and_run(
         conn=conn,
@@ -328,7 +342,7 @@ def main() -> None:
             continue
 
         try:
-            caption = caption_image(pipe, src.abs_path, decode_params)
+            caption = caption_image_blip(model, processor, src.abs_path, decode_params)
             if not caption:
                 pending_queue_updates.append((sha, "error", "Empty caption output", run_id))
                 errors += 1
