@@ -1,0 +1,10 @@
+christmas
+xmas
+thanksgiving
+halloween
+easter
+birthday
+wedding
+vacation
+trip
+graduation
