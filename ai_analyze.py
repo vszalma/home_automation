@@ -151,11 +151,11 @@ def resolve_file_abs_path(conn: sqlite3.Connection, file_id: int) -> Path:
     If your schema differs, adjust this function accordingly.
 
     Expected:
-      roots(root_id PK, root_path TEXT)
+      roots(root_id PK, base_path TEXT)
       files(file_id PK, root_id, path, filename)
     """
     row = conn.execute("""
-        SELECT f.path, f.filename, r.root_path
+        SELECT f.path, f.filename, r.base_path
         FROM files f
         JOIN roots r ON r.root_id = f.root_id
         WHERE f.file_id = ?
