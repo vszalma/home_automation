@@ -376,16 +376,49 @@ def main() -> None:
             pending_queue_updates.append((sha, "error", repr(e), run_id))
 
         # batch commit
-        if not args.dry_run and (len(pending_inserts_captions) >= args.batch_size):
+        if not args.dry_run and (
+            len(pending_inserts_captions) >= args.batch_size
+            or len(pending_queue_updates) >= args.batch_size
+        ):
+            if pending_inserts_captions:
+                conn.executemany(
+                    "INSERT OR REPLACE INTO ai_captions(sha256, run_id, caption, caption_alt_json, confidence, source_file_id) VALUES (?,?,?,?,?,?)",
+                    pending_inserts_captions
+                )
+            if pending_inserts_tags:
+                conn.executemany(
+                    "INSERT OR REPLACE INTO ai_tags(sha256, run_id, tag, score, evidence) VALUES (?,?,?,?,?)",
+                    pending_inserts_tags
+                )
+            if pending_queue_updates:
+                conn.executemany("""
+                    INSERT INTO ai_queue(sha256, status, last_error, last_run_id, updated_at)
+                    VALUES (?, ?, ?, ?, datetime('now'))
+                    ON CONFLICT(sha256) DO UPDATE SET
+                        status=excluded.status,
+                        last_error=excluded.last_error,
+                        last_run_id=excluded.last_run_id,
+                        updated_at=datetime('now')
+                """, pending_queue_updates)
+
+            conn.commit()
+            pending_inserts_captions.clear()
+            pending_inserts_tags.clear()
+            pending_queue_updates.clear()
+
+    # flush remainder
+    if not args.dry_run and (pending_inserts_captions or pending_queue_updates):
+        if pending_inserts_captions:
             conn.executemany(
                 "INSERT OR REPLACE INTO ai_captions(sha256, run_id, caption, caption_alt_json, confidence, source_file_id) VALUES (?,?,?,?,?,?)",
                 pending_inserts_captions
             )
+        if pending_inserts_tags:
             conn.executemany(
                 "INSERT OR REPLACE INTO ai_tags(sha256, run_id, tag, score, evidence) VALUES (?,?,?,?,?)",
                 pending_inserts_tags
             )
-            # upsert queue
+        if pending_queue_updates:
             conn.executemany("""
                 INSERT INTO ai_queue(sha256, status, last_error, last_run_id, updated_at)
                 VALUES (?, ?, ?, ?, datetime('now'))
@@ -395,31 +428,6 @@ def main() -> None:
                     last_run_id=excluded.last_run_id,
                     updated_at=datetime('now')
             """, pending_queue_updates)
-
-            conn.commit()
-            pending_inserts_captions.clear()
-            pending_inserts_tags.clear()
-            pending_queue_updates.clear()
-
-    # flush remainder
-    if not args.dry_run and pending_inserts_captions:
-        conn.executemany(
-            "INSERT OR REPLACE INTO ai_captions(sha256, run_id, caption, caption_alt_json, confidence, source_file_id) VALUES (?,?,?,?,?,?)",
-            pending_inserts_captions
-        )
-        conn.executemany(
-            "INSERT OR REPLACE INTO ai_tags(sha256, run_id, tag, score, evidence) VALUES (?,?,?,?,?)",
-            pending_inserts_tags
-        )
-        conn.executemany("""
-            INSERT INTO ai_queue(sha256, status, last_error, last_run_id, updated_at)
-            VALUES (?, ?, ?, ?, datetime('now'))
-            ON CONFLICT(sha256) DO UPDATE SET
-                status=excluded.status,
-                last_error=excluded.last_error,
-                last_run_id=excluded.last_run_id,
-                updated_at=datetime('now')
-        """, pending_queue_updates)
         conn.commit()
 
     # close run
