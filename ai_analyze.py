@@ -166,7 +166,7 @@ def resolve_file_abs_path(conn: sqlite3.Connection, file_id: int) -> Path:
 
     rel = Path(row["path"]) / row["filename"]
     # row["path"] is stored with '\' separator. Path will tolerate it on Windows.
-    return Path(row["root_path"]) / rel
+    return Path(row["base_path"]) / rel
 
 
 def pick_representative_file(conn: sqlite3.Connection, sha256: str, roles: Sequence[str],
