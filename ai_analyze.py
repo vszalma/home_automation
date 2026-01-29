@@ -146,14 +146,6 @@ def already_done(conn: sqlite3.Connection, run_id: int, sha256: str) -> bool:
 
 
 def resolve_file_abs_path(conn: sqlite3.Connection, file_id: int) -> Path:
-    """
-    Assumes you have a roots table mapping root_id -> absolute root path.
-    If your schema differs, adjust this function accordingly.
-
-    Expected:
-      roots(root_id PK, base_path TEXT)
-      files(file_id PK, root_id, path, filename)
-    """
     row = conn.execute("""
         SELECT f.path, f.filename, r.base_path
         FROM files f
@@ -162,11 +154,22 @@ def resolve_file_abs_path(conn: sqlite3.Connection, file_id: int) -> Path:
     """, (file_id,)).fetchone()
 
     if not row:
-        raise RuntimeError(f"Could not resolve file_id={file_id} (missing files/roots row).")
+        raise RuntimeError(f"Could not resolve file_id={file_id}")
 
-    rel = Path(row["path"]) / row["filename"]
-    # row["path"] is stored with '\' separator. Path will tolerate it on Windows.
-    return Path(row["base_path"]) / rel
+    base = Path(row["base_path"])
+    path = (row["path"] or "").lstrip("\\/")
+    filename = row["filename"] or ""
+
+    path_p = Path(path)
+
+    # If path already includes filename, don’t double-append
+    if path_p.name.lower() == filename.lower():
+        rel = path_p
+    else:
+        rel = path_p / filename
+
+    return base / rel
+
 
 
 def pick_representative_file(conn: sqlite3.Connection, sha256: str, roles: Sequence[str],
