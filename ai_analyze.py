@@ -30,22 +30,20 @@ import torch
 from PIL import Image, ImageOps
 from tqdm import tqdm
 
-# Prefer your existing logging helper if present.
-try:
-    import home_automation_common  # type: ignore
-    _HAS_HA_LOGGER = True
-except Exception:
-    _HAS_HA_LOGGER = False
+import logging
+import structlog
+import home_automation_common
 
-def _get_logger():
-    if _HAS_HA_LOGGER and hasattr(home_automation_common, "create_logger"):
-        return home_automation_common.create_logger("ai_analyze")
-    # lightweight fallback
-    import logging
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    return logging.getLogger("ai_analyze")
 
-log = _get_logger()
+def _init_logger(module_name: str, verbose: bool = False):
+    home_automation_common.create_logger(module_name)  # side effects
+    logging.getLogger().setLevel(logging.DEBUG if verbose else logging.INFO)
+    return structlog.get_logger().bind(module=module_name)
+
+def _init_logger(module_name: str, verbose: bool = False):
+    home_automation_common.create_logger(module_name)  # side effects
+    logging.getLogger().setLevel(logging.DEBUG if verbose else logging.INFO)
+    return structlog.get_logger().bind(module=module_name)
 
 @dataclass(frozen=True)
 class ImageSource:
@@ -280,6 +278,9 @@ def ensure_vocab(conn: sqlite3.Connection, tags: Iterable[str]) -> None:
 
 def main() -> None:
     args = parse_args()
+    
+    logger = _init_logger("ai_analyze", verbose=getattr(args, "verbose", False))
+
     roles = [r.strip() for r in args.roles.split(",") if r.strip()]
     if not roles:
         raise ValueError("No roles provided.")
@@ -298,7 +299,11 @@ def main() -> None:
         "num_beams": 1,
     }
 
-    log.info("Loading BLIP model", extra={"model": args.model, "device": args.device, "revision": args.revision})
+    logger.info("Loading BLIP model", 
+                model=args.model, 
+                device=args.device, 
+                revision=args.revision
+                )
     torch.set_num_threads(2)
     processor = BlipProcessor.from_pretrained(args.model, revision=args.revision)
     model = BlipForConditionalGeneration.from_pretrained(
@@ -319,7 +324,11 @@ def main() -> None:
     conn.commit()
 
     sha_list = list_target_sha256(conn, args.where_tag, args.limit)
-    log.info("Targets selected", extra={"count": len(sha_list), "where_tag": args.where_tag, "run_id": run_id})
+    logger.info("Targets selected", 
+                count=len(sha_list), 
+                where_tag=args.where_tag, 
+                run_id=run_id
+                )
 
     processed = 0
     wrote = 0
@@ -417,14 +426,14 @@ def main() -> None:
     conn.execute("UPDATE ai_caption_runs SET finished_at=datetime('now') WHERE run_id=?", (run_id,))
     conn.commit()
 
-    log.info("Done", extra={
-        "run_id": run_id,
-        "processed": processed,
-        "wrote": wrote,
-        "errors": errors,
-        "model": args.model,
-        "device": args.device
-    })
+    logger.info("Done", 
+        run_id=run_id,
+        processed=processed,
+        wrote=wrote,
+        errors=errors,
+        model=args.model,
+        device=args.device,
+        )
 
 
 if __name__ == "__main__":
