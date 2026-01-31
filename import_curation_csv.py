@@ -80,6 +80,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--sync-curated-tags", action="store_true",
                    help="When accepting, delete prior ai_promoted curated_tags that are no longer promoted")
     p.add_argument("--limit", type=int, default=0, help="Optional: process only first N rows")
+    p.add_argument("--progress", action="store_true", help="Show progress bar if tqdm available")
+    p.add_argument("--progress-every", type=int, default=250,
+                   help="Heartbeat log interval when progress bar is not used (default 250 rows)")
     p.add_argument("--dry-run", action="store_true", help="Preview changes; do not write to DB")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
@@ -434,7 +437,16 @@ def main() -> None:
         import_id = begin_import_run(conn, args.csv_path, args.accept_threshold)
         conn.commit()
 
-    for rr in rows:
+    rows_iter = rows
+    if args.progress:
+        try:
+            from tqdm import tqdm as _tqdm  # type: ignore
+            rows_iter = _tqdm(rows, total=len(rows), desc="Import curation")
+        except Exception:
+            logger.info("tqdm not available; proceeding without progress bar")
+            rows_iter = rows
+
+    for rr in rows_iter:
         totals["rows_total"] += 1
 
         try:
@@ -574,6 +586,15 @@ def main() -> None:
         except Exception as e:
             totals["rows_errors"] += 1
             logger.error("Row processing failed", sha256=rr.sha256, run_id=rr.run_id, error=repr(e))
+
+        if (not args.progress) and args.progress_every > 0 and (totals["rows_total"] % args.progress_every == 0):
+            logger.info(
+                "Progress",
+                processed=totals["rows_total"],
+                applied=totals["rows_applied"],
+                skipped=totals["rows_skipped"],
+                errors=totals["rows_errors"],
+            )
 
     if not args.dry_run and import_id is not None:
         finalize_import_run(conn, import_id, totals)
