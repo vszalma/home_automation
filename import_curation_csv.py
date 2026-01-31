@@ -75,8 +75,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--csv", required=True, dest="csv_path", help="Path to reviewed CSV output from step 4b")
     p.add_argument("--accept-threshold", type=float, default=0.80,
                    help="AI score threshold for promoting tags when review_action=accept (default 0.80)")
-    p.add_argument("--only-action", default=None, choices=["accept", "review", "reject"],
+    p.add_argument("--only-action", default=None, choices=["accept", "review", "reject", "unaccept"],
                    help="Optional: process only rows with this review_action")
+    p.add_argument("--sync-curated-tags", action="store_true",
+                   help="When accepting, delete prior ai_promoted curated_tags that are no longer promoted")
     p.add_argument("--limit", type=int, default=0, help="Optional: process only first N rows")
     p.add_argument("--dry-run", action="store_true", help="Preview changes; do not write to DB")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
@@ -275,6 +277,46 @@ def delete_curated_tags(conn: sqlite3.Connection, sha256: str, tags_to_remove: S
     return len(tags_to_remove)
 
 
+def delete_ai_promoted_curated_tags(conn: sqlite3.Connection, sha256: str) -> int:
+    cur = conn.execute(
+        "DELETE FROM curated_tags WHERE sha256 = ? AND source = 'ai_promoted'",
+        (sha256,),
+    )
+    return cur.rowcount
+
+
+def delete_ai_accepted_curated_caption(conn: sqlite3.Connection, sha256: str) -> int:
+    cur = conn.execute(
+        "DELETE FROM curated_captions WHERE sha256 = ? AND source = 'ai_accepted'",
+        (sha256,),
+    )
+    return cur.rowcount
+
+
+def sync_ai_promoted_tags(conn: sqlite3.Connection, sha256: str, desired_tags: Set[str]) -> int:
+    """
+    Remove ai_promoted curated tags that are no longer desired for this sha256.
+    """
+    if desired_tags:
+        placeholders = ",".join(["?"] * len(desired_tags))
+        sql = f"""
+            DELETE FROM curated_tags
+            WHERE sha256 = ?
+              AND source = 'ai_promoted'
+              AND tag NOT IN ({placeholders})
+        """
+        params = (sha256, *sorted(desired_tags))
+    else:
+        sql = """
+            DELETE FROM curated_tags
+            WHERE sha256 = ?
+              AND source = 'ai_promoted'
+        """
+        params = (sha256,)
+    cur = conn.execute(sql, params)
+    return cur.rowcount
+
+
 def upsert_ai_overrides(
     conn: sqlite3.Connection,
     sha256: str,
@@ -396,8 +438,40 @@ def main() -> None:
         totals["rows_total"] += 1
 
         try:
-            if rr.review_action not in ("accept", "review", "reject"):
+            if rr.review_action not in ("accept", "review", "reject", "unaccept"):
                 totals["rows_skipped"] += 1
+                continue
+
+            if rr.review_action == "unaccept":
+                if args.dry_run:
+                    existing_ai_promoted = conn.execute(
+                        "SELECT COUNT(*) AS c FROM curated_tags WHERE sha256 = ? AND source = 'ai_promoted'",
+                        (rr.sha256,),
+                    ).fetchone()["c"]
+                    existing_ai_accepted_cap = conn.execute(
+                        "SELECT COUNT(*) AS c FROM curated_captions WHERE sha256 = ? AND source = 'ai_accepted'",
+                        (rr.sha256,),
+                    ).fetchone()["c"]
+                    logger.info(
+                        "Would unaccept curation",
+                        sha256=rr.sha256,
+                        run_id=rr.run_id,
+                        delete_ai_promoted_tags=existing_ai_promoted,
+                        delete_ai_accepted_caption=existing_ai_accepted_cap,
+                    )
+                    totals["rows_applied"] += 1
+                    continue
+
+                deleted_tags = delete_ai_promoted_curated_tags(conn, rr.sha256)
+                deleted_caption = delete_ai_accepted_curated_caption(conn, rr.sha256)
+                logger.info(
+                    "Unaccepted curation",
+                    sha256=rr.sha256,
+                    run_id=rr.run_id,
+                    deleted_ai_promoted_tags=deleted_tags,
+                    deleted_ai_accepted_caption=deleted_caption,
+                )
+                totals["rows_applied"] += 1
                 continue
 
             if rr.review_action != "accept":
@@ -410,6 +484,7 @@ def main() -> None:
 
             # Apply manual add/remove
             final_tags = compute_curated_tag_set(ai_tags, rr.curated_add_tags, rr.curated_remove_tags)
+            desired_ai_promoted = {t for t, _, src in final_tags if src == "ai_promoted"}
 
             # Suppress tags (sticky)
             suppress_tags = rr.curated_suppress_ai_tags
@@ -429,6 +504,31 @@ def main() -> None:
             note = rr.review_notes.strip()
 
             if args.dry_run:
+                sync_delete_count = 0
+                if args.sync_curated_tags:
+                    if desired_ai_promoted:
+                        placeholders = ",".join(["?"] * len(desired_ai_promoted))
+                        row = conn.execute(
+                            f"""
+                            SELECT COUNT(*) AS c
+                            FROM curated_tags
+                            WHERE sha256 = ?
+                              AND source = 'ai_promoted'
+                              AND tag NOT IN ({placeholders})
+                            """,
+                            (rr.sha256, *sorted(desired_ai_promoted)),
+                        ).fetchone()
+                    else:
+                        row = conn.execute(
+                            """
+                            SELECT COUNT(*) AS c
+                            FROM curated_tags
+                            WHERE sha256 = ?
+                              AND source = 'ai_promoted'
+                            """,
+                            (rr.sha256,),
+                        ).fetchone()
+                    sync_delete_count = row["c"] if row else 0
                 # Log what would happen
                 logger.info(
                     "Would apply curation",
@@ -437,6 +537,8 @@ def main() -> None:
                     curated_tags=len(final_tags),
                     suppressed_tags=len(suppress_tags),
                     set_caption=bool(caption_to_set),
+                    sync_curated_tags=args.sync_curated_tags,
+                    sync_delete_ai_promoted=sync_delete_count,
                 )
                 totals["rows_applied"] += 1
                 continue
@@ -452,6 +554,10 @@ def main() -> None:
                 rr.run_id,
                 note=note,
             )
+
+            # Optional sync: remove ai_promoted curated tags no longer desired
+            if args.sync_curated_tags:
+                sync_ai_promoted_tags(conn, rr.sha256, desired_ai_promoted)
 
             # Remove tags explicitly requested (ensure removal even if previously curated)
             delete_curated_tags(conn, rr.sha256, rr.curated_remove_tags)
