@@ -778,18 +778,31 @@ def generate_html(rows: List[Dict], html_path: Path, thumb_dir: Path) -> None:
     }}
 
     function keyboardNav(e) {{
+      const target = e.target;
+      const active = document.activeElement;
+      const tag = (target && target.tagName) ? target.tagName.toUpperCase() : "";
+      const activeTag = (active && active.tagName) ? active.tagName.toUpperCase() : "";
+      if (
+        (["INPUT","TEXTAREA","SELECT"].includes(tag)) ||
+        (["INPUT","TEXTAREA","SELECT"].includes(activeTag)) ||
+        (target && target.isContentEditable) ||
+        (active && active.isContentEditable)
+      ) {{
+        return;
+      }}
+
       const rowEl = findCurrentRow();
       if (!rowEl) return;
-      if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName) && e.target !== document.body) {{
-        // allow typing but still handle shortcuts
-      }}
+
       const key = e.key.toLowerCase();
-      if (key === 'a') {{ changeAction(rowEl,'accept'); e.preventDefault(); }}
-      if (key === 'r') {{ changeAction(rowEl,'review'); e.preventDefault(); }}
-      if (key === 'x') {{ changeAction(rowEl,'reject'); e.preventDefault(); }}
-      if (key === 'u') {{ changeAction(rowEl,'unaccept'); e.preventDefault(); }}
-      if (key === 'n') {{ focusRow(rowEl.nextElementSibling); e.preventDefault(); }}
-      if (key === 'p') {{ focusRow(rowEl.previousElementSibling); e.preventDefault(); }}
+      let handled = false;
+      if (key === 'a') {{ changeAction(rowEl,'accept'); handled = true; }}
+      if (key === 'r') {{ changeAction(rowEl,'review'); handled = true; }}
+      if (key === 'x') {{ changeAction(rowEl,'reject'); handled = true; }}
+      if (key === 'u') {{ changeAction(rowEl,'unaccept'); handled = true; }}
+      if (key === 'n') {{ focusRow(rowEl.nextElementSibling); handled = true; }}
+      if (key === 'p') {{ focusRow(rowEl.previousElementSibling); handled = true; }}
+      if (handled) e.preventDefault();
     }}
 
     document.addEventListener('DOMContentLoaded', () => {{
