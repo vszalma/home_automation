@@ -359,6 +359,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--thumb-size", type=int, default=256, help="Thumbnail long edge in pixels (default 256)")
     p.add_argument("--thumb-quality", type=int, default=85, help="JPEG quality for thumbnails (default 85)")
     p.add_argument("--thumb-format", choices=["jpg", "png"], default="jpg", help="Thumbnail format (default jpg)")
+    p.add_argument("--progress", dest="progress", action="store_true", default=True, help="Show progress during thumbnail/HTML generation (default on)")
+    p.add_argument("--no-progress", dest="progress", action="store_false", help="Disable progress reporting")
     return p.parse_args()
 
 
@@ -1013,7 +1015,21 @@ def main() -> None:
         fmt = args.thumb_format.lower()
         ext = "jpg" if fmt == "jpg" else "png"
 
-        for r in rows_out:
+        thumbs_created = 0
+        thumbs_reused = 0
+        thumbs_failed = 0
+
+        rows_iter = rows_out
+        use_bar = False
+        if args.progress:
+            try:
+                from tqdm import tqdm  # type: ignore
+                rows_iter = tqdm(rows_out, total=len(rows_out), desc="Thumbnails/HTML")
+                use_bar = True
+            except Exception:
+                rows_iter = rows_out
+
+        for idx, r in enumerate(rows_iter):
             safe_id = _safe_row_id(r["row_id"])
             thumb_path = thumb_dir / f"{safe_id}.{ext}"
 
@@ -1027,6 +1043,7 @@ def main() -> None:
 
             if thumb_path.exists():
                 error = None
+                thumbs_reused += 1
             else:
                 error = make_thumbnail(
                     r.get("representative_abs_path"),
@@ -1035,6 +1052,10 @@ def main() -> None:
                     quality=args.thumb_quality,
                     fmt=fmt,
                 )
+                if error:
+                    thumbs_failed += 1
+                else:
+                    thumbs_created += 1
 
             if error:
                 r["thumb_path"] = ""
@@ -1043,8 +1064,14 @@ def main() -> None:
                 r["thumb_path"] = rel_thumb
                 r["thumb_error"] = ""
 
+            if (not use_bar) and ((idx + 1) % 250 == 0):
+                print(f"Processed {idx + 1}/{len(rows_out)} rows (thumbs created {thumbs_created}, reused {thumbs_reused}, errors {thumbs_failed})")
+
         if html_path:
             generate_html(rows_out, html_path, thumb_dir)
+
+        if not use_bar:
+            print(f"Thumbnail phase complete: {len(rows_out)} rows (thumbs created {thumbs_created}, reused {thumbs_reused}, errors {thumbs_failed})")
 
     print(f"Wrote {len(rows_out)} rows to {out_path}")
 
