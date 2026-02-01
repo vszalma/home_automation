@@ -36,6 +36,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from PIL import Image, ImageOps
+
 
 # ----------------------------
 # DB helpers
@@ -351,6 +353,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--top-tags", type=int, default=8, help="How many AI tags to include (default 8)")
     p.add_argument("--write-review-table", action="store_true",
                   help="Stub: also write basic rows to review_queue table (optional).")
+    p.add_argument("--html-out", default=None, help="Optional: write interactive review HTML to this path")
+    p.add_argument("--thumb-dir", default=None,
+                   help="Optional: directory for thumbnails (default: sibling 'thumbs' next to html-out)")
+    p.add_argument("--thumb-size", type=int, default=256, help="Thumbnail long edge in pixels (default 256)")
+    p.add_argument("--thumb-quality", type=int, default=85, help="JPEG quality for thumbnails (default 85)")
+    p.add_argument("--thumb-format", choices=["jpg", "png"], default="jpg", help="Thumbnail format (default jpg)")
     return p.parse_args()
 
 
@@ -412,6 +420,401 @@ def upsert_review_table(conn: sqlite3.Connection, rows: List[Dict]) -> None:
             for r in rows
         ],
     )
+
+
+# ----------------------------
+# Thumbnail + HTML helpers
+# ----------------------------
+def _escape_html(text: str) -> str:
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
+
+
+def _safe_row_id(row_id: str) -> str:
+    return row_id.replace(":", "__")
+
+
+def make_thumbnail(src_path: Optional[str], dest_path: Path, size: int, quality: int, fmt: str) -> Optional[str]:
+    if not src_path:
+        return "missing_source"
+    try:
+        img = Image.open(src_path)
+        img = ImageOps.exif_transpose(img)
+        img = img.convert("RGB")
+        img.thumbnail((size, size))
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        save_kwargs = {}
+        if fmt.lower() == "jpg":
+            save_kwargs = {"format": "JPEG", "quality": quality, "optimize": True}
+        else:
+            save_kwargs = {"format": "PNG", "optimize": True}
+        img.save(dest_path, **save_kwargs)
+        return None
+    except Exception as e:
+        return repr(e)
+
+
+def generate_html(rows: List[Dict], html_path: Path, thumb_dir: Path) -> None:
+    html_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # rows already sorted for CSV; keep same order
+    rows_sorted = sorted(rows, key=lambda x: int(x["priority"]), reverse=True)
+
+    for r in rows_sorted:
+        r.setdefault("thumb_path", "")
+        r.setdefault("thumb_error", "")
+
+    def row_html(r: Dict) -> str:
+        safe_id = _safe_row_id(r["row_id"])
+        thumb_html = ""
+        if r.get("thumb_path"):
+            thumb_html = f'<img src="{_escape_html(r["thumb_path"])}" class="thumb" loading="lazy" />'
+        elif r.get("thumb_error"):
+            thumb_html = f'<div class="thumb error" title="{_escape_html(r["thumb_error"])}">!</div>'
+        else:
+            thumb_html = '<div class="thumb missing">?</div>'
+
+        data_search = " ".join([
+            r.get("ai_caption", ""),
+            r.get("ai_top_tags", ""),
+            r.get("state_tags", ""),
+            r.get("representative_abs_path", "") or "",
+            r.get("sha256", ""),
+        ]).lower()
+
+        def esc(val: str) -> str:
+            return _escape_html(val or "")
+
+        return f"""
+        <div class="row" id="row-{safe_id}" data-row-id="{esc(r["row_id"])}" data-action="{esc(r['review_action'])}" data-priority="{r['priority']}" data-search="{_escape_html(data_search)}">
+          <div class="thumb-col">{thumb_html}</div>
+          <div class="meta-col">
+            <div class="top-line">
+              <span class="priority">Priority: {r['priority']}</span>
+              <span class="sha">sha256: <code>{esc(r['sha256'])}</code> <button class="copy" data-copy="{esc(r['sha256'])}">Copy</button></span>
+              <span class="run">run_id: {r['run_id']}</span>
+            </div>
+            <div class="path">path: <code>{esc(r.get('representative_abs_path') or '')}</code> <button class="copy" data-copy="{esc(r.get('representative_abs_path') or '')}">Copy</button></div>
+            <div class="caption">caption: {esc(r.get('ai_caption') or '')}</div>
+            <div class="tags">ai_top_tags: {esc(r.get('ai_top_tags') or '')}</div>
+            <div class="state">state_tags: {esc(r.get('state_tags') or '')}</div>
+            <div class="ai-status">ai_status: {esc(r.get('ai_status') or '')} {esc(r.get('ai_error') or '')}</div>
+
+            <div class="controls" data-row="{esc(r['row_id'])}">
+              <label>review_action
+                <select class="review_action">
+                  <option value="accept" {"selected" if r["review_action"]=="accept" else ""}>accept</option>
+                  <option value="review" {"selected" if r["review_action"]=="review" else ""}>review</option>
+                  <option value="reject" {"selected" if r["review_action"]=="reject" else ""}>reject</option>
+                  <option value="unaccept" {"selected" if r["review_action"]=="unaccept" else ""}>unaccept</option>
+                </select>
+              </label>
+              <label>review_notes
+                <textarea class="review_notes">{esc(r.get('review_notes') or '')}</textarea>
+              </label>
+              <label>curated_caption
+                <textarea class="curated_caption">{esc(r.get('curated_caption') or '')}</textarea>
+              </label>
+              <label>curated_add_tags
+                <input class="curated_add_tags" value="{esc(r.get('curated_add_tags') or '')}" />
+              </label>
+              <label>curated_remove_tags
+                <input class="curated_remove_tags" value="{esc(r.get('curated_remove_tags') or '')}" />
+              </label>
+              <label>curated_suppress_ai_tags
+                <input class="curated_suppress_ai_tags" value="{esc(r.get('curated_suppress_ai_tags') or '')}" />
+              </label>
+            </div>
+          </div>
+        </div>
+        """
+
+    rows_html = "\n".join([row_html(r) for r in rows_sorted])
+
+    rows_json = json.dumps(rows_sorted)
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Review Queue</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 0; padding: 0; background: #111; color: #eee; }}
+    header {{ padding: 12px 16px; background: #222; position: sticky; top: 0; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }}
+    .controls-bar {{ display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }}
+    .controls-bar label {{ font-size: 0.9em; color: #ccc; }}
+    .controls-bar input[type="text"] {{ padding: 6px; min-width: 240px; }}
+    .controls-bar select, .controls-bar input[type="checkbox"] {{ padding: 4px; }}
+    .controls-bar button {{ padding: 6px 10px; cursor: pointer; }}
+    #rows {{ padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }}
+    .row {{ display: grid; grid-template-columns: 180px 1fr; gap: 10px; padding: 10px; background: #1c1c1c; border: 1px solid #333; border-radius: 6px; }}
+    .row.hidden {{ display: none; }}
+    .thumb-col {{ width: 180px; }}
+    .thumb {{ width: 100%; height: auto; border-radius: 4px; background: #000; object-fit: contain; }}
+    .thumb.error, .thumb.missing {{ width: 100%; height: 120px; display: grid; place-items: center; color: #f66; border: 1px dashed #f66; }}
+    .meta-col {{ display: flex; flex-direction: column; gap: 4px; }}
+    .top-line {{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }}
+    .priority {{ font-weight: bold; color: #ffd166; }}
+    .controls textarea {{ width: 100%; min-height: 48px; }}
+    .controls input {{ width: 100%; }}
+    .controls label {{ display: block; margin: 6px 0; font-size: 0.9em; color: #ccc; }}
+    .controls select {{ padding: 4px; }}
+    .row:focus-within {{ outline: 2px solid #4098ff; }}
+    .btn-row {{ display: flex; gap: 8px; align-items: center; }}
+    code {{ color: #8fd; }}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="controls-bar">
+      <label>Search <input id="search" type="text" placeholder="caption, tags, path, sha"></label>
+      <label>Filter action
+        <select id="filter-action">
+          <option value="all">all</option>
+          <option value="accept">accept</option>
+          <option value="review">review</option>
+          <option value="reject">reject</option>
+          <option value="unaccept">unaccept</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="only-non-accept" checked> Show only non-accept</label>
+      <label>Sort
+        <select id="sort">
+          <option value="priority_desc">priority desc</option>
+          <option value="priority_asc">priority asc</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="auto-advance" checked> Auto-advance</label>
+      <div class="btn-row">
+        <button id="export-csv">Export Reviewed CSV</button>
+        <button id="export-json">Export JSON State</button>
+        <button id="import-json">Import JSON State</button>
+        <button id="clear-state">Clear Saved State</button>
+      </div>
+    </div>
+  </header>
+  <div id="rows">
+    {rows_html}
+  </div>
+
+  <script>
+    const rowsData = {rows_json};
+    const LS_PREFIX = "review_state::";
+
+    function saveRowState(rowEl) {{
+      const rowId = rowEl.dataset.rowId;
+      const state = {{
+        review_action: rowEl.querySelector('.review_action').value,
+        review_notes: rowEl.querySelector('.review_notes').value,
+        curated_caption: rowEl.querySelector('.curated_caption').value,
+        curated_add_tags: rowEl.querySelector('.curated_add_tags').value,
+        curated_remove_tags: rowEl.querySelector('.curated_remove_tags').value,
+        curated_suppress_ai_tags: rowEl.querySelector('.curated_suppress_ai_tags').value,
+      }};
+      localStorage.setItem(LS_PREFIX + rowId, JSON.stringify(state));
+      rowEl.dataset.action = state.review_action;
+    }}
+
+    function loadRowState(rowEl) {{
+      const saved = localStorage.getItem(LS_PREFIX + rowEl.dataset.rowId);
+      if (!saved) return;
+      try {{
+        const state = JSON.parse(saved);
+        if (state.review_action) rowEl.querySelector('.review_action').value = state.review_action;
+        if (state.review_notes !== undefined) rowEl.querySelector('.review_notes').value = state.review_notes;
+        if (state.curated_caption !== undefined) rowEl.querySelector('.curated_caption').value = state.curated_caption;
+        if (state.curated_add_tags !== undefined) rowEl.querySelector('.curated_add_tags').value = state.curated_add_tags;
+        if (state.curated_remove_tags !== undefined) rowEl.querySelector('.curated_remove_tags').value = state.curated_remove_tags;
+        if (state.curated_suppress_ai_tags !== undefined) rowEl.querySelector('.curated_suppress_ai_tags').value = state.curated_suppress_ai_tags;
+        if (state.review_action) rowEl.dataset.action = state.review_action;
+      }} catch (e) {{}}
+    }}
+
+    function initRows() {{
+      document.querySelectorAll('.row').forEach((rowEl) => {{
+        loadRowState(rowEl);
+        rowEl.querySelectorAll('select, textarea, input').forEach(el => {{
+          el.addEventListener('change', () => saveRowState(rowEl));
+          if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {{
+            el.addEventListener('input', () => saveRowState(rowEl));
+          }}
+        }});
+      }});
+    }}
+
+    function exportCSV() {{
+      const cols = ["sha256","run_id","review_action","review_notes","curated_caption","curated_add_tags","curated_remove_tags","curated_suppress_ai_tags"];
+      const lines = [cols.join(",")];
+      document.querySelectorAll('.row').forEach(rowEl => {{
+        const data = rowsData.find(r => r.row_id === rowEl.dataset.rowId);
+        const state = JSON.parse(localStorage.getItem(LS_PREFIX + rowEl.dataset.rowId) || "{{}}");
+        function val(key) {{
+          const el = rowEl.querySelector('.' + key);
+          return (state[key] !== undefined ? state[key] : (el ? el.value : "")) || "";
+        }}
+        const values = [
+          data.sha256,
+          data.run_id,
+          val("review_action"),
+          val("review_notes"),
+          val("curated_caption"),
+          val("curated_add_tags"),
+          val("curated_remove_tags"),
+          val("curated_suppress_ai_tags"),
+        ].map(v => '"' + String(v).replace(/"/g,'""') + '"');
+        lines.push(values.join(","));
+      }});
+      const blob = new Blob([lines.join("\\n")], {{type: "text/csv"}});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "review_queue_reviewed.csv";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }}
+
+    function exportJSON() {{
+      const all = {{}};
+      document.querySelectorAll('.row').forEach(rowEl => {{
+        const saved = localStorage.getItem(LS_PREFIX + rowEl.dataset.rowId);
+        if (saved) all[rowEl.dataset.rowId] = JSON.parse(saved);
+      }});
+      const blob = new Blob([JSON.stringify(all, null, 2)], {{type: "application/json"}});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "review_state.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }}
+
+    function importJSON() {{
+      const inp = document.createElement("input");
+      inp.type = "file";
+      inp.accept = "application/json";
+      inp.onchange = () => {{
+        const file = inp.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {{
+          try {{
+            const data = JSON.parse(reader.result);
+            Object.entries(data).forEach(([k,v]) => localStorage.setItem(LS_PREFIX + k, JSON.stringify(v)));
+            initRows(); // reapply
+            applyFilters();
+          }} catch (e) {{
+            alert("Invalid JSON");
+          }}
+        }};
+        reader.readAsText(file);
+      }};
+      inp.click();
+    }}
+
+    function clearState() {{
+      Object.keys(localStorage).forEach(k => {{
+        if (k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
+      }});
+      initRows();
+      applyFilters();
+    }}
+
+    function applyFilters() {{
+      const search = document.getElementById('search').value.toLowerCase();
+      const action = document.getElementById('filter-action').value;
+      const onlyNonAccept = document.getElementById('only-non-accept').checked;
+      document.querySelectorAll('.row').forEach(rowEl => {{
+        const matchesSearch = rowEl.dataset.search.includes(search);
+        const matchesAction = (action === "all") || (rowEl.dataset.action === action);
+        const matchesNonAccept = (!onlyNonAccept) || (rowEl.dataset.action !== "accept");
+        const show = matchesSearch && matchesAction && matchesNonAccept;
+        rowEl.classList.toggle('hidden', !show);
+      }});
+    }}
+
+    function sortRows() {{
+      const sort = document.getElementById('sort').value;
+      const container = document.getElementById('rows');
+      const rows = Array.from(container.children);
+      rows.sort((a,b) => {{
+        const pa = parseInt(a.dataset.priority,10);
+        const pb = parseInt(b.dataset.priority,10);
+        return sort === "priority_desc" ? pb - pa : pa - pb;
+      }}).forEach(r => container.appendChild(r));
+    }}
+
+    function copyHandler(e) {{
+      const target = e.target.closest('.copy');
+      if (!target) return;
+      const text = target.dataset.copy || "";
+      navigator.clipboard.writeText(text);
+    }}
+
+    function findCurrentRow() {{
+      const active = document.activeElement;
+      if (!active) return null;
+      return active.closest('.row');
+    }}
+
+    function focusRow(rowEl) {{
+      if (!rowEl) return;
+      rowEl.scrollIntoView({{behavior:"smooth", block:"center"}});
+      rowEl.querySelector('select, textarea, input')?.focus();
+    }}
+
+    function changeAction(rowEl, val) {{
+      if (!rowEl) return;
+      const sel = rowEl.querySelector('.review_action');
+      sel.value = val;
+      saveRowState(rowEl);
+      applyFilters();
+      if (document.getElementById('auto-advance').checked) {{
+        const next = rowEl.nextElementSibling;
+        focusRow(next || rowEl);
+      }}
+    }}
+
+    function keyboardNav(e) {{
+      const rowEl = findCurrentRow();
+      if (!rowEl) return;
+      if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName) && e.target !== document.body) {{
+        // allow typing but still handle shortcuts
+      }}
+      const key = e.key.toLowerCase();
+      if (key === 'a') {{ changeAction(rowEl,'accept'); e.preventDefault(); }}
+      if (key === 'r') {{ changeAction(rowEl,'review'); e.preventDefault(); }}
+      if (key === 'x') {{ changeAction(rowEl,'reject'); e.preventDefault(); }}
+      if (key === 'u') {{ changeAction(rowEl,'unaccept'); e.preventDefault(); }}
+      if (key === 'n') {{ focusRow(rowEl.nextElementSibling); e.preventDefault(); }}
+      if (key === 'p') {{ focusRow(rowEl.previousElementSibling); e.preventDefault(); }}
+    }}
+
+    document.addEventListener('DOMContentLoaded', () => {{
+      initRows();
+      applyFilters();
+      sortRows();
+
+      document.getElementById('search').addEventListener('input', applyFilters);
+      document.getElementById('filter-action').addEventListener('change', applyFilters);
+      document.getElementById('only-non-accept').addEventListener('change', applyFilters);
+      document.getElementById('sort').addEventListener('change', sortRows);
+      document.getElementById('export-csv').addEventListener('click', exportCSV);
+      document.getElementById('export-json').addEventListener('click', exportJSON);
+      document.getElementById('import-json').addEventListener('click', importJSON);
+      document.getElementById('clear-state').addEventListener('click', clearState);
+      document.body.addEventListener('click', copyHandler);
+      document.addEventListener('keydown', keyboardNav);
+    }});
+  </script>
+</body>
+</html>
+"""
+
+    with html_path.open("w", encoding="utf-8") as f:
+        f.write(html)
 
 
 def main() -> None:
@@ -490,9 +893,12 @@ def main() -> None:
             ai_top_score=top_score,
         )
 
+        row_id = f"{sha}:{run_id}"
+
         rows_out.append({
             "sha256": sha,
             "run_id": run_id,
+            "row_id": row_id,
             "priority": priority,
             "review_action": action,
             "review_notes": "",
@@ -581,6 +987,51 @@ def main() -> None:
         ensure_review_table(conn)
         upsert_review_table(conn, rows_out)
         conn.commit()
+
+    # HTML + thumbnails (optional)
+    if args.html_out or args.thumb_dir:
+        html_path = Path(args.html_out) if args.html_out else None
+        thumb_dir = Path(args.thumb_dir) if args.thumb_dir else None
+        if html_path and thumb_dir is None:
+            thumb_dir = html_path.parent / "thumbs"
+        if thumb_dir is None:
+            thumb_dir = Path("thumbs")
+
+        fmt = args.thumb_format.lower()
+        ext = "jpg" if fmt == "jpg" else "png"
+
+        for r in rows_out:
+            safe_id = _safe_row_id(r["row_id"])
+            thumb_path = thumb_dir / f"{safe_id}.{ext}"
+
+            # compute relative path for HTML referencing
+            rel_thumb = ""
+            if html_path:
+                try:
+                    rel_thumb = str(Path(thumb_path).relative_to(html_path.parent))
+                except Exception:
+                    rel_thumb = str(thumb_path)
+
+            if thumb_path.exists():
+                error = None
+            else:
+                error = make_thumbnail(
+                    r.get("representative_abs_path"),
+                    thumb_path,
+                    size=args.thumb_size,
+                    quality=args.thumb_quality,
+                    fmt=fmt,
+                )
+
+            if error:
+                r["thumb_path"] = ""
+                r["thumb_error"] = error
+            else:
+                r["thumb_path"] = rel_thumb
+                r["thumb_error"] = ""
+
+        if html_path:
+            generate_html(rows_out, html_path, thumb_dir)
 
     print(f"Wrote {len(rows_out)} rows to {out_path}")
 
